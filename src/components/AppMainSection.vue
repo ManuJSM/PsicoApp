@@ -12,12 +12,9 @@ defineEmits(['back'])
     class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
   >
     <!-- Back button for mobile -->
-    <button 
-      @click="$emit('back')"
-      class="md:hidden flex items-center gap-2 p-4 text-primary"
-    >
+    <button @click="$emit('back')" class="flex items-center gap-2 p-4 text-primary">
       <span class="material-symbols-outlined">arrow_back</span>
-      <span>Volver a la lista</span>
+      <span>Volver</span>
     </button>
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <div class="flex flex-wrap items-center gap-4 justify-between">

@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref, inject, type Ref } from 'vue'
+import { inject, type Ref } from 'vue'
 import type { Patient } from '@/types'
 
 const selectedPatient = inject<Ref<Patient | null>>('selectedPatient')
-const activePatientId = ref<number>()
+const activePatientId = inject<Ref<number | null>>('activePatientId')
 defineProps<{
   patients: Patient[]
 }>()
 
 const handlePatientClick = (patient: Patient) => {
-  activePatientId.value = patient.id
-  if (selectedPatient) selectedPatient.value = patient
+  if (selectedPatient && activePatientId) {
+    selectedPatient.value = patient
+    activePatientId.value = patient.id
+  }
 }
 </script>
 
