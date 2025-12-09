@@ -3,9 +3,11 @@ import SideFinder from './components/SideFinder.vue'
 import FilterButton from './components/FilterButton.vue'
 import CardList from './components/CardList.vue'
 import type { Patient } from '@/types'
+type Filtro = 'all' | 'active' | 'inactive'
 import { ref, computed } from 'vue'
 const title: string = 'Pacientes'
 const searchQuery = ref<string>('')
+  const filterButton = ref<Filtro>('active')
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -58,8 +60,11 @@ const patients = ref<Patient[]>([
 ])
 // Filtrar pacientes
 const filteredPatients = computed<Patient[]>(() => {
-  if (!searchQuery.value) return patients.value
-  return patients.value.filter(
+
+  const currentFilter = filterButton.value === 'all' ? patients.value : patients.value.filter((patient) => patient.status === filterButton.value)
+
+  if (!searchQuery.value) return currentFilter ;
+  return currentFilter.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       patient.email.toLowerCase().includes(searchQuery.value.toLowerCase()),
@@ -77,9 +82,9 @@ const filteredPatients = computed<Patient[]>(() => {
       <!-- Buscador -->
       <SideFinder v-model:searchQuery="searchQuery" placeholder="Buscar paciente" />
       <div class="flex gap-3 overflow-x-auto pb-1">
-        <FilterButton label="Todos" />
-        <FilterButton label="Activos" />
-        <FilterButton label="Inactivos" />
+        <FilterButton label="Activos" :active="filterButton === 'active'" @click="filterButton = 'active'" />
+        <FilterButton label="Inactivos" :active="filterButton === 'inactive'" @click="filterButton = 'inactive'" />
+        <FilterButton label="Todos" :active="filterButton === 'all'" @click="filterButton = 'all'" />
       </div>
     </div>
 
