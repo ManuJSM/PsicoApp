@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Configuración personalizada */
+/* Configuración Tema*/
 @theme {
   /* Colores */
   --color-primary: #137fec;
@@ -20,7 +20,16 @@
   --dark: initial;
 }
 
-/* Clase de utilidad para fuente display */
+/* Clase de utilidad para fuente */
 .font-display {
   font-family: var(--font-family-display);
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 20px;
 }
