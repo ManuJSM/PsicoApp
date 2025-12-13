@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import MenuButton from './components/MenuButton.vue'
 import UserHeader from './components/UserHeader.vue'
 import SleepC from './components/SleepC.vue'
 import AppFooter from './components/AppFooter.vue'
+import NotifiShow from './components/NotifiShow.vue'
+
+const showNotifications = ref(false)
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value
+}
 </script>
 <template>
   <div class="bg-background-light dark:bg-background-dark font-display">
@@ -12,16 +20,16 @@ import AppFooter from './components/AppFooter.vue'
           <div
             class="layout-content-container flex w-full flex-col max-w-[500px] flex-1 bg-white dark:bg-background-dark sm:rounded-xl sm:shadow-lg sm:overflow-hidden"
           >
-            <UserHeader />
-            <main class="flex flex-col flex-1 px-6 pt-6 pb-10 gap-6">
+            <UserHeader @notification-click="toggleNotifications" />
+            <main v-if="!showNotifications" class="flex flex-col flex-1 px-6 pt-6 pb-10 gap-6">
               <div class="flex flex-col gap-1">
                 <h1
                   class="text-gray-900 dark:text-white tracking-tight text-2xl font-bold leading-tight"
                 >
-                  ¿Listo para descansar?
+                  ¿Listo para NO dormir?
                 </h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">
-                  Gestiona tu sueño y tu bienestar hoy.
+                  Bienvenido al club de los Insomnes
                 </p>
               </div>
               <SleepC />
@@ -56,6 +64,9 @@ import AppFooter from './components/AppFooter.vue'
                 />
               </div>
             </main>
+            <Transition name="slide-fade">
+              <NotifiShow v-if="showNotifications" />
+            </Transition>
             <AppFooter />
           </div>
         </div>
@@ -63,3 +74,23 @@ import AppFooter from './components/AppFooter.vue'
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Enter and leave animations */
+.slide-fade-enter-active {
+  transition:
+    transform 0.3s cubic-bezier(1, 0.5, 0.8, 1),
+    opacity 0.3s ease-out;
+}
+
+/* Same transform and opacity for both enter and leave */
+.slide-fade-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-fade-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
+</style>

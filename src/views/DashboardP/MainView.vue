@@ -40,9 +40,9 @@ const handleAdd = () => {
     <AppHeader />
     <!-- Mobile: Show either sidebar or main section -->
     <div class="md:hidden flex-1 overflow-hidden">
-      <SideBar v-if="!selectedPatient" />
+      <SideBar v-if="!selectedPatient && currentView !== 'add'" />
       <MainSectionShow
-        v-else-if="currentView === 'show'"
+        v-else-if="currentView === 'show' && selectedPatient"
         :patient="selectedPatient"
         @exit="handleExit"
         @edit="handleEdit"

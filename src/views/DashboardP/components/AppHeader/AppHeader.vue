@@ -1,29 +1,46 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const emit = defineEmits<{
+  (e: 'notification-click'): void
+}>()
+
+const isNotificationActive = ref(false)
+
+const handleNotificationClick = () => {
+  isNotificationActive.value = !isNotificationActive.value
+  emit('notification-click')
+}
+</script>
 <template>
   <header
     class="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
   >
     <div class="flex items-center gap-4 text-white">
-      <div class="size-6 text-primary">
-        <svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
-          ></path>
-        </svg>
+      <div class="size-10 bg-primary rounded-full flex justify-center items-center">
+        <img src="@/assets/appIcon.svg" alt="" />
       </div>
       <h2
         class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]"
       >
-        Dashboard Profesional
+        Dashboard
       </h2>
     </div>
-    <div class="flex flex-1 justify-end gap-4 items-center">
-      <button
-        class="flex items-center justify-center rounded-lg h-10 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-white gap-2 text-sm font-bold min-w-0 px-2.5"
-      >
-        <span class="material-symbols-outlined">notifications</span>
-      </button>
-      <div class="relative group">
+    <div class="flex flex-1 justify-end gap-4">
+      <div>
+        <button
+          @click="handleNotificationClick"
+          :class="[
+            'flex items-center justify-center size-10 rounded-full transition-all duration-300 ease-in-out',
+            isNotificationActive
+              ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary ring-2 ring-primary/20'
+              : 'hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300',
+          ]"
+        >
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+      </div>
+      <div>
         <button
           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
           data-alt="User profile picture"
