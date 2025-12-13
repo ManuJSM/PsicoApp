@@ -3,18 +3,33 @@ import { provide, ref } from 'vue'
 import type { Patient } from '@/types'
 import SideBar from './components/AppSideBar/AppSidebar.vue'
 import AppHeader from './components/AppHeader/AppHeader.vue'
-import AppMainSection from './components/AppMainSection/AppMainSection.vue'
+import MainSectionShow from './components/MainSection/MainSectionShow.vue'
+import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
+import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
 
 const selectedPatient = ref<Patient | null>(null)
 provide('selectedPatient', selectedPatient)
 const activePatientId = ref<number>()
 provide('activePatientId', activePatientId)
 
-const buttonTitle: string = 'Añadir Nuevo Paciente'
-const buttonIcon: string = 'add'
+type ViewMode = 'show' | 'add' | 'edit'
+const currentView = ref<ViewMode>('show')
+const AddButtonT = 'Añadir Nuevo Paciente'
+
 const handleBack = () => {
+  currentView.value = 'show'
+}
+const handleExit = () => {
   selectedPatient.value = null
   activePatientId.value = 0
+}
+
+const handleEdit = () => {
+  currentView.value = 'edit'
+}
+
+const handleAdd = () => {
+  currentView.value = 'add'
 }
 </script>
 
@@ -26,7 +41,18 @@ const handleBack = () => {
     <!-- Mobile: Show either sidebar or main section -->
     <div class="md:hidden flex-1 overflow-hidden">
       <SideBar v-if="!selectedPatient" />
-      <AppMainSection v-else :patient="selectedPatient" @back="handleBack" />
+      <MainSectionShow
+        v-else-if="currentView === 'show'"
+        :patient="selectedPatient"
+        @exit="handleExit"
+        @edit="handleEdit"
+      />
+      <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" />
+      <MainSectionEdit
+        v-else-if="currentView === 'edit'"
+        :patient="selectedPatient"
+        @back="handleBack"
+      />
     </div>
 
     <!-- Desktop: Show both side by side -->
@@ -35,14 +61,38 @@ const handleBack = () => {
         <SideBar />
       </div>
       <div class="flex-1 overflow-y-auto">
-        <AppMainSection v-if="selectedPatient" :patient="selectedPatient" @back="handleBack" />
+        <MainSectionShow
+          v-if="selectedPatient && currentView === 'show'"
+          :patient="selectedPatient"
+          @exit="handleExit"
+          @edit="handleEdit"
+        />
+        <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" />
+        <MainSectionEdit
+          v-else-if="selectedPatient && currentView === 'edit'"
+          :patient="selectedPatient"
+          @back="handleBack"
+        />
       </div>
     </div>
     <button
+      v-if="currentView !== 'add'"
       class="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
-      :title="buttonTitle"
+      :title="AddButtonT"
+      @click="handleAdd"
     >
-      <span class="material-symbols-outlined">{{ buttonIcon }}</span>
+      <span class="material-symbols-outlined">add</span>
     </button>
   </div>
 </template>
+
+<style scoped>
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 20px;
+}
+</style>
