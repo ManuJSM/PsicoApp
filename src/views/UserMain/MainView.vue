@@ -14,7 +14,7 @@ const toggleNotifications = () => {
 </script>
 <template>
   <div class="bg-background-light dark:bg-background-dark font-display">
-    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+    <div class="flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
       <div class="layout-container flex h-full grow flex-col">
         <div class="flex flex-1 justify-center p-0 sm:p-5">
           <div
@@ -77,15 +77,3 @@ const toggleNotifications = () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Animación de entrada */
-.slide-fade-enter-active {
-  transition: all 0.3s ease;
-}
-
-.slide-fade-enter-from {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-</style>

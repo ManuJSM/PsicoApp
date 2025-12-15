@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const mounted = ref(false)
 const showPassword = ref(false)
+
+//TODO: Implementar login
+const handleLogin = () => {
+  console.log('Login button clicked')
+  router.push({ name: 'User' })
+}
 
 onMounted(() => {
   mounted.value = true
@@ -192,6 +201,7 @@ const togglePassword = () => {
           >
             <button
               class="group flex h-12 min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-5 text-base font-bold text-white shadow-lg hover:bg-primary/90 hover:shadow-xl active:scale-95 transition-all duration-300"
+              @click.prevent="handleLogin"
             >
               <span class="truncate group-hover:scale-105 transition-transform duration-300">
                 Iniciar Sesión

@@ -5,17 +5,17 @@ import Pacient from '../views/UserMain/MainView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/Dashboard',
     name: 'DashboardP',
     component: DashboardP,
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     component: Login,
   },
   {
-    path: '/user',
+    path: '/account',
     name: 'User',
     component: Pacient,
   },

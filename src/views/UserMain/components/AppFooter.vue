@@ -8,7 +8,7 @@ const appName = name.toUpperCase()
 <template>
   <footer class="py-6 flex justify-center pb-8 bg-gray-50 dark:bg-background-dark">
     <div
-      class="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 transition-all duration-500"
+      class="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
     >
       <div class="size-6 bg-primary rounded-full p-0.5">
         <img src="@/assets/appIcon.svg" alt="Logo" class="w-full h-full object-contain" />
