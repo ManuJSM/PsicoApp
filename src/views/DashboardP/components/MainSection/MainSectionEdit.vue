@@ -1,20 +1,24 @@
 <script setup lang="ts">
-defineEmits(['back'])
+import BackButton from './components/BackButton.vue'
+import DeleteModal from './components/DeleteModal.vue'
+import { ref } from 'vue'
+
+const emit = defineEmits(['back', 'delete'])
+const showDeleteModal = ref(false)
+const handleDelete = () => {
+  emit('delete')
+  showDeleteModal.value = false
+}
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
+    class="relative z-0 md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
   >
-    <button
-      @click="$emit('back')"
-      class="group flex cursor-pointer items-center gap-2 p-4 text-primary hover:text-primary/80 transition-colors duration-200"
-    >
-      <span
-        class="material-symbols-outlined group-hover:-translate-x-0.5 transition-transform duration-200"
-        >arrow_back</span
-      >
-      <span>Volver</span>
-    </button>
+    <BackButton @click="emit('back')" />
+
+    <Transition name="modal" appear>
+      <DeleteModal v-if="showDeleteModal" @delete="handleDelete" @back="showDeleteModal = false" />
+    </Transition>
     <div class="w-full max-w-2xl mx-auto">
       <div class="flex flex-col items-center mb-10">
         <div class="relative group">
@@ -42,7 +46,7 @@ defineEmits(['back'])
           alex.rodriguez@email.com
         </p>
       </div>
-      <div class="space-y-6">
+      <div class="p-6 space-y-6">
         <div
           class="bg-white dark:bg-gray-800/50 p-5 sm:p-6 md:p-10 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800"
         >
@@ -127,7 +131,7 @@ defineEmits(['back'])
                   <span class="text-sm font-medium text-primary">Activo</span>
                   <button
                     aria-checked="true"
-                    class="relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark touch-manipulation"
+                    class="relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark touch-manipulation"
                     id="status"
                     role="switch"
                     type="button"
@@ -148,6 +152,7 @@ defineEmits(['back'])
           <div class="w-full md:w-auto order-last md:order-first flex flex-col gap-3">
             <button
               class="w-full md:w-auto flex cursor-pointer items-center justify-center gap-2.5 rounded-xl min-h-[52px] px-6 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-base font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-all duration-200 border border-red-100 dark:border-red-900/30 touch-manipulation whitespace-nowrap"
+              @click="showDeleteModal = true"
             >
               <span class="material-symbols-outlined">delete_forever</span>
               Borrar Paciente
@@ -157,14 +162,14 @@ defineEmits(['back'])
             class="flex mb-2 flex-col sm:flex-row gap-4 w-full md:w-auto order-first md:order-last"
           >
             <button
-              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
-            >
-              Cancelar
-            </button>
-            <button
               class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
             >
               Guardar Cambios
+            </button>
+            <button
+              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
+            >
+              Cancelar
             </button>
           </div>
         </div>
@@ -172,3 +177,19 @@ defineEmits(['back'])
     </div>
   </section>
 </template>
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease-in;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .modal-content,
+.modal-leave-active .modal-content {
+  transition: all 0.2s ease-in;
+}
+</style>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BackButton from './components/BackButton.vue'
 import type { Patient } from '@/types'
 
 defineProps<{
@@ -11,17 +12,7 @@ defineEmits(['exit', 'edit'])
   <section
     class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
   >
-    <!-- TODO sacar el boton a component -->
-    <button
-      @click="$emit('exit')"
-      class="group flex cursor-pointer items-center gap-2 p-4 text-primary hover:text-primary/80 transition-colors duration-200"
-    >
-      <span
-        class="material-symbols-outlined group-hover:-translate-x-0.5 transition-transform duration-200"
-        >arrow_back</span
-      >
-      <span>Cerrar</span>
-    </button>
+    <BackButton @click="$emit('exit')" label="Cerrar" />
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">

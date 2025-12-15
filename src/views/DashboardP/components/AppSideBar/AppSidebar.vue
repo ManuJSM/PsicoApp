@@ -7,7 +7,7 @@ type Filtro = 'all' | 'active' | 'inactive'
 import { ref, computed } from 'vue'
 const title: string = 'Pacientes'
 const searchQuery = ref<string>('')
-  const filterButton = ref<Filtro>('active')
+const filterButton = ref<Filtro>('active')
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -60,10 +60,12 @@ const patients = ref<Patient[]>([
 ])
 // Filtrar pacientes
 const filteredPatients = computed<Patient[]>(() => {
+  const currentFilter =
+    filterButton.value === 'all'
+      ? patients.value
+      : patients.value.filter((patient) => patient.status === filterButton.value)
 
-  const currentFilter = filterButton.value === 'all' ? patients.value : patients.value.filter((patient) => patient.status === filterButton.value)
-
-  if (!searchQuery.value) return currentFilter ;
+  if (!searchQuery.value) return currentFilter
   return currentFilter.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -76,15 +78,27 @@ const filteredPatients = computed<Patient[]>(() => {
     class="col-span-1 flex flex-col border-r border-white/10 bg-slate-100/30 dark:bg-white/5 h-full overflow-y-auto"
   >
     <div
-      class="p-4 space-y-4 sticky top-0 bg-slate-100/80 dark:bg-background-dark/80 backdrop-blur-sm z-10 border-b border-white/10"
+      class="p-4 space-y-4 sticky top-0 bg-slate-100/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-white/10"
     >
       <h3 class="text-xl font-bold text-slate-900 dark:text-white px-2">{{ title }}</h3>
       <!-- Buscador -->
       <SideFinder v-model:searchQuery="searchQuery" placeholder="Buscar paciente" />
       <div class="flex gap-3 overflow-x-auto pb-1">
-        <FilterButton label="Activos" :active="filterButton === 'active'" @click="filterButton = 'active'" />
-        <FilterButton label="Inactivos" :active="filterButton === 'inactive'" @click="filterButton = 'inactive'" />
-        <FilterButton label="Todos" :active="filterButton === 'all'" @click="filterButton = 'all'" />
+        <FilterButton
+          label="Activos"
+          :active="filterButton === 'active'"
+          @click="filterButton = 'active'"
+        />
+        <FilterButton
+          label="Inactivos"
+          :active="filterButton === 'inactive'"
+          @click="filterButton = 'inactive'"
+        />
+        <FilterButton
+          label="Todos"
+          :active="filterButton === 'all'"
+          @click="filterButton = 'all'"
+        />
       </div>
     </div>
 
