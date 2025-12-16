@@ -2,72 +2,25 @@
 import SideFinder from './components/SideFinder.vue'
 import FilterButton from './components/FilterButton.vue'
 import CardList from './components/CardList.vue'
-import type { Patient } from '@/types'
-type Filtro = 'all' | 'active' | 'inactive'
+import { type Patient } from '@/types'
+type Filtro = 'All' | 'Active' | 'Inactive'
 import { ref, computed } from 'vue'
 const title: string = 'Pacientes'
 const searchQuery = ref<string>('')
-const filterButton = ref<Filtro>('active')
-const patients = ref<Patient[]>([
-  {
-    id: 1,
-    name: 'Ana García',
-    email: 'ana.garcia@email.com',
-    phone: '+1 (555) 123-4567',
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDi7DjWBgArlAw_noUDTky-yNcT25lMvPN9HSz-DexcpzcR5WcnGa-krB0KNT6yh_KC7XrKgfgGnErbQyw2t88uOsDrkLO9Y6RWsS_t2KYdFCc5Xal2tZY-72YqNeyGy4qFQkAs7t4BDP9CQgOgnWkxoP3150lTcfiLLr22wfWeYdaIvQG0-1xJxQZgnGAX5q3WZ-uVfUSuobBizFyiE4o0W139BA61WM4fmQTo2j8tFOrcZXECG6VaL5T6E8SvoaXFAyeb2LSwkbA',
-    sleepAverage: '7h 15m',
-    lastNote: 'Hace 2d',
-    consistency: '82%',
-    status: 'active',
-  },
-  {
-    id: 2,
-    name: 'Carlos Rodriguez',
-    email: 'carlos.rodriguez@email.com',
-    phone: '+1 (555) 987-6543',
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCvQ5iQvliShWSS_jRnMjHheMaly86tSDZxjFhHIJ5SCeyUggZ1NQhSQBKO_3_bMwLhkg9Wpw8XdOW9yMu5-r-WrCStluttF3_G0ECWTPszfJOTyv9f28LaCoWQ2_k56Q1E2jvz497rdNiTB-92lKZGUeOaJ1GcCFf1HNMEk7IsNUtKGGvTJnf8RwMJc_l2PN7QobwQZ-8zwLze8HIbc_BV4pa0W8QLn-_UeZDY2D4IkBmv-UlEEbEu_U8HmxOeKVREUd7TeSL292A',
-    sleepAverage: '6h 45m',
-    lastNote: 'Ayer',
-    consistency: '75%',
-    status: 'active',
-  },
-  {
-    id: 3,
-    name: 'Luisa Martínez',
-    email: 'luisa.martinez@email.com',
-    phone: '+1 (555) 456-7890',
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDlnhGmTqlOgCPoUbdUhornc9Iwwqxa81WdliD-Fhn3gtwc7wwGLmSnEpwVySXvfj-OZ4I4aRGRKX_DlI4Ead3zfkLSi_Rs28ze0HAMa6CZg4ESdRSknTjc2UN4CASbAKZFGQriHQx5laCDAYWKAVe049r4wTUOmhtttP0ObSr4kgbtfEgViG_YcYgSaArraZuAG0u0Z6TO-TzhxSpxOsK9Kp19F6t_hQftfldVHL0yALfFwWbH1cskBT-UgUz7rGmNPirYa1eiQOI',
-    sleepAverage: '8h 05m',
-    lastNote: 'Hace 3d',
-    consistency: '88%',
-    status: 'active',
-  },
-  {
-    id: 4,
-    name: 'Javier Gómez',
-    email: 'javier.gomez@email.com',
-    phone: '+1 (555) 111-2233',
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCGcb2FTBhhzil5rU1G7Qt9Mx-5ivpKjIwWleJb7UzI4L4Ps3grl9uAhf2QXgYVy3UvcPgXZt1tRzfNDWHacqXLOy8vQL0rLjHf4Ku0HncHvmIFvh3vLIHgvuJ5B-hsPkc2UxpPd0TU7XWn_XEhQ3oP5FnQssDVOadlNsNp2YJz7ny-4CC7B2ROTvd_b0v2ygoRU0EMz8n6RsZjiOm1nXzCeSdISyMG_dWfikNOTSBF6_dmxEL5Su01h24Wv-fm97c3vwWl7PkqAio',
-    sleepAverage: '5h 50m',
-    lastNote: 'Hace 5d',
-    consistency: '65%',
-    status: 'inactive',
-  },
-])
+const filterButton = ref<Filtro>('Active')
+
+const props = defineProps<{ patients: Patient[] }>()
+
 // Filtrar pacientes
 const filteredPatients = computed<Patient[]>(() => {
   const currentFilter =
-    filterButton.value === 'all'
-      ? patients.value
-      : patients.value.filter((patient) => patient.status === filterButton.value)
+    filterButton.value === 'All'
+      ? props.patients
+      : props.patients.filter((patient: Patient) => patient.status === filterButton.value)
 
   if (!searchQuery.value) return currentFilter
   return currentFilter.filter(
-    (patient) =>
+    (patient: Patient) =>
       patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       patient.email.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
@@ -86,18 +39,18 @@ const filteredPatients = computed<Patient[]>(() => {
       <div class="flex gap-3 overflow-x-auto pb-1">
         <FilterButton
           label="Activos"
-          :active="filterButton === 'active'"
-          @click="filterButton = 'active'"
+          :active="filterButton === 'Active'"
+          @click="filterButton = 'Active'"
         />
         <FilterButton
           label="Inactivos"
-          :active="filterButton === 'inactive'"
-          @click="filterButton = 'inactive'"
+          :active="filterButton === 'Inactive'"
+          @click="filterButton = 'Inactive'"
         />
         <FilterButton
           label="Todos"
-          :active="filterButton === 'all'"
-          @click="filterButton = 'all'"
+          :active="filterButton === 'All'"
+          @click="filterButton = 'All'"
         />
       </div>
     </div>

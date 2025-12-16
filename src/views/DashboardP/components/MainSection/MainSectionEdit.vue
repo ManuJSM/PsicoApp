@@ -1,14 +1,38 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
 import DeleteModal from './components/DeleteModal.vue'
-import { ref } from 'vue'
+import { Status, type Patient } from '@/types'
+import { ref, computed, reactive, watch } from 'vue'
 
-const emit = defineEmits(['back', 'delete'])
+const props = defineProps<{
+  patient: Patient
+}>()
+const emit = defineEmits<{
+  (e: 'back'): void
+  (e: 'delete'): void
+  (e: 'save', patient: Patient): void
+}>()
 const showDeleteModal = ref(false)
+const editPatient = reactive<Patient>({
+  ...props.patient,
+})
+const isActive = computed<boolean>(() => editPatient.status === Status.Active)
+
+const toggleStatus = () => {
+  editPatient.status = isActive.value ? Status.Inactive : Status.Active
+}
+
 const handleDelete = () => {
   emit('delete')
   showDeleteModal.value = false
 }
+watch(
+  () => props.patient,
+  (newPatient) => {
+    Object.assign(editPatient, newPatient)
+  },
+  { immediate: true, deep: true },
+)
 </script>
 <template>
   <section
@@ -25,9 +49,7 @@ const handleDelete = () => {
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
             data-alt="Patient avatar"
-            style="
-              background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWoHqaA7dq_qhMrfVmh63nndpIKFwxN75_b7OljfUVc56ky7dYjCTH85UY1FN9IqLr1VMVT54YbWCcz4hzQ3gO5z7rgEb8yhg0aR332ljniRntCHJoGlUYsWE2Z55ORRoOa7_27DvnS0paNvmK_ZJmX-_Wu1m3U0wfXlM8IoqefMR7_wqb6Ww0fY7Il2D_AccwGea5zYPooCtxmVAyGW70QunAk7r35-7XSIHxQEnC-Kh3VV7_k4pYXzOY1y4XbL2EzSWJn9kE-rk');
-            "
+            :style="{ backgroundImage: `url(${editPatient.avatar})` }"
           ></div>
           <button
             class="absolute bottom-1 right-1 flex items-center justify-center bg-primary rounded-full size-9 text-white hover:bg-primary/90 transition-colors duration-200 ring-2 ring-white dark:ring-gray-800 touch-manipulation shadow-md"
@@ -38,12 +60,12 @@ const handleDelete = () => {
         <h1
           class="text-gray-900 dark:text-white tracking-tight text-2xl md:text-4xl font-bold leading-tight mt-5 text-center"
         >
-          Alex Rodríguez
+          {{ editPatient.name }}
         </h1>
         <p
           class="text-gray-500 dark:text-gray-400 text-base md:text-lg font-medium leading-normal text-center mt-2"
         >
-          alex.rodriguez@email.com
+          {{ editPatient.email }}
         </p>
       </div>
       <div class="p-6 space-y-6">
@@ -68,7 +90,7 @@ const handleDelete = () => {
                   class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
                   id="name"
                   type="text"
-                  value="Alex Rodríguez"
+                  v-model="editPatient.name"
                 />
               </div>
             </div>
@@ -83,7 +105,7 @@ const handleDelete = () => {
                   class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
                   id="email"
                   type="email"
-                  value="alex.rodriguez@email.com"
+                  v-model="editPatient.email"
                 />
               </div>
             </div>
@@ -97,7 +119,7 @@ const handleDelete = () => {
                 <input
                   class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
                   id="phone"
-                  placeholder="+1 234 567 890"
+                  v-model="editPatient.phone"
                   type="tel"
                 />
               </div>
@@ -128,17 +150,27 @@ const handleDelete = () => {
                   >
                 </div>
                 <div class="flex items-center gap-3">
-                  <span class="text-sm font-medium text-primary">Activo</span>
+                  <span
+                    :class="['text-sm font-medium', isActive ? 'text-primary' : 'text-gray-500']"
+                    >{{ editPatient.status }}</span
+                  >
                   <button
-                    aria-checked="true"
-                    class="relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark touch-manipulation"
+                    :aria-checked="isActive"
+                    :class="[
+                      'relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark touch-manipulation',
+                      isActive ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600',
+                    ]"
                     id="status"
                     role="switch"
                     type="button"
+                    @click="toggleStatus"
                   >
                     <span class="sr-only">Estado del paciente</span>
                     <span
-                      class="pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-6"
+                      :class="[
+                        'pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                        isActive ? 'translate-x-6' : 'translate-x-1',
+                      ]"
                     ></span>
                   </button>
                 </div>
@@ -163,11 +195,13 @@ const handleDelete = () => {
           >
             <button
               class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
+              @click="emit('save', editPatient)"
             >
               Guardar Cambios
             </button>
             <button
               class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
+              @click="emit('back')"
             >
               Cancelar
             </button>
@@ -180,7 +214,7 @@ const handleDelete = () => {
 <style scoped>
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.2s ease-in;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .modal-enter-from,
@@ -190,6 +224,6 @@ const handleDelete = () => {
 
 .modal-enter-active .modal-content,
 .modal-leave-active .modal-content {
-  transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in-out;
 }
 </style>

@@ -1,3 +1,9 @@
+
+export enum Status{
+  Active = 'Active',
+  Inactive = 'Inactive'
+}
+
 export interface Patient {
   id: number
   name: string
@@ -7,5 +13,5 @@ export interface Patient {
   sleepAverage: string
   lastNote: string
   consistency: string
-  status: 'active' | 'inactive'
+  status: Status
 }

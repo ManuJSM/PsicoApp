@@ -42,7 +42,7 @@ defineEmits(['delete', 'back'])
             </div>
           </div>
           <div
-            class="bg-gray-50 dark:bg-gray-800/80 px-4 py-4 sm:px-6 flex flex-col sm:flex-row-reverse gap-3"
+            class="bg-gray-50 dark:bg-gray-800/80 px-4 py-4 sm:px-6 flex justify-center flex-col sm:flex-row-reverse gap-3"
           >
             <button
               class="inline-flex w-full justify-center rounded-xl bg-red-600 px-3 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 sm:w-auto transition-colors min-h-[48px] items-center"
