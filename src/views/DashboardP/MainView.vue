@@ -92,6 +92,11 @@ const handleEdit = () => {
 const handleAdd = () => {
   currentView.value = 'add'
 }
+const handleDelete = () => {
+  patients.value = patients.value.filter((p: Patient) => p.id !== activePatientId.value)
+  selectedPatient.value = null
+  activePatientId.value = 0
+}
 </script>
 
 <template>
@@ -134,6 +139,7 @@ const handleAdd = () => {
           :patient="selectedPatient"
           @save="handleSave"
           @back="handleBack"
+          @delete="handleDelete"
         />
       </div>
     </div>
