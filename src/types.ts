@@ -4,6 +4,11 @@ export enum Status{
   Inactive = 'Inactive'
 }
 
+export enum ToastType {
+  Success = 'success',
+  Error = 'error',
+}
+
 export interface Patient {
   id: number
   name: string

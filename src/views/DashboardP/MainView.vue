@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { provide, ref } from 'vue'
-import { type Patient, Status } from '@/types'
+import { computed, provide, ref } from 'vue'
+import { type Patient, Status, ToastType } from '@/types'
 import SideBar from './components/AppSideBar/AppSidebar.vue'
 import AppHeader from './components/AppHeader/AppHeader.vue'
 import MainSectionShow from './components/MainSection/MainSectionShow.vue'
 import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
 import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
+import NotificationToast from './components/MainSection/components/NotificationToast.vue'
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -57,8 +58,12 @@ const patients = ref<Patient[]>([
   },
 ])
 
-const selectedPatient = ref<Patient | null>(null)
-provide('selectedPatient', selectedPatient)
+// const selectedPatient = ref<Patient | null>(null)
+// provide('selectedPatient', selectedPatient)
+
+const selectedPatient = computed<Patient | undefined>(() => {
+  return patients.value.find((p) => p.id === activePatientId.value)
+})
 const activePatientId = ref<number>()
 provide('activePatientId', activePatientId)
 
@@ -66,16 +71,33 @@ type ViewMode = 'show' | 'add' | 'edit'
 const currentView = ref<ViewMode>('show')
 const AddButtonT = 'Añadir Nuevo Paciente'
 
+const showToast = ref<boolean>(false)
+const toastType = ref<ToastType>(ToastType.Success)
+const toastMessage = ref<string>('')
+
+const setToast = (type: ToastType, message: string) => {
+  toastType.value = type
+  toastMessage.value = message
+  showToast.value = true
+}
+
 const handleBack = () => {
   currentView.value = 'show'
 }
 const handleExit = () => {
-  selectedPatient.value = null
+  // selectedPatient.value = null
   activePatientId.value = 0
 }
 
+const handleAdd = (patient: Patient) => {
+  patients.value.push(patient)
+  activePatientId.value = patient.id
+  currentView.value = 'show'
+  setToast(ToastType.Success, 'Paciente añadido correctamente')
+}
+
 const handleSave = (patient: Patient) => {
-  selectedPatient.value = patient
+  // selectedPatient.value = patient
   patients.value = patients.value.map((p: Patient) => {
     if (p.id === patient.id) {
       p = patient
@@ -83,19 +105,21 @@ const handleSave = (patient: Patient) => {
     return p
   })
   currentView.value = 'show'
+  setToast(ToastType.Success, 'Paciente actualizado correctamente')
 }
 
 const handleEdit = () => {
   currentView.value = 'edit'
 }
 
-const handleAdd = () => {
+const showAdd = () => {
   currentView.value = 'add'
 }
 const handleDelete = () => {
   patients.value = patients.value.filter((p: Patient) => p.id !== activePatientId.value)
-  selectedPatient.value = null
+  // selectedPatient.value = null
   activePatientId.value = 0
+  setToast(ToastType.Success, 'Paciente eliminado correctamente')
 }
 </script>
 
@@ -113,11 +137,13 @@ const handleDelete = () => {
         @exit="handleExit"
         @edit="handleEdit"
       />
-      <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" />
+      <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" @save="handleAdd" />
       <MainSectionEdit
         v-else-if="currentView === 'edit' && selectedPatient"
         :patient="selectedPatient"
         @back="handleBack"
+        @save="handleSave"
+        @delete="handleDelete"
       />
     </div>
 
@@ -133,7 +159,7 @@ const handleDelete = () => {
           @exit="handleExit"
           @edit="handleEdit"
         />
-        <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" />
+        <MainSectionAdd v-else-if="currentView === 'add'" @save="handleAdd" @back="handleBack" />
         <MainSectionEdit
           v-else-if="selectedPatient && currentView === 'edit'"
           :patient="selectedPatient"
@@ -147,10 +173,16 @@ const handleDelete = () => {
       v-if="currentView !== 'add'"
       class="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
       :title="AddButtonT"
-      @click="handleAdd"
+      @click="showAdd"
     >
       <span class="material-symbols-outlined">add</span>
     </button>
+    <NotificationToast
+      :show="showToast"
+      :type="toastType"
+      :message="toastMessage"
+      @close="showToast = false"
+    />
   </div>
 </template>
 

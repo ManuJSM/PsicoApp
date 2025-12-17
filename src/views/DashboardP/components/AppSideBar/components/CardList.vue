@@ -2,15 +2,13 @@
 import { inject, type Ref } from 'vue'
 import type { Patient } from '@/types'
 
-const selectedPatient = inject<Ref<Patient | null>>('selectedPatient')
 const activePatientId = inject<Ref<number | null>>('activePatientId')
 defineProps<{
   patients: Patient[]
 }>()
 
 const handlePatientClick = (patient: Patient) => {
-  if (selectedPatient && activePatientId) {
-    selectedPatient.value = patient
+  if (activePatientId) {
     activePatientId.value = patient.id
   }
 }

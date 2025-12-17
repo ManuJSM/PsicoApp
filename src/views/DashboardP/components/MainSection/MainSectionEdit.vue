@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
 import DeleteModal from './components/DeleteModal.vue'
+import FormInput from './components/FormInput.vue'
 import { Status, type Patient } from '@/types'
 import { ref, computed, reactive, watch } from 'vue'
 
@@ -44,7 +45,7 @@ watch(
       <DeleteModal v-if="showDeleteModal" @delete="handleDelete" @back="showDeleteModal = false" />
     </Transition>
     <div class="w-full max-w-2xl mx-auto">
-      <div class="flex flex-col items-center mb-10">
+      <section class="flex flex-col items-center mb-10">
         <div class="relative group">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
@@ -67,7 +68,7 @@ watch(
         >
           {{ editPatient.email }}
         </p>
-      </div>
+      </section>
       <div class="p-6 space-y-6">
         <div
           class="bg-white dark:bg-gray-800/50 p-5 sm:p-6 md:p-10 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800"
@@ -80,49 +81,31 @@ watch(
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             <div class="md:col-span-2">
-              <label
-                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                for="name"
-                >Nombre Completo</label
-              >
-              <div class="relative">
-                <input
-                  class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
-                  id="name"
-                  type="text"
-                  v-model="editPatient.name"
-                />
-              </div>
+              <FormInput
+                id="name"
+                label="Nombre Completo"
+                type="text"
+                v-model="editPatient.name"
+                required
+              />
             </div>
             <div class="md:col-span-1">
-              <label
-                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                for="email"
-                >Correo Electrónico</label
-              >
-              <div class="relative">
-                <input
-                  class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
-                  id="email"
-                  type="email"
-                  v-model="editPatient.email"
-                />
-              </div>
+              <FormInput
+                id="email"
+                label="Correo Electrónico"
+                type="email"
+                v-model="editPatient.email"
+                required
+              />
             </div>
             <div class="md:col-span-1">
-              <label
-                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                for="phone"
-                >Teléfono <span class="text-gray-400 font-normal">(Opcional)</span></label
-              >
-              <div class="relative">
-                <input
-                  class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
-                  id="phone"
-                  v-model="editPatient.phone"
-                  type="tel"
-                />
-              </div>
+              <FormInput
+                id="phone"
+                label="Teléfono"
+                type="tel"
+                v-model="editPatient.phone"
+                :optional="true"
+              />
             </div>
             <div class="md:col-span-2">
               <label
