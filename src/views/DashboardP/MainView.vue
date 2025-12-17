@@ -85,7 +85,6 @@ const handleBack = () => {
   currentView.value = 'show'
 }
 const handleExit = () => {
-  // selectedPatient.value = null
   activePatientId.value = 0
 }
 
@@ -97,7 +96,6 @@ const handleAdd = (patient: Patient) => {
 }
 
 const handleSave = (patient: Patient) => {
-  // selectedPatient.value = patient
   patients.value = patients.value.map((p: Patient) => {
     if (p.id === patient.id) {
       p = patient
@@ -108,7 +106,7 @@ const handleSave = (patient: Patient) => {
   setToast(ToastType.Success, 'Paciente actualizado correctamente')
 }
 
-const handleEdit = () => {
+const showEdit = () => {
   currentView.value = 'edit'
 }
 
@@ -117,7 +115,6 @@ const showAdd = () => {
 }
 const handleDelete = () => {
   patients.value = patients.value.filter((p: Patient) => p.id !== activePatientId.value)
-  // selectedPatient.value = null
   activePatientId.value = 0
   setToast(ToastType.Success, 'Paciente eliminado correctamente')
 }
@@ -135,7 +132,7 @@ const handleDelete = () => {
         v-else-if="currentView === 'show' && selectedPatient"
         :patient="selectedPatient"
         @exit="handleExit"
-        @edit="handleEdit"
+        @edit="showEdit"
       />
       <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" @save="handleAdd" />
       <MainSectionEdit
@@ -157,7 +154,7 @@ const handleDelete = () => {
           v-if="selectedPatient && currentView === 'show'"
           :patient="selectedPatient"
           @exit="handleExit"
-          @edit="handleEdit"
+          @edit="showEdit"
         />
         <MainSectionAdd v-else-if="currentView === 'add'" @save="handleAdd" @back="handleBack" />
         <MainSectionEdit

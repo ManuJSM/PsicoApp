@@ -1,9 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import NotiCard from './components/NotiCard.vue'
 
 const emit = defineEmits<{
   (e: 'notification-click'): void
 }>()
+const notifications = [
+  {
+    id: 1,
+    title: 'Registro de Sueño: Ana García',
+    description:
+      'Calidad de sueño baja reportada (2/5). Comentario: "Tuve pesadillas y desperté varias veces."',
+    time: 'Hace 15 min',
+    unread: true,
+  },
+  {
+    id: 2,
+    title: 'Recordatorio de Sesión',
+    description: 'Sesión de seguimiento con Carlos Rodriguez en 30 minutos.',
+    time: '09:30 AM',
+    unread: true,
+  },
+  {
+    id: 3,
+    title: 'Actualización del Sistema',
+    description: 'Nuevas métricas de consistencia de sueño disponibles en los reportes semanales.',
+    time: 'Ayer',
+    unread: false,
+  },
+]
 
 const isNotificationActive = ref(false)
 
@@ -14,7 +39,7 @@ const handleNotificationClick = () => {
 </script>
 <template>
   <header
-    class="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
+    class="flex relative items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
   >
     <div class="flex items-center gap-4 text-white">
       <div class="size-10 bg-primary rounded-full flex justify-center items-center">
@@ -39,6 +64,18 @@ const handleNotificationClick = () => {
         >
           <span class="material-symbols-outlined">notifications</span>
         </button>
+
+        <div
+          v-if="isNotificationActive"
+          class="fixed inset-0 z-40"
+          @click="isNotificationActive = false"
+        ></div>
+        <NotiCard
+          v-if="isNotificationActive"
+          @close="isNotificationActive = false"
+          :notifications="notifications"
+          @click.self="isNotificationActive = false"
+        />
       </div>
       <div>
         <button
