@@ -8,12 +8,13 @@ export enum ToastType {
   Success = 'success',
   Error = 'error',
 }
-export type Notification = {
+export interface Notification {
   id: number
+  type: 'comment' | 'reminder'
   title: string
-  description: string
-  time: string
-  unread?: boolean
+  message: string
+  timeAgo: string
+  read: boolean
 }
 export interface Patient {
   id: number
