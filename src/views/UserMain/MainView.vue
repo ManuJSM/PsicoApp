@@ -4,7 +4,7 @@ import MenuButton from './components/MenuButton.vue'
 import UserHeader from './components/UserHeader.vue'
 import SleepC from './components/SleepC.vue'
 import AppFooter from './components/AppFooter.vue'
-import NotifiShow from './components/NotifiShow.vue'
+import NotifiShow from './components/NotifiCard.vue'
 
 const showNotifications = ref(false)
 

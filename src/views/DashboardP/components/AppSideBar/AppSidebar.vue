@@ -31,7 +31,7 @@ const filteredPatients = computed<Patient[]>(() => {
     class="col-span-1 flex flex-col border-r border-white/10 bg-slate-100/30 dark:bg-white/5 h-full overflow-y-auto"
   >
     <div
-      class="p-4 space-y-4 sticky top-0 bg-slate-100/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-white/10"
+      class="p-4 space-y-4 top-0 bg-slate-100/80 dark:bg-background-dark/80 backdrop-blur-sm border-b border-white/10"
     >
       <h3 class="text-xl font-bold text-slate-900 dark:text-white px-2">{{ title }}</h3>
       <!-- Buscador -->
