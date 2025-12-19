@@ -10,7 +10,7 @@ defineEmits(['delete', 'back'])
     role="dialog"
   >
     <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-[1px] transition-opacity"></div>
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="fixed inset-0 pb-safe-sm z-10 w-screen overflow-y-auto">
       <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         <div
           class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl transition-all w-full max-w-md border border-gray-100 dark:border-gray-700"

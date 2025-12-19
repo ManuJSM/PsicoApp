@@ -6,7 +6,7 @@ import AppHeader from './components/AppHeader/AppHeader.vue'
 import MainSectionShow from './components/MainSection/MainSectionShow.vue'
 import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
 import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
-import NotificationToast from './components/MainSection/components/NotificationToast.vue'
+import { useToast } from '@/composables/useToast'
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -71,15 +71,7 @@ type ViewMode = 'show' | 'add' | 'edit'
 const currentView = ref<ViewMode>('show')
 const AddButtonT = 'Añadir Nuevo Paciente'
 
-const showToast = ref<boolean>(false)
-const toastType = ref<ToastType>(ToastType.Success)
-const toastMessage = ref<string>('')
-
-const setToast = (type: ToastType, message: string) => {
-  toastType.value = type
-  toastMessage.value = message
-  showToast.value = true
-}
+const { setToast } = useToast()
 
 const handleBack = () => {
   currentView.value = 'show'
@@ -174,7 +166,6 @@ const handleDelete = () => {
     >
       <span class="material-symbols-outlined">add</span>
     </button>
-    <NotificationToast v-model:show="showToast" :type="toastType" :message="toastMessage" />
   </div>
 </template>
 

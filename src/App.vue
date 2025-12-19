@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import NotificationToast from '@/views/components/NotificationToast.vue'
+import { useToast } from '@/composables/useToast.ts'
+
+const { showToast, toastType, toastMessage } = useToast()
 </script>
 
 <template>
@@ -8,6 +12,7 @@ import { RouterView } from 'vue-router'
       <component :is="Component" />
     </transition>
   </Router-view>
+  <NotificationToast v-model:show="showToast" :type="toastType" :message="toastMessage" />
 </template>
 
 <style>
