@@ -5,10 +5,15 @@ import type { Notification } from '@/types'
 import AsideMenu from './components/AsideMenu.vue'
 import MenuButton from './components/MenuButton.vue'
 import HeaderLogo from './components/HeaderLogo.vue'
+import NotificationBell from './components/NotificationBell.vue'
+import MovilMenu from './components/MovilMenu.vue'
 
 const emit = defineEmits<{
   (e: 'notification-click'): void
 }>()
+
+const avatar =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE'
 
 const notifications = ref<Notification[]>([
   {
@@ -85,27 +90,11 @@ const handleMarkRead = (id: number) => {
     </div>
     <div class="flex flex-1 justify-end gap-4">
       <div>
-        <button
+        <NotificationBell
+          :is-active="isNotificationActive"
+          :has-unread="unreadNotifications"
           @click="handleNotificationClick"
-          :class="[
-            'relative flex items-center justify-center size-10 rounded-full transition-all duration-100 ease-in-out',
-            isNotificationActive
-              ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary ring-1 ring-primary/20'
-              : 'hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300',
-            unreadNotifications
-              ? 'text-primary dark:text-primary'
-              : 'hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300',
-          ]"
-        >
-          <span class="material-symbols-outlined">notifications</span>
-          <span v-show="unreadNotifications" class="absolute top-2.5 right-2.5 flex h-2 w-2">
-            <span
-              class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"
-            ></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-          </span>
-        </button>
-
+        />
         <div
           v-if="isNotificationActive"
           class="fixed inset-0 z-40"
@@ -118,17 +107,14 @@ const handleMarkRead = (id: number) => {
           :notifications="notifications"
         />
       </div>
-      <!-- <div>
-        <button
-          class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-          data-alt="User profile picture"
-          style="
-            background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE');
-          "
-        ></button>
-      </div> -->
+      <div
+        class="bg-center bg-no-repeat aspect-square size-10 bg-cover rounded-full"
+        data-alt="Profile picture"
+        :style="{ backgroundImage: `url(${avatar})` }"
+      ></div>
     </div>
   </header>
 
-  <AsideMenu v-show="showMenu" @close="asideMenuClose" />
+  <AsideMenu v-if="showMenu" @close="asideMenuClose" />
+  <MovilMenu />
 </template>

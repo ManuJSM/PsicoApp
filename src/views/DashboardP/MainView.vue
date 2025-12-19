@@ -126,7 +126,7 @@ const handleDelete = () => {
   >
     <AppHeader />
     <!-- Mobile: Show either sidebar or main section -->
-    <div class="md:hidden flex-1 overflow-hidden">
+    <div class="md:hidden flex-1 overflow-hidden pb-safe-sm">
       <SideBar v-if="!selectedPatient && currentView !== 'add'" :patients="patients" />
       <MainSectionShow
         v-else-if="currentView === 'show' && selectedPatient"
@@ -168,18 +168,13 @@ const handleDelete = () => {
     </div>
     <button
       v-if="currentView !== 'add'"
-      class="absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+      class="fixed bottom-20 md:bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
       :title="AddButtonT"
       @click="showAdd"
     >
       <span class="material-symbols-outlined">add</span>
     </button>
-    <NotificationToast
-      :show="showToast"
-      :type="toastType"
-      :message="toastMessage"
-      @close="showToast = false"
-    />
+    <NotificationToast v-model:show="showToast" :type="toastType" :message="toastMessage" />
   </div>
 </template>
 

@@ -19,10 +19,10 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['update:show'])
 
 const handleClose = () => {
-  emit('close')
+  emit('update:show', false)
 }
 
 // Auto-close after 2 seconds when shown
@@ -58,7 +58,7 @@ const defaultMessages: Record<ToastType, string> = {
 
 <template>
   <Transition name="fade">
-    <div v-if="show" class="fixed bottom-6 left-6 w-full max-w-xs">
+    <div v-if="show" class="fixed bottom-6 z-20 left-6 w-full max-w-xs">
       <div class="flex items-center gap-4 bg-[#111827] p-4 rounded-lg shadow-lg">
         <div
           class="flex items-center justify-center shrink-0 size-8 rounded-full"

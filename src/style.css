@@ -24,6 +24,11 @@
 .font-display {
   font-family: var(--font-family-display);
 }
+
+/* Clase de utilidad para Menu movil*/
+.pb-safe-sm{
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+}
 :root {
   background-color: var(--color-background-light);
 }
