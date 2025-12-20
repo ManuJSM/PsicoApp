@@ -52,7 +52,7 @@ const updateValue = (event: Event) => {
         @input="updateValue"
         :required="required"
         :placeholder="placeholder"
-        class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 transition-all placeholder:text-gray-400"
+        class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[48px] px-4 placeholder:text-gray-400"
       />
     </div>
   </div>

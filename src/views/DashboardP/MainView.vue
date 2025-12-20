@@ -132,11 +132,11 @@ const handleDelete = () => {
   </div>
 
   <!-- Desktop: Show both side by side -->
-  <div class="hidden md:flex md:h-screen flex-1">
-    <div class="w-1/3 lg:w-1/4 overflow-y-auto">
+  <div class="hidden md:flex overflow-y-auto flex-1">
+    <div class="w-1/3 lg:w-1/4">
       <SideBar :patients="patients" />
     </div>
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1">
       <MainSectionShow
         v-if="selectedPatient && currentView === 'show'"
         :patient="selectedPatient"

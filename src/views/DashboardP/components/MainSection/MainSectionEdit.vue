@@ -42,7 +42,12 @@ watch(
     <BackButton @click="emit('back')" />
 
     <Transition name="modal" appear>
-      <DeleteModal v-if="showDeleteModal" @delete="handleDelete" @back="showDeleteModal = false" />
+      <DeleteModal
+        v-show="showDeleteModal"
+        :PacientName="props.patient.name"
+        @delete="handleDelete"
+        @back="showDeleteModal = false"
+      />
     </Transition>
     <div class="w-full max-w-2xl mx-auto">
       <section class="flex flex-col items-center mb-10">
@@ -195,18 +200,11 @@ watch(
   </section>
 </template>
 <style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.2s ease-in-out;
+.modal-enter-active {
+  transition: opacity 160ms ease-in;
 }
 
-.modal-enter-from,
-.modal-leave-to {
+.modal-enter-from {
   opacity: 0;
-}
-
-.modal-enter-active .modal-content,
-.modal-leave-active .modal-content {
-  transition: all 0.2s ease-in-out;
 }
 </style>
