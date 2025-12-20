@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 <template>
   <nav
-    class="md:hidden fixed bottom-0 left-0 right-0 z-10 opacity-80 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+    class="md:hidden fixed left-0 right-0 z-10 translate-z-0 bottom-0 opacity-90 bg-white/80 backdrop-blur-md dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
   >
     <div class="grid grid-cols-3 h-16 items-center">
       <a

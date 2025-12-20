@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import AppHeader from '../DashboardP/components/AppHeader/AppHeader.vue'
+import AppMenu from './AppMenu/MainView.vue'
+import MovilMenu from './AppMenu/MovilMenu.vue'
 </script>
 <template>
   <div
-    class="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden"
+    class="relative flex min-h-dvh md:h-screen flex-col bg-background-light dark:bg-background-dark overflow-hidden"
   >
-    <AppHeader />
-    <slot />
+    <AppMenu />
+    <router-view />
+    <MovilMenu />
   </div>
 </template>

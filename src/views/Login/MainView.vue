@@ -10,7 +10,7 @@ const showPassword = ref(false)
 //TODO: Implementar login
 const handleLogin = () => {
   console.log('Login button clicked')
-  router.push({ name: 'DashboardP' })
+  router.push({ name: 'Dashboard' })
 }
 
 onMounted(() => {

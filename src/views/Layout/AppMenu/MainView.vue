@@ -6,7 +6,6 @@ import AsideMenu from './components/AsideMenu.vue'
 import MenuButton from './components/MenuButton.vue'
 import HeaderLogo from './components/HeaderLogo.vue'
 import NotificationBell from './components/NotificationBell.vue'
-import MovilMenu from './components/MovilMenu.vue'
 
 const emit = defineEmits<{
   (e: 'notification-click'): void
@@ -116,5 +115,4 @@ const handleMarkRead = (id: number) => {
   </header>
 
   <AsideMenu v-if="showMenu" @close="asideMenuClose" />
-  <MovilMenu />
 </template>

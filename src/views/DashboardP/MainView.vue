@@ -2,7 +2,6 @@
 import { computed, provide, ref } from 'vue'
 import { type Patient, Status, ToastType } from '@/types'
 import SideBar from './components/AppSideBar/AppSidebar.vue'
-import AppHeader from './components/AppHeader/AppHeader.vue'
 import MainSectionShow from './components/MainSection/MainSectionShow.vue'
 import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
 import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
@@ -113,60 +112,55 @@ const handleDelete = () => {
 </script>
 
 <template>
-  <div
-    class="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-hidden"
-  >
-    <AppHeader />
-    <!-- Mobile: Show either sidebar or main section -->
-    <div class="md:hidden flex-1 overflow-hidden pb-safe-sm">
-      <SideBar v-if="!selectedPatient && currentView !== 'add'" :patients="patients" />
+  <!-- Mobile: Show either sidebar or main section -->
+  <div class="md:hidden pb-safe-sm flex-1">
+    <SideBar v-if="!selectedPatient && currentView !== 'add'" :patients="patients" />
+    <MainSectionShow
+      v-else-if="currentView === 'show' && selectedPatient"
+      :patient="selectedPatient"
+      @exit="handleExit"
+      @edit="showEdit"
+    />
+    <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" @save="handleAdd" />
+    <MainSectionEdit
+      v-else-if="currentView === 'edit' && selectedPatient"
+      :patient="selectedPatient"
+      @back="handleBack"
+      @save="handleSave"
+      @delete="handleDelete"
+    />
+  </div>
+
+  <!-- Desktop: Show both side by side -->
+  <div class="hidden md:flex md:h-screen flex-1">
+    <div class="w-1/3 lg:w-1/4 overflow-y-auto">
+      <SideBar :patients="patients" />
+    </div>
+    <div class="flex-1 overflow-y-auto">
       <MainSectionShow
-        v-else-if="currentView === 'show' && selectedPatient"
+        v-if="selectedPatient && currentView === 'show'"
         :patient="selectedPatient"
         @exit="handleExit"
         @edit="showEdit"
       />
-      <MainSectionAdd v-else-if="currentView === 'add'" @back="handleBack" @save="handleAdd" />
+      <MainSectionAdd v-else-if="currentView === 'add'" @save="handleAdd" @back="handleBack" />
       <MainSectionEdit
-        v-else-if="currentView === 'edit' && selectedPatient"
+        v-else-if="selectedPatient && currentView === 'edit'"
         :patient="selectedPatient"
-        @back="handleBack"
         @save="handleSave"
+        @back="handleBack"
         @delete="handleDelete"
       />
     </div>
-
-    <!-- Desktop: Show both side by side -->
-    <div class="hidden md:flex flex-1 overflow-hidden">
-      <div class="w-1/3 lg:w-1/4 overflow-y-auto">
-        <SideBar :patients="patients" />
-      </div>
-      <div class="flex-1 overflow-y-auto">
-        <MainSectionShow
-          v-if="selectedPatient && currentView === 'show'"
-          :patient="selectedPatient"
-          @exit="handleExit"
-          @edit="showEdit"
-        />
-        <MainSectionAdd v-else-if="currentView === 'add'" @save="handleAdd" @back="handleBack" />
-        <MainSectionEdit
-          v-else-if="selectedPatient && currentView === 'edit'"
-          :patient="selectedPatient"
-          @save="handleSave"
-          @back="handleBack"
-          @delete="handleDelete"
-        />
-      </div>
-    </div>
-    <button
-      v-if="currentView !== 'add'"
-      class="fixed bottom-20 md:bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
-      :title="AddButtonT"
-      @click="showAdd"
-    >
-      <span class="material-symbols-outlined">add</span>
-    </button>
   </div>
+  <button
+    v-if="currentView !== 'add'"
+    class="fixed bottom-20 md:bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+    :title="AddButtonT"
+    @click="showAdd"
+  >
+    <span class="material-symbols-outlined">add</span>
+  </button>
 </template>
 
 <style scoped>
