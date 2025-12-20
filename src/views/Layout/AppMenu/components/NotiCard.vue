@@ -20,7 +20,7 @@ const handleMarkAll = () => {}
 
 <template>
   <div
-    class="absolute right-0 top-full m-2 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700/60 overflow-hidden z-50 origin-top-right"
+    class="absolute right-0 top-full m-2 md:w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700/60 z-40 overflow-hidden origin-top-right"
   >
     <!-- Header -->
     <div
@@ -36,7 +36,7 @@ const handleMarkAll = () => {}
     </div>
 
     <!-- Notifications List -->
-    <div class="max-h-[40vh] overflow-y-auto">
+    <div class="md:max-h-[40vh] overflow-y-auto">
       <div
         v-for="notification in props.notifications"
         :key="notification.id"

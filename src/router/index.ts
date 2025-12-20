@@ -7,31 +7,31 @@ import {
 } from 'vue-router'
 import DashboardP from '../views/DashboardP/MainView.vue'
 import Login from '../views/Login/MainView.vue'
-import Pacient from '../views/UserMain/MainView.vue'
+import User from '../views/UserMain/MainView.vue'
 import Layout from '../views/Layout/MainView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/app',
+    path: '/Login',
+    name: 'Login',
+    component: Login,
+  },
+  {
+    path: '/',
     component: Layout,
-    redirect: '/app/Dashboard',
+    redirect: '/Login',
     children: [
       {
         path: 'Dashboard',
         name: 'Dashboard',
         component: DashboardP,
       },
+      {
+        path: 'User',
+        name: 'User',
+        component: User,
+      },
     ],
-  },
-  {
-    path: '/',
-    name: 'Login',
-    component: Login,
-  },
-  {
-    path: '/account',
-    name: 'User',
-    component: Pacient,
   },
 ]
 
