@@ -2,10 +2,13 @@
 import { ref, computed } from 'vue'
 import NotiCard from './components/NotiCard.vue'
 import type { Notification } from '@/types'
-import AsideMenu from './components/AsideMenu.vue'
+import AppNav from './components/AppMenu/MainView.vue'
 import MenuButton from './components/MenuButton.vue'
 import HeaderLogo from './components/HeaderLogo.vue'
 import NotificationBell from './components/NotificationBell.vue'
+import { useAsideMenu } from '@/composables/useAsideMenu'
+
+const { open } = useAsideMenu()
 
 const emit = defineEmits<{
   (e: 'notification-click'): void
@@ -52,11 +55,6 @@ const notifications = ref<Notification[]>([
   },
 ])
 
-const showMenu = ref(false)
-const asideMenuClose = () => {
-  showMenu.value = false
-}
-
 const isNotificationActive = ref(false)
 const unreadNotifications = computed<boolean>(() => {
   return notifications.value.some((notification) => !notification.read)
@@ -81,7 +79,7 @@ const handleMarkRead = (id: number) => {
     class="flex relative items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
   >
     <div class="flex items-center gap-4 text-white">
-      <MenuButton @click="showMenu = !showMenu" />
+      <MenuButton @click="open" />
       <HeaderLogo />
       <h2
         class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]"
@@ -114,7 +112,6 @@ const handleMarkRead = (id: number) => {
         :style="{ backgroundImage: `url(${avatar})` }"
       ></div>
     </div>
+    <AppNav />
   </header>
-
-  <AsideMenu v-if="showMenu" @close="asideMenuClose" />
 </template>

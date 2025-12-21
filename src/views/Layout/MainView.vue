@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import AppMenu from './AppMenu/MainView.vue'
-import MovilMenu from './AppMenu/MovilMenu.vue'
+import AppMenu from './AppHeader/MainView.vue'
 </script>
 <template>
   <div
@@ -8,6 +7,5 @@ import MovilMenu from './AppMenu/MovilMenu.vue'
   >
     <AppMenu />
     <router-view />
-    <MovilMenu />
   </div>
 </template>

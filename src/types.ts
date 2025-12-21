@@ -1,7 +1,12 @@
-
-export enum Status{
+export enum Status {
   Active = 'Active',
-  Inactive = 'Inactive'
+  Inactive = 'Inactive',
+}
+
+export interface MenuItems {
+  title: string
+  icon: string
+  routeName: string
 }
 
 export enum ToastType {

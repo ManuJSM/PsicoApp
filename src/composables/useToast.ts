@@ -4,6 +4,7 @@ import { ToastType } from '@/types'
 const showToast = ref(false)
 const toastType = ref<ToastType>(ToastType.Success)
 const toastMessage = ref('')
+const timeout = 2000
 
 export function useToast() {
   const setToast = (type: ToastType, message: string) => {
@@ -13,13 +14,13 @@ export function useToast() {
 
     setTimeout(() => {
       showToast.value = false
-    }, 2000)
+    }, timeout)
   }
 
   return {
     showToast,
     toastType,
     toastMessage,
-    setToast
+    setToast,
   }
 }

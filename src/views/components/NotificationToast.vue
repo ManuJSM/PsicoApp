@@ -58,7 +58,7 @@ const defaultMessages: Record<ToastType, string> = {
 
 <template>
   <Transition name="fade">
-    <div v-if="show" class="z-20 fixed bottom-8 flex justify-center w-full">
+    <div v-if="show" class="z-50 fixed bottom-8 flex justify-center w-full">
       <div class="flex items-center gap-4 bg-[#111827] p-4 rounded-lg shadow-lg">
         <div
           class="flex items-center justify-center shrink-0 size-8 rounded-full"
