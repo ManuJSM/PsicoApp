@@ -17,7 +17,7 @@ const menuItems: MenuItems[] = [
   {
     title: 'Ayuda',
     icon: 'help',
-    routeName: 'User',
+    routeName: 'Help',
   },
 ]
 

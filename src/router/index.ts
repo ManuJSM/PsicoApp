@@ -9,6 +9,7 @@ import DashboardP from '../views/DashboardP/MainView.vue'
 import Login from '../views/Login/MainView.vue'
 import User from '../views/UserMain/MainView.vue'
 import Layout from '../views/Layout/MainView.vue'
+import Help from '../views/Help/MainView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,6 +31,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'User',
         name: 'User',
         component: User,
+      },
+      {
+        path: 'Help',
+        name: 'Help',
+        component: Help,
       },
     ],
   },

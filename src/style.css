@@ -26,9 +26,10 @@
 }
 
 /* Clase de utilidad para Menu movil*/
-.pb-safe-sm{
-  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+.pb-safe-sm {
+  @apply pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0;
 }
+
 :root {
   background-color: var(--color-background-light);
 }
@@ -36,4 +37,3 @@
 :root.dark {
   background-color: var(--color-background-dark);
 }
-

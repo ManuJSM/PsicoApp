@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SleepC from './components/SleepC.vue'
-import AppFooter from './components/AppFooter.vue'
+import AppFooter from '../components/AppFooter.vue'
 </script>
 <template>
   <main

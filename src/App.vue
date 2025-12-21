@@ -12,6 +12,7 @@ const { showToast, toastType, toastMessage } = useToast()
       <component :is="Component" />
     </transition>
   </Router-view>
+
   <NotificationToast v-model:show="showToast" :type="toastType" :message="toastMessage" />
 </template>
 
