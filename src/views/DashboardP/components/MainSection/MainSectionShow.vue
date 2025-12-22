@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
 import type { Patient } from '@/types'
+import SleepReg from './components/SleepReg.vue'
 
 defineProps<{
   patient: Patient
@@ -29,7 +30,7 @@ defineEmits(['exit', 'edit'])
           </div>
         </div>
         <button
-          class="flex items-center justify-center gap-2 rounded-lg bg-primary h-10 px-4 text-white text-sm font-bold w-full sm:w-auto"
+          class="flex items-center justify-center gap-2 rounded-lg hover:bg-primary/80 hover:cursor-pointer bg-primary h-10 px-4 text-white text-sm font-bold w-full sm:w-auto"
           @click="$emit('edit')"
         >
           <span class="material-symbols-outlined">edit</span>
@@ -75,31 +76,7 @@ defineEmits(['exit', 'edit'])
           </p>
         </div>
       </div>
-      <div class="p-6 rounded-xl bg-slate-100 dark:bg-slate-800/50">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white">
-            Registro de Sueño Semanal
-          </h3>
-          <div class="flex items-center gap-2">
-            <button
-              class="size-8 flex items-center justify-center rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
-            >
-              <span class="material-symbols-outlined" style="font-size: 18px">chevron_left</span>
-            </button>
-            <span class="text-sm font-medium text-slate-600 dark:text-slate-400">18-24 Nov</span>
-            <button
-              class="size-8 flex items-center justify-center rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
-            >
-              <span class="material-symbols-outlined" style="font-size: 18px">chevron_right</span>
-            </button>
-          </div>
-        </div>
-        <div
-          class="h-64 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center"
-        >
-          <p class="text-slate-500 dark:text-slate-400">Gráfico de visualización de datos aquí</p>
-        </div>
-      </div>
+      <SleepReg />
     </div>
   </section>
 </template>

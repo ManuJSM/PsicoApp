@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Notification } from '@/types'
+import noNotiCard from './noNotiCard.vue'
 
 const notificationIcons = {
   comment: 'chat_bubble',
@@ -10,17 +11,13 @@ const props = defineProps<{ notifications: Notification[] }>()
 
 const emit = defineEmits<{
   (e: 'markRead', id: number): void
-  //   viewAll: () => void
-  //   clickNotification: (id: number) => void
+  (e: 'deleteAll'): void
 }>()
-
-const handleMarkAll = () => {}
-// const handleClick = () => {}
 </script>
 
 <template>
   <div
-    class="absolute right-0 top-full m-2 md:w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700/60 z-40 overflow-hidden origin-top-right"
+    class="absolute left-0 right-0 md:left-auto top-full m-2 md:w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700/60 z-40 overflow-hidden origin-top-right"
   >
     <!-- Header -->
     <div
@@ -28,15 +25,20 @@ const handleMarkAll = () => {}
     >
       <h3 class="font-bold text-slate-900 dark:text-white text-base">Notificaciones</h3>
       <button
-        class="text-xs font-semibold text-primary hover:text-blue-600 transition-colors py-1 px-2 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
-        @click="handleMarkAll"
+        class="text-xs font-semibold text-primary hover:cursor-pointer transition-colors py-1 px-2 rounded"
+        @click="emit('deleteAll')"
       >
-        Marcar todo leído
+        Borrar Todas
       </button>
     </div>
 
     <!-- Notifications List -->
-    <div class="md:max-h-[40vh] overflow-y-auto">
+    <!-- https://vuejs.org/guide/built-ins/transition-group -->
+    <transition-group
+      name="list"
+      tag="article"
+      class="relative md:max-h-[40vh] overflow-x-hidden overflow-y-auto"
+    >
       <div
         v-for="notification in props.notifications"
         :key="notification.id"
@@ -78,6 +80,23 @@ const handleMarkAll = () => {}
           </p>
         </div>
       </div>
-    </div>
+      <noNotiCard v-if="props.notifications.length == 0" />
+    </transition-group>
   </div>
 </template>
+
+<style scoped>
+/* https://vuejs.org/guide/built-ins/transition-group */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(300px);
+}
+.list-move {
+  transition: transform 0.3s ease;
+}
+</style>

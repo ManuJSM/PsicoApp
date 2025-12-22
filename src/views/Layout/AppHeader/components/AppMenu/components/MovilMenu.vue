@@ -8,9 +8,9 @@ const props = defineProps<{ menuItems: MenuItems[] }>()
 </script>
 <template>
   <nav
-    class="md:hidden fixed left-0 right-0 z-40 translate-z-0 bottom-0 opacity-90 bg-white/80 backdrop-blur-md dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
+    class="md:hidden fixed left-0 right-0 bottom-0 z-40 opacity-90 bg-white/80 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
   >
-    <div :class="['grid', 'grid-cols-' + props.menuItems.length, 'h-16', 'items-center']">
+    <div :class="['grid', 'grid-cols-3', 'h-16', 'items-center']">
       <router-link
         v-for="(item, index) in props.menuItems"
         :key="index"

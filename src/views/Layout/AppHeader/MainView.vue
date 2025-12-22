@@ -64,6 +64,12 @@ const handleNotificationClick = () => {
   isNotificationActive.value = !isNotificationActive.value
   emit('notification-click')
 }
+const handleDeleteAll = async () => {
+  while (notifications.value.length > 0) {
+    notifications.value.pop()
+    await new Promise((resolve) => setTimeout(resolve, 300)) // espera 500ms
+  }
+}
 
 const handleMarkRead = (id: number) => {
   notifications.value = notifications.value.map((notification) => {
@@ -76,7 +82,7 @@ const handleMarkRead = (id: number) => {
 </script>
 <template>
   <header
-    class="flex relative items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
+    class="flex items-center justify-between whitespace-nowrap overflow-y-hidden border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
   >
     <div class="flex items-center gap-4 text-white">
       <MenuButton @click="open" />
@@ -103,6 +109,7 @@ const handleMarkRead = (id: number) => {
           v-if="isNotificationActive"
           @close="isNotificationActive = false"
           @markRead="handleMarkRead"
+          @deleteAll="handleDeleteAll"
           :notifications="notifications"
         />
       </div>

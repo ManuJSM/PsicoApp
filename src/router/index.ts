@@ -5,11 +5,12 @@ import {
   type RouteRecordRaw,
   type RouterHistory,
 } from 'vue-router'
-import DashboardP from '../views/DashboardP/MainView.vue'
-import Login from '../views/Login/MainView.vue'
-import User from '../views/UserMain/MainView.vue'
-import Layout from '../views/Layout/MainView.vue'
-import Help from '../views/Help/MainView.vue'
+import Login from '@/views/Login/MainView.vue'
+import Layout from '@/views/Layout/MainView.vue'
+
+const lazyLoad = (component: string) => {
+  return () => import(`@/views/${component}/MainView.vue`)
+}
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -25,17 +26,17 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'Dashboard',
         name: 'Dashboard',
-        component: DashboardP,
+        component: lazyLoad('DashboardP'),
       },
       {
         path: 'User',
         name: 'User',
-        component: User,
+        component: lazyLoad('UserMain'),
       },
       {
         path: 'Help',
         name: 'Help',
-        component: Help,
+        component: lazyLoad('Help'),
       },
     ],
   },
