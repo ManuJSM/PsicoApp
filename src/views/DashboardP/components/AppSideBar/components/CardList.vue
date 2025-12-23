@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { inject, type Ref } from 'vue'
+import { computed } from 'vue'
 import type { Patient } from '@/types'
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
+const router = useRouter()
 
-const activePatientId = inject<Ref<number | null>>('activePatientId')
+const activePatientId = computed<number>(() => Number(route.params.id))
 defineProps<{
   patients: Patient[]
 }>()
 
-const handlePatientClick = (patient: Patient) => {
-  if (activePatientId) {
-    activePatientId.value = patient.id
-  }
+const handlePatientClick = (id: number) => {
+  router.push({ name: 'Dashboard', params: { id: String(id) } })
 }
 </script>
 
@@ -26,7 +27,7 @@ const handlePatientClick = (patient: Patient) => {
         'bg-transparent hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-l-4 border-transparent':
           activePatientId !== patient.id,
       }"
-      @click="handlePatientClick(patient)"
+      @click="handlePatientClick(patient.id)"
     >
       <div class="flex items-center gap-4">
         <div

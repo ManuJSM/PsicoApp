@@ -24,9 +24,10 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/Login',
     children: [
       {
-        path: 'Dashboard',
+        path: 'Dashboard/:id?',
         name: 'Dashboard',
         component: lazyLoad('DashboardP'),
+        props: true,
       },
       {
         path: 'User',

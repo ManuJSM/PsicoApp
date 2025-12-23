@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, provide, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { type Patient, Status, ToastType } from '@/types'
 import SideBar from './components/AppSideBar/AppSidebar.vue'
 import MainSectionShow from './components/MainSection/MainSectionShow.vue'
 import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
 import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
 import { useToast } from '@/composables/useToast'
+import { useRouter } from 'vue-router'
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -56,15 +57,15 @@ const patients = ref<Patient[]>([
     status: Status.Inactive,
   },
 ])
+const props = defineProps<{
+  id?: string
+}>()
 
-// const selectedPatient = ref<Patient | null>(null)
-// provide('selectedPatient', selectedPatient)
+const router = useRouter()
 
 const selectedPatient = computed<Patient | undefined>(() => {
-  return patients.value.find((p) => p.id === activePatientId.value)
+  return patients.value.find((p) => p.id === Number(props.id))
 })
-const activePatientId = ref<number>()
-provide('activePatientId', activePatientId)
 
 type ViewMode = 'show' | 'add' | 'edit'
 const currentView = ref<ViewMode>('show')
@@ -76,12 +77,12 @@ const handleBack = () => {
   currentView.value = 'show'
 }
 const handleExit = () => {
-  activePatientId.value = 0
+  router.push({ name: 'Dashboard' })
 }
 
 const handleAdd = (patient: Patient) => {
   patients.value.push(patient)
-  activePatientId.value = patient.id
+  router.push({ name: 'Dashboard', params: { id: String(patient.id) } })
   currentView.value = 'show'
   setToast(ToastType.Success, 'Paciente añadido correctamente')
 }
@@ -105,8 +106,8 @@ const showAdd = () => {
   currentView.value = 'add'
 }
 const handleDelete = () => {
-  patients.value = patients.value.filter((p: Patient) => p.id !== activePatientId.value)
-  activePatientId.value = 0
+  patients.value = patients.value.filter((p: Patient) => p.id !== Number(props.id))
+  handleExit()
   setToast(ToastType.Success, 'Paciente eliminado correctamente')
 }
 </script>

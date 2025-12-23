@@ -37,7 +37,7 @@ const emit = defineEmits<{
     <transition-group
       name="list"
       tag="article"
-      class="relative md:max-h-[40vh] overflow-x-hidden overflow-y-auto"
+      class="min-h-[40vh] md:max-h-[40vh] overflow-x-hidden overflow-y-auto"
     >
       <div
         v-for="notification in props.notifications"
