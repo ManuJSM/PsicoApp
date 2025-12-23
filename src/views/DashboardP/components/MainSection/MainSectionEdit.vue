@@ -49,7 +49,7 @@ watch(
         @back="showDeleteModal = false"
       />
     </Transition>
-    <div class="w-full max-w-2xl mx-auto">
+    <div class="w-full mx-auto overflow-y-auto">
       <section class="flex flex-col items-center mb-10">
         <div class="relative group">
           <div

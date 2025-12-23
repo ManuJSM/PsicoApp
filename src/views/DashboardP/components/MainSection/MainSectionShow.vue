@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
 import type { Patient } from '@/types'
-import SleepReg from './components/SleepReg.vue'
+import RegTable from './components/RegTable.vue'
+import StatCard from './components/StatCard.vue'
+import { getQualityEficiency } from './utils/utils'
 
 defineProps<{
   patient: Patient
 }>()
-
 defineEmits(['exit', 'edit'])
 </script>
 <template>
@@ -55,28 +56,19 @@ defineEmits(['exit', 'edit'])
         </nav>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="p-5 rounded-xl bg-slate-100 dark:bg-slate-800/50">
-          <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">
-            Promedio de sueño (7d)
-          </h4>
-          <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-            {{ patient.sleepAverage }}
-          </p>
-        </div>
-        <div class="p-5 rounded-xl bg-slate-100 dark:bg-slate-800/50">
-          <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">Consistencia (7d)</h4>
-          <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-            {{ patient.consistency }}
-          </p>
-        </div>
-        <div class="p-5 rounded-xl bg-slate-100 dark:bg-slate-800/50">
-          <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400">Última Nota</h4>
-          <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">
-            {{ patient.lastNote }}
-          </p>
-        </div>
+        <StatCard
+          title="Promedio de sueño (7d)"
+          :value="patient.sleepAverage"
+          :color="getQualityEficiency(Number(patient.sleepAverage))"
+        />
+        <StatCard
+          title="Eficiencia (7d)"
+          :value="`${patient.Eficiency}%`"
+          :color="getQualityEficiency(patient.Eficiency)"
+        />
+        <StatCard title="Última Nota" :value="patient.lastNote" />
       </div>
-      <SleepReg />
+      <RegTable />
     </div>
   </section>
 </template>

@@ -16,7 +16,7 @@ const editPatient = reactive<Patient>({
   avatar: nonAvatar,
   sleepAverage: '',
   lastNote: '',
-  consistency: '',
+  Eficiency: 0,
 })
 </script>
 <template>
@@ -24,7 +24,7 @@ const editPatient = reactive<Patient>({
     class="relative z-0 md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
   >
     <BackButton @click="$emit('back')" label="Cerrar" />
-    <div class="w-full max-w-2xl mx-auto">
+    <div class="w-full mx-auto overflow-y-auto">
       <section class="flex flex-col items-center mb-5">
         <div class="relative group">
           <div
