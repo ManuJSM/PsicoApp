@@ -3,7 +3,9 @@ import BackButton from './components/BackButton.vue'
 import type { Patient } from '@/types'
 import RegTable from './components/RegTable.vue'
 import StatCard from './components/StatCard.vue'
-import { getQualityEficiency } from './utils/utils'
+import { calculateDuration, getQualityEficiency, calculateDurationPercentage } from './utils/utils'
+
+const targetHours = 8
 
 defineProps<{
   patient: Patient
@@ -58,15 +60,17 @@ defineEmits(['exit', 'edit'])
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Promedio de sueño (7d)"
-          :value="patient.sleepAverage"
-          :color="getQualityEficiency(Number(patient.sleepAverage))"
+          :value="calculateDuration(patient.sleepAverage)"
+          :color="
+            getQualityEficiency(calculateDurationPercentage(patient.sleepAverage, targetHours))
+          "
         />
         <StatCard
           title="Eficiencia (7d)"
           :value="`${patient.Eficiency}%`"
           :color="getQualityEficiency(patient.Eficiency)"
         />
-        <StatCard title="Última Nota" :value="patient.lastNote" />
+        <StatCard title="Último registro" :value="patient.lastNote" />
       </div>
       <RegTable />
     </div>

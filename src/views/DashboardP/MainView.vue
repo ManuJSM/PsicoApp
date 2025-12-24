@@ -15,7 +15,7 @@ const patients = ref<Patient[]>([
     phone: '+1 (555) 123-4567',
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuDi7DjWBgArlAw_noUDTky-yNcT25lMvPN9HSz-DexcpzcR5WcnGa-krB0KNT6yh_KC7XrKgfgGnErbQyw2t88uOsDrkLO9Y6RWsS_t2KYdFCc5Xal2tZY-72YqNeyGy4qFQkAs7t4BDP9CQgOgnWkxoP3150lTcfiLLr22wfWeYdaIvQG0-1xJxQZgnGAX5q3WZ-uVfUSuobBizFyiE4o0W139BA61WM4fmQTo2j8tFOrcZXECG6VaL5T6E8SvoaXFAyeb2LSwkbA',
-    sleepAverage: '7h 15m',
+    sleepAverage: 7.15,
     lastNote: 'Hace 2d',
     Eficiency: 82,
     status: Status.Active,
@@ -27,7 +27,7 @@ const patients = ref<Patient[]>([
     phone: '+1 (555) 987-6543',
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuCvQ5iQvliShWSS_jRnMjHheMaly86tSDZxjFhHIJ5SCeyUggZ1NQhSQBKO_3_bMwLhkg9Wpw8XdOW9yMu5-r-WrCStluttF3_G0ECWTPszfJOTyv9f28LaCoWQ2_k56Q1E2jvz497rdNiTB-92lKZGUeOaJ1GcCFf1HNMEk7IsNUtKGGvTJnf8RwMJc_l2PN7QobwQZ-8zwLze8HIbc_BV4pa0W8QLn-_UeZDY2D4IkBmv-UlEEbEu_U8HmxOeKVREUd7TeSL292A',
-    sleepAverage: '6h 45m',
+    sleepAverage: 6.45,
     lastNote: 'Ayer',
     Eficiency: 75,
     status: Status.Active,
@@ -39,9 +39,9 @@ const patients = ref<Patient[]>([
     phone: '+1 (555) 456-7890',
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuDlnhGmTqlOgCPoUbdUhornc9Iwwqxa81WdliD-Fhn3gtwc7wwGLmSnEpwVySXvfj-OZ4I4aRGRKX_DlI4Ead3zfkLSi_Rs28ze0HAMa6CZg4ESdRSknTjc2UN4CASbAKZFGQriHQx5laCDAYWKAVe049r4wTUOmhtttP0ObSr4kgbtfEgViG_YcYgSaArraZuAG0u0Z6TO-TzhxSpxOsK9Kp19F6t_hQftfldVHL0yALfFwWbH1cskBT-UgUz7rGmNPirYa1eiQOI',
-    sleepAverage: '8h 05m',
+    sleepAverage: 4.05,
     lastNote: 'Hace 3d',
-    Eficiency: 88,
+    Eficiency: 60,
     status: Status.Active,
   },
   {
@@ -51,7 +51,7 @@ const patients = ref<Patient[]>([
     phone: '+1 (555) 111-2233',
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuCGcb2FTBhhzil5rU1G7Qt9Mx-5ivpKjIwWleJb7UzI4L4Ps3grl9uAhf2QXgYVy3UvcPgXZt1tRzfNDWHacqXLOy8vQL0rLjHf4Ku0HncHvmIFvh3vLIHgvuJ5B-hsPkc2UxpPd0TU7XWn_XEhQ3oP5FnQssDVOadlNsNp2YJz7ny-4CC7B2ROTvd_b0v2ygoRU0EMz8n6RsZjiOm1nXzCeSdISyMG_dWfikNOTSBF6_dmxEL5Su01h24Wv-fm97c3vwWl7PkqAio',
-    sleepAverage: '5h 50m',
+    sleepAverage: 5.5,
     lastNote: 'Hace 5d',
     Eficiency: 65,
     status: Status.Inactive,

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUpdated } from 'vue'
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+
 import {
   calculateDuration,
   calculateDurationPercentage,
@@ -11,7 +14,7 @@ import {
 } from '../utils/utils'
 
 /* =========================
-   MODELO DE DOMINIO (PURO)
+   MODELO (API?)
 ========================= */
 
 interface SleepRecord {
@@ -201,11 +204,12 @@ const toggleRowExpansion = (id: number) => {
     expandedRows.value.delete(id)
   } else {
     expandedRows.value.add(id)
+    const record = computedRecords.value.find((r) => r.data.id === id)
+    if (record && record.data.hasNotification) {
+      record.data.hasNotification = false
+    }
   }
 }
-
-const goToNextWeek = () => {}
-const goToPreviousWeek = () => {}
 
 const saveProfessionalNote = (record: SleepRecord) => {
   console.log('Guardando nota:', record.id)
@@ -221,15 +225,25 @@ const recordsWithData = computed(() => computedRecords.value.filter((r) => !r.is
 const daysWithNotifications = computed(
   () => computedRecords.value.filter((r) => r.data.hasNotification).length,
 )
+onUpdated(() => {
+  console.log('currentWeek', currentWeek.value)
+})
 
-const currentWeek = ref('18 – 24 Nov')
+const currentWeek = ref(new Date())
+
+// Definir el rango de fechas permitido
+const minDate = new Date()
+minDate.setFullYear(minDate.getFullYear() - 1) // Un año atrás desde hoy
+
+const maxDate = new Date()
+maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
+    <div class="flex md:flex-row flex-col justify-center items-center md:gap-10 gap-4">
+      <div class="text-center">
         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Registro de Sueño Semanal</h3>
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
           {{ recordsWithData.length }} de {{ sleepRecords.length }} días registrados
@@ -238,24 +252,21 @@ const currentWeek = ref('18 – 24 Nov')
           </span>
         </p>
       </div>
-      <div
-        class="flex items-center gap-2 self-end sm:self-auto bg-slate-100 dark:bg-slate-800 p-1 rounded-lg"
-      >
-        <button
-          @click="goToPreviousWeek"
-          class="size-8 flex items-center justify-center rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors"
-        >
-          <span class="material-symbols-outlined" style="font-size: 20px">chevron_left</span>
-        </button>
-        <span class="text-sm font-bold text-slate-700 dark:text-slate-200 px-2">{{
-          currentWeek
-        }}</span>
-        <button
-          @click="goToNextWeek"
-          class="size-8 flex items-center justify-center rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors"
-        >
-          <span class="material-symbols-outlined" style="font-size: 20px">chevron_right</span>
-        </button>
+      <div class="items-center max-w-[150px] self-center p-2">
+        <VueDatePicker
+          v-model="currentWeek"
+          week-picker
+          :dark="true"
+          :enable-time-picker="false"
+          :time-picker="false"
+          auto-apply
+          format-locale="es"
+          :prevent-min-max-navigation="true"
+          :clearable="false"
+          :hide-navigation="['time']"
+          :min-date="minDate"
+          :max-date="maxDate"
+        />
       </div>
     </div>
 
@@ -274,13 +285,13 @@ const currentWeek = ref('18 – 24 Nov')
             <th class="px-4 py-4 rounded-r-xl w-[13%] text-right">Detalles</th>
           </tr>
         </thead>
-        <tbody class="space-y-4 md:space-y-4">
+        <tbody class="space-y-4">
           <!-- Iterar sobre los registros -->
           <template v-for="record in computedRecords" :key="record.data.id">
             <!-- Fila principal -->
             <tr
               :class="[
-                'group modern-row transition-all duration-200 cursor-pointer',
+                'group modern-row rounded-xl transition-all duration-200 cursor-pointer',
                 record.isMissingData
                   ? 'bg-slate-50 dark:bg-slate-800/30'
                   : 'bg-white dark:bg-slate-800 hover:shadow-md',
@@ -290,12 +301,12 @@ const currentWeek = ref('18 – 24 Nov')
               <!-- Día -->
               <td
                 :class="[
-                  'px-6 py-4 rounded-l-xl',
+                  'px-6 py-4 rounded-l-xl md:rounded-l-none',
                   record.meta.border && !record.isMissingData ? 'border-l-4' : '',
                   record.meta.border || '',
                 ]"
               >
-                <div class="flex flex-col">
+                <div class="flex rounded-xl flex-col">
                   <span
                     :class="[
                       'font-bold text-base',
@@ -321,7 +332,7 @@ const currentWeek = ref('18 – 24 Nov')
 
               <!-- Inicio y Fin -->
               <template v-if="record.isMissingData">
-                <td class="px-4 py-4 text-center" colspan="4">
+                <td class="px-4 py-4 rounded-xl text-center" colspan="4">
                   <!-- Versión desktop -->
                   <div
                     class="hidden md:inline-flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 bg-white/50 dark:bg-slate-800/50 py-1.5 px-4 rounded-full border border-dashed border-slate-300 dark:border-slate-600 w-full md:w-auto"
@@ -476,18 +487,12 @@ const currentWeek = ref('18 – 24 Nov')
                       class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 flex items-center gap-2"
                     >
                       <span class="material-symbols-outlined text-base">edit_note</span>
-                      Notas del Profesional
+                      Comentario del Profesional
                     </h5>
                     <div
                       class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3"
                     >
                       <div class="flex gap-4 items-start">
-                        <div
-                          class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-9 w-9 shrink-0 mt-1"
-                          style="
-                            background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE');
-                          "
-                        ></div>
                         <textarea
                           v-model="record.data.professionalNote"
                           class="flex-1 w-full text-sm bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-md p-3 focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white resize-none"
@@ -496,7 +501,13 @@ const currentWeek = ref('18 – 24 Nov')
                           @click.stop
                         ></textarea>
                       </div>
-                      <div class="flex justify-end">
+                      <div class="flex justify-center gap-5">
+                        <div
+                          class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-9 w-9 shrink-0 mt-1"
+                          style="
+                            background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE');
+                          "
+                        ></div>
                         <button
                           @click.stop="saveProfessionalNote(record.data)"
                           :class="[
@@ -594,8 +605,6 @@ input.toggle-row {
     display: flex;
     flex-direction: column;
     width: 100%;
-    background-color: white;
-    border-radius: 0.75rem;
     border: 1px solid #e2e8f0;
     position: relative;
     margin-bottom: 0;

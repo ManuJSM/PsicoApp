@@ -27,7 +27,7 @@ export interface Patient {
   email: string
   phone: string
   avatar: string
-  sleepAverage: string
+  sleepAverage: number
   lastNote: string
   Eficiency: number
   status: Status

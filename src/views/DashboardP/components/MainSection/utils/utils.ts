@@ -1,5 +1,5 @@
 function getQualityEficiency(quality: number): 'green' | 'yellow' | 'red' {
-  if (quality >= 75) return 'green'
+  if (quality >= 80) return 'green'
   if (quality >= 60) return 'yellow'
   return 'red'
 }

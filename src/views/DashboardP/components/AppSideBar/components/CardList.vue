@@ -1,23 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Patient } from '@/types'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 const route = useRoute()
-const router = useRouter()
 
 const activePatientId = computed<number>(() => Number(route.params.id))
 defineProps<{
   patients: Patient[]
 }>()
-
-const handlePatientClick = (id: number) => {
-  router.push({ name: 'Dashboard', params: { id: String(id) } })
-}
 </script>
 
 <template>
   <div class="flex flex-col divide-y divide-white/10">
-    <div
+    <router-link
       v-for="patient in patients"
       :key="patient.id"
       class="flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between cursor-pointer transition-colors duration-200"
@@ -27,7 +22,7 @@ const handlePatientClick = (id: number) => {
         'bg-transparent hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-l-4 border-transparent':
           activePatientId !== patient.id,
       }"
-      @click="handlePatientClick(patient.id)"
+      :to="{ name: 'Dashboard', params: { id: String(patient.id) } }"
     >
       <div class="flex items-center gap-4">
         <div
@@ -53,6 +48,6 @@ const handlePatientClick = (id: number) => {
           <span class="material-symbols-outlined">chevron_right</span>
         </div>
       </div>
-    </div>
+    </router-link>
   </div>
 </template>
