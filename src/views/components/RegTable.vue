@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onUpdated } from 'vue'
+import { ref, computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import { es } from 'date-fns/locale'
+import { type SleepRecord } from '@/types'
+
+const props = defineProps<{ userRole: 'paciente' | 'psico' }>()
 
 import {
   calculateDuration,
@@ -11,26 +15,7 @@ import {
   getQualityColor,
   getBorderColor,
   getBgColor as getProgressBarColor,
-} from '../utils/utils'
-
-/* =========================
-   MODELO (API?)
-========================= */
-
-interface SleepRecord {
-  id: number
-  day: string
-  date: string
-  startTime: string
-  endTime: string
-  durationHours: number
-  targetHours: number
-  qualityRating: number
-  hasNotification: boolean
-  hasPatientComment: boolean
-  patientComment?: string
-  professionalNote?: string
-}
+} from './utils/utils'
 
 /* =========================
    MODELO DE VISTA
@@ -66,7 +51,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 4.2,
     hasNotification: true,
-    hasPatientComment: true,
     patientComment:
       'Tuve un poco de insomnio al inicio pero logré descansar bien. Me levanté una vez.',
   },
@@ -80,7 +64,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 3.9,
     hasNotification: false,
-    hasPatientComment: true,
     patientComment:
       'Me costó un poco conciliar el sueño anoche, estuve pensando mucho en el trabajo. Me desperté una vez para ir al baño pero volví a dormir rápido.',
     professionalNote: 'Recomendar técnicas de respiración antes de dormir.',
@@ -95,7 +78,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 4.5,
     hasNotification: false,
-    hasPatientComment: true,
     patientComment: 'Noche perfecta, dormí de corrido.',
   },
   {
@@ -108,7 +90,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 0,
     hasNotification: false,
-    hasPatientComment: false,
   },
   {
     id: 5,
@@ -120,7 +101,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 4.4,
     hasNotification: true,
-    hasPatientComment: false,
   },
   {
     id: 6,
@@ -132,7 +112,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 4.8,
     hasNotification: false,
-    hasPatientComment: true,
     patientComment: 'Descansé súper bien, me siento renovado.',
   },
   {
@@ -145,7 +124,6 @@ const sleepRecords = ref<SleepRecord[]>([
     targetHours: 8,
     qualityRating: 0,
     hasNotification: false,
-    hasPatientComment: false,
   },
 ])
 
@@ -196,9 +174,6 @@ const computedRecords = computed<SleepRecordView[]>(() =>
   }),
 )
 
-/* =========================
-   ACTIONS
-========================= */
 const toggleRowExpansion = (id: number) => {
   if (expandedRows.value.has(id)) {
     expandedRows.value.delete(id)
@@ -216,27 +191,20 @@ const saveProfessionalNote = (record: SleepRecord) => {
   alert(`Nota guardada para ${record.day}`)
 }
 
-/* =========================
-   HEADER COMPUTED
-========================= */
-
 const recordsWithData = computed(() => computedRecords.value.filter((r) => !r.isMissingData))
 
 const daysWithNotifications = computed(
   () => computedRecords.value.filter((r) => r.data.hasNotification).length,
 )
-onUpdated(() => {
-  console.log('currentWeek', currentWeek.value)
-})
 
-const currentWeek = ref(new Date())
+const currentDate = ref(new Date())
 
 // Definir el rango de fechas permitido
 const minDate = new Date()
-minDate.setFullYear(minDate.getFullYear() - 1) // Un año atrás desde hoy
-
 const maxDate = new Date()
-maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
+
+minDate.setFullYear(minDate.getFullYear() - 1)
+maxDate.setMonth(maxDate.getMonth() + 1)
 </script>
 
 <template>
@@ -254,8 +222,10 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
       </div>
       <div class="items-center max-w-[150px] self-center p-2">
         <VueDatePicker
-          v-model="currentWeek"
+          v-model="currentDate"
           week-picker
+          week-numbers
+          :locale="es"
           :dark="true"
           :enable-time-picker="false"
           :time-picker="false"
@@ -275,18 +245,17 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
       <table class="w-full text-sm text-left modern-table">
         <thead>
           <tr
-            class="text-xs uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wider"
+            class="text-xs text-center uppercase text-slate-500 dark:text-slate-400 font-semibold tracking-wider"
           >
             <th class="px-6 py-4 rounded-l-xl w-[12%]">Día</th>
-            <th class="px-4 py-4 text-center w-[15%]">Inicio</th>
-            <th class="px-4 py-4 text-center w-[15%]">Fin</th>
+            <th class="px-4 py-4 w-[15%]">Inicio</th>
+            <th class="px-4 py-4 w-[15%]">Fin</th>
             <th class="px-4 py-4 w-[25%]">Duración</th>
             <th class="px-4 py-4 w-[20%]">Calidad</th>
             <th class="px-4 py-4 rounded-r-xl w-[13%] text-right">Detalles</th>
           </tr>
         </thead>
         <tbody class="space-y-4">
-          <!-- Iterar sobre los registros -->
           <template v-for="record in computedRecords" :key="record.data.id">
             <!-- Fila principal -->
             <tr
@@ -317,6 +286,7 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                   >
                     {{ record.data.day }}
                   </span>
+
                   <span
                     :class="[
                       'text-xs',
@@ -332,14 +302,26 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
 
               <!-- Inicio y Fin -->
               <template v-if="record.isMissingData">
-                <td class="px-4 py-4 rounded-xl text-center" colspan="4">
+                <td class="px-4 py-4 rounded-xl align-middle text-center" colspan="4">
                   <!-- Versión desktop -->
-                  <div
-                    class="hidden md:inline-flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 bg-white/50 dark:bg-slate-800/50 py-1.5 px-4 rounded-full border border-dashed border-slate-300 dark:border-slate-600 w-full md:w-auto"
-                  >
-                    <span class="material-symbols-outlined text-sm">bedtime_off</span>
-                    <span class="text-xs font-medium uppercase tracking-wide">Sin registro</span>
+                  <div class="flex flex-row items-center justify-center gap-4 w-full">
+                    <div
+                      class="hidden md:inline-flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 bg-white/50 dark:bg-slate-800/50 py-1.5 px-4 rounded-full border border-dashed border-slate-300 dark:border-slate-600 w-full md:w-auto"
+                    >
+                      <span class="material-symbols-outlined text-sm">bedtime_off</span>
+                      <span class="text-xs font-medium uppercase tracking-wide">Sin registro</span>
+                    </div>
+
+                    <router-link
+                      v-if="props.userRole === 'paciente'"
+                      :to="{ name: 'UserAddReg', params: { date: currentDate.toISOString() } }"
+                      class="hidden md:flex items-center gap-1.5 hover:cursor-pointer bg-primary hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95"
+                    >
+                      <span class="material-symbols-outlined text-sm">add</span>
+                      <span>Añadir Registro</span>
+                    </router-link>
                   </div>
+
                   <!-- Versión móvil -->
                   <div class="flex md:hidden flex-col items-center justify-center gap-3 w-full">
                     <div class="bg-white dark:bg-slate-700/50 p-3 rounded-full shadow-sm">
@@ -347,7 +329,7 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                         >bedtime_off</span
                       >
                     </div>
-                    <div class="text-center">
+                    <div class="text-center flex flex-col items-center">
                       <h4 class="text-slate-700 dark:text-slate-200 font-bold text-lg">
                         Día sin registro
                       </h4>
@@ -356,12 +338,18 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                       >
                         No hay datos de sueño sincronizados para este día.
                       </p>
+                      <router-link
+                        v-if="props.userRole === 'paciente'"
+                        :to="{ name: 'UserAddReg', params: { date: currentDate.toISOString() } }"
+                        class="mt-2 flex items-center gap-2 bg-primary text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm active:scale-95 transition-transform"
+                      >
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Añadir Registro
+                      </router-link>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 rounded-r-xl text-right opacity-40">
-                  <span class="material-symbols-outlined text-slate-400">remove</span>
-                </td>
+                <td></td>
               </template>
 
               <template v-else>
@@ -383,7 +371,9 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                       <span class="font-bold text-slate-800 dark:text-slate-200">
                         {{ record.meta.duration }}
                       </span>
-                      <span class="text-slate-400 text-[10px]">Meta: 8h</span>
+                      <span class="text-slate-400 text-[10px]"
+                        >Meta: {{ record.data.targetHours }}h</span
+                      >
                     </div>
                     <div
                       class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden"
@@ -396,7 +386,7 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                   </div>
                 </td>
 
-                <!-- Calidad -->
+                <!-- Calidad Suenio -->
                 <td class="px-4 py-4">
                   <div class="flex items-center gap-2">
                     <span :class="[record.meta.color, 'material-symbols-outlined text-lg']">
@@ -428,7 +418,7 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                       @change="toggleRowExpansion(record.data.id)"
                     />
                     <span
-                      class="material-symbols-outlined chevron transition-transform duration-300"
+                      class="material-symbols-outlined chevron text-center transition-transform duration-300"
                     >
                       expand_more
                     </span>
@@ -453,16 +443,13 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
             <tr v-if="!record.isMissingData" class="details-row">
               <td v-show="record.isExpanded" class="p-0 border-none rounded-b-xl" colspan="6">
                 <div
-                  :class="[
-                    'detail-panel-content mx-0 mb-0 mt-0 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/50 rounded-b-xl px-6 py-5 grid md:grid-cols-2 gap-6',
-                    record.meta.border ? 'border-l-4' : '',
-                    record.meta.border,
-                  ]"
+                  class="grid gap-6 md:grid-cols-2 detail-panel-content mx-0 mb-0 mt-0 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/50 rounded-b-xl px-6 py-5"
+                  :class="[record.meta.border ? 'border-l-4' : '', record.meta.border]"
                 >
                   <!-- Comentario del paciente -->
-                  <div v-if="record.data.hasPatientComment" class="space-y-3">
+                  <div class="space-y-3">
                     <h5
-                      class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 flex items-center gap-2"
+                      class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 flex justify-center items-center gap-2"
                     >
                       <span class="material-symbols-outlined text-base">chat_bubble_outline</span>
                       Comentario del Paciente
@@ -474,23 +461,25 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                         class="absolute top-4 left-0 bottom-4 w-1 bg-primary rounded-r-full"
                       ></div>
                       <p
-                        class="text-sm text-slate-700 dark:text-slate-300 italic pl-3 leading-relaxed"
+                        class="text-sm text-slate-700 dark:text-slate-300 pl-3 leading-relaxed"
+                        :class="record.data.patientComment ? 'italic' : 'text-slate-400'"
                       >
-                        {{ record.data.patientComment }}
+                        {{ record.data.patientComment || 'No hay Ningun comentario 😢' }}
                       </p>
                     </div>
                   </div>
 
                   <!-- Notas del profesional -->
-                  <div class="space-y-3">
+                  <div class="space-y-3 md:col-start-2">
                     <h5
-                      class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 flex items-center gap-2"
+                      class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 flex justify-center items-center gap-2"
                     >
                       <span class="material-symbols-outlined text-base">edit_note</span>
                       Comentario del Profesional
                     </h5>
                     <div
                       class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3"
+                      v-if="props.userRole === 'psico'"
                     >
                       <div class="flex gap-4 items-start">
                         <textarea
@@ -524,6 +513,20 @@ maxDate.setMonth(maxDate.getMonth() + 1) // Un mes hacia adelante desde hoy
                           }}
                         </button>
                       </div>
+                    </div>
+                    <div
+                      class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm relative"
+                      v-else
+                    >
+                      <div
+                        class="absolute top-4 left-0 bottom-4 w-1 bg-primary rounded-r-full"
+                      ></div>
+                      <p
+                        class="text-sm text-slate-700 dark:text-slate-300 pl-3 leading-relaxed"
+                        :class="record.data.professionalNote ? 'italic' : 'text-slate-400'"
+                      >
+                        {{ record.data.professionalNote || 'No hay ningun comentario 😢' }}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 <script lang="ts"></script>
 <template>
-  <div class="lg:col-span-5 xl:col-span-4 flex flex-col">
+  <router-link :to="{ name: 'UserCalendar' }" class="lg:col-span-5 xl:col-span-4 flex flex-col">
     <div
       class="relative overflow-hidden rounded-2xl bg-linear-to-br from-[#4b39ef] to-[#39d2c0] dark:from-primary dark:to-[#39d2c0] shadow-lg shadow-indigo-500/20 dark:shadow-primary/20 text-white cursor-pointer group transition-transform active:scale-[0.98] h-full min-h-[250px] lg:min-h-[340px] flex flex-col"
     >
@@ -35,5 +35,5 @@
         </button>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>

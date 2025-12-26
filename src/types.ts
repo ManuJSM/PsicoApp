@@ -8,6 +8,23 @@ export interface MenuItems {
   icon: string
   routeName: string
 }
+/* =========================
+   MODELO (API?)
+========================= */
+
+export interface SleepRecord {
+  id: number
+  day: string
+  date: string
+  startTime: string
+  endTime: string
+  durationHours: number
+  targetHours: number
+  qualityRating: number
+  hasNotification: boolean
+  patientComment?: string
+  professionalNote?: string
+}
 
 export enum ToastType {
   Success = 'success',

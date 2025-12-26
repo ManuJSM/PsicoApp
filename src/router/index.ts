@@ -12,6 +12,37 @@ const lazyLoad = (component: string) => {
   return () => import(`@/views/${component}/MainView.vue`)
 }
 
+const pacientRoutes: Array<RouteRecordRaw> = [
+  {
+    path: 'User',
+    name: 'User',
+    component: lazyLoad('UserMain'),
+  },
+  {
+    path: 'Calendar',
+    name: 'UserCalendar',
+    component: lazyLoad('UserCalendar'),
+  },
+  {
+    path: 'Add',
+    name: 'UserAddReg',
+    component: lazyLoad('UserAddReg'),
+  },
+  {
+    path: 'Help',
+    name: 'Help',
+    component: lazyLoad('Help'),
+  },
+]
+const psicoRoutes: Array<RouteRecordRaw> = [
+  {
+    path: 'Dashboard/:id?',
+    name: 'Dashboard',
+    component: lazyLoad('DashboardP'),
+    props: true,
+  },
+]
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/Login',
@@ -22,24 +53,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     component: Layout,
     redirect: '/Login',
-    children: [
-      {
-        path: 'Dashboard/:id?',
-        name: 'Dashboard',
-        component: lazyLoad('DashboardP'),
-        props: true,
-      },
-      {
-        path: 'User',
-        name: 'User',
-        component: lazyLoad('UserMain'),
-      },
-      {
-        path: 'Help',
-        name: 'Help',
-        component: lazyLoad('Help'),
-      },
-    ],
+    children: [...pacientRoutes, ...psicoRoutes],
   },
 ]
 

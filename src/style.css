@@ -30,6 +30,8 @@
   @apply pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0;
 }
 
+
+
 :root {
   background-color: var(--color-background-light);
 }
