@@ -407,34 +407,44 @@ maxDate.setMonth(maxDate.getMonth() + 1)
 
                 <!-- Detalles -->
                 <td class="px-6 py-4 rounded-r-xl text-right">
-                  <label
-                    class="relative cursor-pointer inline-flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary"
-                    @click.stop="toggleRowExpansion(record.data.id)"
-                  >
-                    <input
-                      class="toggle-row"
-                      type="checkbox"
-                      :checked="record.isExpanded"
-                      @change="toggleRowExpansion(record.data.id)"
-                    />
-                    <span
-                      class="material-symbols-outlined chevron text-center transition-transform duration-300"
+                  <div class="flex items-center justify-center md:justify-end gap-2">
+                    <router-link
+                      v-if="userRole === 'paciente'"
+                      :to="{ name: 'UserAddReg', params: { date: record.data.date } }"
+                      class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary z-20 relative"
+                      title="Editar registro"
                     >
-                      expand_more
-                    </span>
-                    <!-- Notificación -->
-                    <span
-                      v-if="record.data.hasNotification"
-                      class="absolute top-1 right-1 flex h-2.5 w-2.5"
+                      <span class="material-symbols-outlined">edit</span>
+                    </router-link>
+                    <label
+                      class="relative cursor-pointer inline-flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary"
+                      @click.stop="toggleRowExpansion(record.data.id)"
                     >
+                      <input
+                        class="toggle-row"
+                        type="checkbox"
+                        :checked="record.isExpanded"
+                        @change="toggleRowExpansion(record.data.id)"
+                      />
                       <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-                      ></span>
+                        class="material-symbols-outlined chevron text-center transition-transform duration-300"
+                      >
+                        expand_more
+                      </span>
+                      <!-- Notificación -->
                       <span
-                        class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-slate-800"
-                      ></span>
-                    </span>
-                  </label>
+                        v-if="record.data.hasNotification"
+                        class="absolute top-1 right-1 flex h-2.5 w-2.5"
+                      >
+                        <span
+                          class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                        ></span>
+                        <span
+                          class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-slate-800"
+                        ></span>
+                      </span>
+                    </label>
+                  </div>
                 </td>
               </template>
             </tr>
