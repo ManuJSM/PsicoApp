@@ -4,9 +4,7 @@ import RegTable from '../components/RegTable.vue'
 const userRole = 'paciente'
 </script>
 <template>
-  <main
-    class="flex-1 pb-safe-sm px-4 py-6 md:px-8 md:py-8 w-full overflow-y-auto self-center max-w-4xl"
-  >
+  <main class="flex-1 pb-safe-sm px-4 py-6 md:py-8 w-full overflow-y-auto self-center md:px-40">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
       <div
         class="rounded-xl border border-gray-200 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] p-5 shadow-sm flex flex-row md:flex-row items-center justify-between gap-4"
