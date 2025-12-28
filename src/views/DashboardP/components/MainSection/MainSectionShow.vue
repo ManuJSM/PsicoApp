@@ -17,10 +17,10 @@ defineEmits(['exit', 'edit'])
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
+    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto h-full"
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+    <div class="p-6 space-y-6 overflow-y-auto">
       <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div

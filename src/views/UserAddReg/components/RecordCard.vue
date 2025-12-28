@@ -41,7 +41,7 @@ defineEmits<{ delete: [id: number] }>()
       >
         <span class="material-symbols-outlined text-xl">{{ record.icon }}</span>
       </div>
-      <div class="flex w-full flex-col md:items-start">
+      <div class="flex w-full flex-col">
         <div class="flex justify-between items-center gap-2">
           <span class="text-xs font-medium uppercase" :class="getTypeStyles(record.type).textColor">
             {{ record.title }}
@@ -64,12 +64,12 @@ defineEmits<{ delete: [id: number] }>()
         </div>
       </div>
     </div>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center">
       <button
         @click="$emit('delete', record.id)"
-        class="p-2 rounded-lg text-red-500 hover:cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+        class="p-2 rounded-full text-red-500 hover:cursor-pointer"
       >
-        <span class="material-symbols-outlined text-center text-xl">delete</span>
+        <span class="material-symbols-outlined">delete</span>
       </button>
     </div>
   </section>

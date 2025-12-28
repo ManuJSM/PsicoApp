@@ -4,7 +4,6 @@ import RecordCard from './components/RecordCard.vue'
 import { scModelToView, type SleepCardModel, type SleepCardView } from './utils/types'
 import FormCard from './components/FormCard.vue'
 
-const pacientName = 'Samuelillo'
 const fechaHoy = 'Martes, 28 de Mayo'
 
 const sleepRecords = ref<SleepCardModel[]>([
@@ -84,21 +83,11 @@ const handleAddCard = (event: Event) => {
 </script>
 <template>
   <main
-    class="relative flex w-full h-screen flex-col font-display dark group/design-root overflow-y-auto px-4 md:px-40"
+    class="relative flex w-full flex-col font-display dark group/design-root overflow-y-auto px-4 md:px-40"
   >
     <div class="layout-container flex h-full grow flex-col">
       <div class="flex flex-1 justify-center py-5 sm:px-4">
         <div class="layout-content-container flex flex-col flex-1">
-          <div class="flex flex-wrap items-center justify-between gap-4 p-4">
-            <div class="flex min-w-72 flex-col gap-2">
-              <h1 class="text-gray-900 dark:text-white tracking-tight text-3xl font-bold">
-                Editar Registro de Sueño
-              </h1>
-              <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">
-                Paciente: {{ pacientName }}
-              </p>
-            </div>
-          </div>
           <div
             class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark sticky top-0 z-10"
           >
@@ -121,16 +110,20 @@ const handleAddCard = (event: Event) => {
               </button>
             </div>
           </div>
-          <FormCard @submit="handleAddCard" />
-          <div class="flex flex-col gap-6 p-4 pb-40">
-            <div v-show="sleepRecordsView.length > 0" class="flex items-center gap-4">
-              <div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
-              <span class="text-xs font-medium text-gray-400 uppercase tracking-widest"
-                >Registros del Día</span
+          <div class="">
+            <div class="flex items-center justify-between mb-2 lg:mt-0 mt-4">
+              <h3
+                class="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2"
               >
-              <div class="h-px bg-gray-200 dark:bg-gray-700 flex-1"></div>
+                <span class="material-symbols-outlined text-primary">list_alt</span>
+                Registros
+              </h3>
+              <span
+                class="text-xs font-bold text-primary bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-800"
+                >{{ sleepRecordsView.length }} eventos</span
+              >
             </div>
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-2 overflow-y-auto">
               <RecordCard
                 v-for="record in sleepRecordsView"
                 :key="record.id"
@@ -138,21 +131,28 @@ const handleAddCard = (event: Event) => {
                 @delete="deleteRecord"
               />
             </div>
-            <div class="h-px w-full bg-gray-200 dark:bg-gray-800"></div>
-            <div class="flex flex-col gap-3">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="material-symbols-outlined text-gray-500 dark:text-gray-400"
-                  >notes</span
-                >
-                <h2 class="text-gray-900 dark:text-white text-lg font-bold">Comentario</h2>
-              </div>
-              <div class="relative">
-                <textarea
-                  class="w-full min-h-[120px] rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 text-base focus:ring-primary focus:border-primary resize-y"
-                  placeholder="Escribe aquí cualquier observación sobre tu sueño de hoy... (ej. me desperté por ruido, tuve pesadillas, etc.)"
-                ></textarea>
-                <div class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none">
-                  Opcional
+            <div class="md:flex-5 mt-2">
+              <FormCard @submit="handleAddCard" />
+              <div class="flex flex-col gap-6 p-4 pb-20">
+                <div class="h-px w-full bg-gray-200 dark:bg-gray-800"></div>
+                <div class="flex flex-col gap-3">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="material-symbols-outlined text-gray-500 dark:text-gray-400"
+                      >notes</span
+                    >
+                    <h2 class="text-gray-900 dark:text-white text-lg font-bold">Comentario</h2>
+                  </div>
+                  <div class="relative">
+                    <textarea
+                      class="w-full min-h-[220px] rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 text-base focus:ring-primary focus:border-primary resize-y"
+                      placeholder="Escribe aquí cualquier observación sobre tu sueño de hoy... (ej. me desperté por ruido, tuve pesadillas, etc.)"
+                    ></textarea>
+                    <div
+                      class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none"
+                    >
+                      Opcional
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -4,7 +4,7 @@ import AppFooter from '../components/AppFooter.vue'
 </script>
 <template>
   <main
-    class="flex flex-col flex-1 px-6 pt-6 pb-safe-sm md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent"
+    class="flex flex-col flex-1 px-6 pt-6 pb-safe-sm md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent overflow-y-auto"
   >
     <div class="flex items-center flex-col gap-1 lg:gap-2">
       <h1

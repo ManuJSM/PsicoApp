@@ -4,7 +4,9 @@ import AppFooter from '../components/AppFooter.vue'
 
 <template>
   <!-- Main Content -->
-  <main class="flex-1 pb-safe-sm md:overflow-y-auto flex flex-col items-center px-4">
+  <main
+    class="flex-1 pb-safe-sm md:overflow-y-auto flex flex-col items-center px-4 overflow-y-auto"
+  >
     <div class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1 gap-8">
       <!-- Page Heading -->
       <div class="flex flex-col items-center gap-3 py-4 md:py-8">

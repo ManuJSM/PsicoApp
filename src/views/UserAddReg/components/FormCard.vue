@@ -18,7 +18,7 @@ const emit = defineEmits<{
           class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide"
           >Tipo de Intervalo</label
         >
-        <div class="flex flex-col gap-3">
+        <div class="grid text-center md:grid-cols-3 items-center gap-3">
           <label class="cursor-pointer">
             <input class="peer sr-only" name="interval_type" checked type="radio" value="sleep" />
             <div

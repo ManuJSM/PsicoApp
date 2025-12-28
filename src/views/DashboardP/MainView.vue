@@ -115,7 +115,7 @@ const handleDelete = () => {
 
 <template>
   <!-- Mobile: Show either sidebar or main section -->
-  <div class="md:hidden pb-safe-sm flex-1">
+  <div class="md:hidden pb-safe-sm overflow-y-auto flex-1">
     <SideBar v-if="!selectedPatient && currentView !== 'add'" :patients="patients" />
     <MainSectionShow
       v-else-if="currentView === 'show' && selectedPatient"
