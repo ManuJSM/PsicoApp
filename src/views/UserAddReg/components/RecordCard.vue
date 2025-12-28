@@ -33,34 +33,43 @@ defineEmits<{ delete: [id: number] }>()
   <section
     class="group flex items-center justify-between p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden"
   >
-    <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="getTypeStyles(record.type).bg"></div>
+    <div
+      class="absolute left-0 top-0 bottom-0 w-1.5"
+      :class="getTypeStyles(record.sleepCardModel.type).bg"
+    ></div>
     <div class="flex w-full items-center gap-4">
       <div
         class="flex items-center justify-center size-10 rounded-full shrink-0"
-        :class="[getTypeStyles(record.type).iconBg, getTypeStyles(record.type).iconColor]"
+        :class="[
+          getTypeStyles(record.sleepCardModel.type).iconBg,
+          getTypeStyles(record.sleepCardModel.type).iconColor,
+        ]"
       >
         <span class="material-symbols-outlined text-xl">{{ record.icon }}</span>
       </div>
       <div class="flex w-full flex-col">
         <div class="flex justify-between items-center gap-2">
-          <span class="text-xs font-medium uppercase" :class="getTypeStyles(record.type).textColor">
+          <span
+            class="text-xs font-medium uppercase"
+            :class="getTypeStyles(record.sleepCardModel.type).textColor"
+          >
             {{ record.title }}
           </span>
           <span
             class="md:self-end"
             :class="[
-              record.day === 'today'
+              record.sleepCardModel.day === 'today'
                 ? 'text-xs font-bold px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase tracking-wider'
                 : 'text-xs font-bold px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-100 dark:border-indigo-800/50',
             ]"
-            >{{ record.day === 'today' ? 'Hoy' : 'Mañana' }}</span
+            >{{ record.sleepCardModel.day === 'today' ? 'Hoy' : 'Mañana' }}</span
           >
         </div>
         <div
           class="flex justify-center items-center gap-2 text-gray-900 dark:text-white font-bold text-lg"
         >
-          {{ record.startTime }} <span class="text-gray-400 font-normal">-</span>
-          {{ record.endTime }}
+          {{ record.sleepCardModel.startTime }} <span class="text-gray-400 font-normal">-</span>
+          {{ record.sleepCardModel.endTime }}
         </div>
       </div>
     </div>

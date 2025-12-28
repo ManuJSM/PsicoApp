@@ -7,6 +7,7 @@ import MenuButton from './components/MenuButton.vue'
 import HeaderLogo from './components/HeaderLogo.vue'
 import NotificationBell from './components/NotificationBell.vue'
 import { useAsideMenu } from '@/composables/useAsideMenu'
+import { deleteAllArray } from '@/views/components/utils/utils'
 
 const { open } = useAsideMenu()
 
@@ -65,10 +66,7 @@ const handleNotificationClick = () => {
   emit('notification-click')
 }
 const handleDeleteAll = async () => {
-  while (notifications.value.length > 0) {
-    notifications.value.pop()
-    await new Promise((resolve) => setTimeout(resolve, 300)) // espera 500ms
-  }
+  await deleteAllArray(notifications.value)
 }
 
 const handleMarkRead = (id: number) => {

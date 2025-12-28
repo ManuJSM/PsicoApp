@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
+const start_time = ref<string>('22:00')
+const end_time = ref<string>('07:00')
 const emit = defineEmits<{
   (e: 'submit', event: SubmitEvent): void
 }>()
+
+const handleSubmit = (event: SubmitEvent) => {
+  emit('submit', event)
+  start_time.value = end_time.value
+  end_time.value = ''
+}
 </script>
 <template>
   <form
-    @submit.prevent="emit('submit', $event)"
+    @submit.prevent="handleSubmit"
     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-4"
   >
     <div class="flex items-center gap-2 mb-1">
@@ -113,6 +123,7 @@ const emit = defineEmits<{
           <input
             class="w-full h-14 rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white p-3 text-base focus:ring-primary focus:border-primary block"
             type="time"
+            v-model="start_time"
             name="start_time"
           />
         </div>
@@ -124,6 +135,7 @@ const emit = defineEmits<{
           <input
             class="w-full h-14 rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white p-3 text-base focus:ring-primary focus:border-primary block"
             type="time"
+            v-model="end_time"
             name="end_time"
           />
         </div>

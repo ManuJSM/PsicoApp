@@ -15,7 +15,7 @@ const props = defineProps<{ menuItems: MenuItems[] }>()
   <aside>
     <div
       @click="emit('close')"
-      class="fixed inset-0 bg-gray-900/60 backdrop-blur-[1px] transition-opacity"
+      class="fixed inset-0 bg-gray-900/60 backdrop-blur-[1px] z-20 transition-opacity"
     ></div>
     <section
       class="fixed inset-y-0 left-0 z-40 flex flex-col lg:w-1/4 md:w-1/3 h-full bg-white dark:bg-background-dark border-r border-white/10 dark:border-white/10 shrink-0 transition-transform duration-300 ease-in-out transform"

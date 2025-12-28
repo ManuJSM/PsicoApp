@@ -84,19 +84,3 @@ const emit = defineEmits<{
     </transition-group>
   </div>
 </template>
-
-<style scoped>
-/* https://vuejs.org/guide/built-ins/transition-group */
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.3s ease;
-}
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(300px);
-}
-.list-move {
-  transition: transform 0.3s ease;
-}
-</style>

@@ -411,7 +411,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                     <router-link
                       v-if="userRole === 'paciente'"
                       :to="{ name: 'UserAddReg', params: { date: record.data.date } }"
-                      class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary"
+                      class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-primary hover:text-primary dark:hover:text-primary"
                       title="Editar registro"
                     >
                       <span class="material-symbols-outlined">edit</span>

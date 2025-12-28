@@ -50,8 +50,16 @@ const getBgColor = (percentage: number): string => {
   return 'bg-red-500'
 }
 
+async function deleteAllArray<T>(array: T[]): Promise<void> {
+  while (array.length > 0) {
+    array.pop()
+    await new Promise((resolve) => setTimeout(resolve, 300)) // espera 300ms
+  }
+}
+
 export {
   calculateDuration,
+  deleteAllArray,
   calculateDurationPercentage,
   calculateQualityPercentage,
   getQualityIcon,

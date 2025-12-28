@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import RecordCard from './components/RecordCard.vue'
-import { scModelToView, type SleepCardModel, type SleepCardView } from './utils/types'
+import type { SleepCardModel, SleepCardView } from './utils/types'
 import FormCard from './components/FormCard.vue'
+import { validarSleepCard, scModelToView } from './utils/utils'
+import { useToast } from '@/composables/useToast'
+import { ToastType } from '@/types'
+import { deleteAllArray } from '../components/utils/utils'
 
+const { setToast } = useToast()
 const fechaHoy = 'Martes, 28 de Mayo'
+const comentario = ref<string>('')
 
 const sleepRecords = ref<SleepCardModel[]>([
   {
@@ -54,30 +60,41 @@ onMounted(() => {
 const deleteRecord = (id: number) => {
   sleepRecordsView.value = sleepRecordsView.value.filter((record) => record.id !== id)
 }
+
+const handleDeleteAll = async () => {
+  await deleteAllArray(sleepRecordsView.value)
+}
+
 const handleSave = () => {}
 const handleAddCard = (event: Event) => {
   const data = new FormData(event.target as HTMLFormElement)
   const type = data.get('interval_type')
-  const startTime = data.get('start_time')
-  const endTime = data.get('end_time')
+  const startTime = <string>data.get('start_time')
+  const endTime = <string>data.get('end_time')
   const day = data.get('day')
   const id = nextId++
 
-  const SleepCardView = <SleepCardView>scModelToView(
-    {
-      type: type as SleepCardModel['type'],
-      startTime: startTime as string,
-      endTime: endTime as string,
-      day: day as SleepCardModel['day'],
-    },
-    id,
-  )
+  const sleepCardModel: SleepCardModel = {
+    type: type as SleepCardModel['type'],
+    startTime: startTime,
+    endTime: endTime,
+    day: day as SleepCardModel['day'],
+  }
+  const validation = validarSleepCard(sleepCardModel)
+  if (!validation.isValid) {
+    setToast(ToastType.Error, validation.error)
+    console.error(validation.error)
+    return
+  }
+
+  const SleepCardView = <SleepCardView>scModelToView(sleepCardModel, id)
 
   sleepRecordsView.value.push(SleepCardView)
+  setToast(ToastType.Success, 'Registro agregado correctamente')
   sleepRecordsView.value.sort((a, b) => {
-    if (a.day === 'today' && b.day === 'tomorrow') return -1
-    if (a.day === 'tomorrow' && b.day === 'today') return 1
-    return a.startTime.localeCompare(b.startTime)
+    if (a.sleepCardModel.day === 'today' && b.sleepCardModel.day === 'tomorrow') return -1
+    if (a.sleepCardModel.day === 'tomorrow' && b.sleepCardModel.day === 'today') return 1
+    return a.sleepCardModel.startTime.localeCompare(b.sleepCardModel.startTime)
   })
 }
 </script>
@@ -111,26 +128,33 @@ const handleAddCard = (event: Event) => {
             </div>
           </div>
           <div class="">
-            <div class="flex items-center justify-between mb-2 lg:mt-0 mt-4">
+            <div class="flex items-center justify-center mb-2 gap-2 lg:mt-0 mt-4">
               <h3
                 class="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2"
               >
                 <span class="material-symbols-outlined text-primary">list_alt</span>
                 Registros
               </h3>
+              <button
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-600 hover:cursor-pointer dark:hover:text-red-400 bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800"
+                @click="handleDeleteAll"
+              >
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+                Borrar Todos
+              </button>
               <span
                 class="text-xs font-bold text-primary bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-800"
                 >{{ sleepRecordsView.length }} eventos</span
               >
             </div>
-            <div class="flex flex-col gap-2 overflow-y-auto">
+            <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 overflow-hidden">
               <RecordCard
                 v-for="record in sleepRecordsView"
                 :key="record.id"
                 :record="record"
                 @delete="deleteRecord"
               />
-            </div>
+            </TransitionGroup>
             <div class="md:flex-5 mt-2">
               <FormCard @submit="handleAddCard" />
               <div class="flex flex-col gap-6 p-4 pb-20">
@@ -146,6 +170,7 @@ const handleAddCard = (event: Event) => {
                     <textarea
                       class="w-full min-h-[220px] rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 text-base focus:ring-primary focus:border-primary resize-y"
                       placeholder="Escribe aquí cualquier observación sobre tu sueño de hoy... (ej. me desperté por ruido, tuve pesadillas, etc.)"
+                      v-model="comentario"
                     ></textarea>
                     <div
                       class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none"
