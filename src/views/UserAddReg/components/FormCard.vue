@@ -1,16 +1,53 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { SleepCardModel } from '../utils/types'
+import { validarSleepCard } from '../utils/utils'
+import { useToast } from '@/composables/useToast'
+import { ToastType } from '@/types'
 
+const { setToast } = useToast()
+const nextDay = ref<boolean>(false)
 const start_time = ref<string>('22:00')
 const end_time = ref<string>('07:00')
+const props = defineProps<{
+  sleepRecords: SleepCardModel[]
+}>()
 const emit = defineEmits<{
-  (e: 'submit', event: SubmitEvent): void
+  (e: 'submit', sleepCardModel: SleepCardModel): void
 }>()
 
-const handleSubmit = (event: SubmitEvent) => {
-  emit('submit', event)
+function setForm() {
+  if (start_time.value.localeCompare('12:00') >= 0 && end_time.value.localeCompare('12:00') < 0) {
+    nextDay.value = true
+  }
   start_time.value = end_time.value
   end_time.value = ''
+}
+
+const handleSubmit = (event: SubmitEvent) => {
+  const data = new FormData(event.target as HTMLFormElement)
+  const type = data.get('interval_type')
+  const startTime = {
+    hour: <string>data.get('start_time'),
+    day: <'today' | 'tomorrow'>data.get('start_day'),
+  }
+  const endTime = {
+    hour: <string>data.get('end_time'),
+    day: <'today' | 'tomorrow'>data.get('end_day'),
+  }
+  const sleepCardModel: SleepCardModel = {
+    type: type as SleepCardModel['type'],
+    startTime: startTime,
+    endTime: endTime,
+  }
+
+  const validation = validarSleepCard(sleepCardModel, props.sleepRecords)
+  if (!validation.isValid) {
+    setToast(ToastType.Error, validation.error)
+    return
+  }
+  emit('submit', sleepCardModel)
+  setForm()
 }
 </script>
 <template>
@@ -88,56 +125,92 @@ const handleSubmit = (event: SubmitEvent) => {
           </label>
         </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <label
-            class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide"
-            >Día del registro</label
-          >
-          <div
-            class="grid grid-cols-2 gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-xl h-14 border border-gray-200 dark:border-gray-600 relative z-0"
-          >
-            <label class="cursor-pointer relative flex-1">
-              <input checked class="peer sr-only" name="day" type="radio" value="today" />
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-6">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-center">
+            <label
+              class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+              >Inicio</label
+            >
+          </div>
+          <div class="flex w-full bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl h-10 sm:h-12">
+            <label class="flex-1 relative cursor-pointer group">
+              <input
+                :checked="!nextDay"
+                class="peer sr-only"
+                name="start_day"
+                type="radio"
+                value="today"
+              />
               <div
-                class="flex items-center justify-center w-full h-full rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:bg-white dark:peer-checked:bg-gray-600 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm"
+                class="w-full h-full flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 peer-checked:bg-white dark:peer-checked:bg-gray-800 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm transition-all"
               >
-                Hoy
+                Mismo día
               </div>
             </label>
-            <label class="cursor-pointer relative flex-1">
-              <input class="peer sr-only" name="day" type="radio" value="tomorrow" />
+            <label class="flex-1 relative cursor-pointer group">
+              <input
+                class="peer sr-only"
+                name="start_day"
+                type="radio"
+                :checked="nextDay"
+                value="tomorrow"
+              />
               <div
-                class="flex items-center justify-center w-full h-full rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 transition-all duration-200 peer-checked:bg-white dark:peer-checked:bg-gray-600 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm"
+                class="w-full h-full flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 peer-checked:bg-white dark:peer-checked:bg-gray-800 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm transition-all"
               >
-                Mañana
+                Siguiente día
               </div>
             </label>
           </div>
+          <div class="relative w-full h-14">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-400 text-2xl">schedule</span>
+            </div>
+            <input
+              class="w-full h-full pl-12 rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xl font-bold focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+              type="time"
+              name="start_time"
+              v-model="start_time"
+            />
+          </div>
         </div>
-        <div>
-          <label
-            class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide"
-            >Hora Inicio</label
-          >
-          <input
-            class="w-full h-14 rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white p-3 text-base focus:ring-primary focus:border-primary block"
-            type="time"
-            v-model="start_time"
-            name="start_time"
-          />
-        </div>
-        <div>
-          <label
-            class="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide"
-            >Hora Fin</label
-          >
-          <input
-            class="w-full h-14 rounded-xl border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white p-3 text-base focus:ring-primary focus:border-primary block"
-            type="time"
-            v-model="end_time"
-            name="end_time"
-          />
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-center">
+            <label
+              class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+              >Fin</label
+            >
+          </div>
+          <div class="flex w-full bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl h-10 sm:h-12">
+            <label class="flex-1 relative cursor-pointer group">
+              <input class="peer sr-only" name="end_day" type="radio" value="today" />
+              <div
+                class="w-full h-full flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 peer-checked:bg-white dark:peer-checked:bg-gray-800 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm transition-all"
+              >
+                Mismo día
+              </div>
+            </label>
+            <label class="flex-1 relative cursor-pointer group">
+              <input checked class="peer sr-only" name="end_day" type="radio" value="tomorrow" />
+              <div
+                class="w-full h-full flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold text-gray-500 dark:text-gray-400 peer-checked:bg-white dark:peer-checked:bg-gray-800 peer-checked:text-primary dark:peer-checked:text-white peer-checked:shadow-sm transition-all"
+              >
+                Siguiente día
+              </div>
+            </label>
+          </div>
+          <div class="relative w-full h-14">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-400 text-2xl">schedule</span>
+            </div>
+            <input
+              class="w-full h-full pl-12 rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900/50 text-gray-900 dark:text-white text-xl font-bold focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+              type="time"
+              name="end_time"
+              v-model="end_time"
+            />
+          </div>
         </div>
       </div>
       <button

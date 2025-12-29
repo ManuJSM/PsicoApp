@@ -7,7 +7,12 @@ export interface SleepCardView {
 
 export interface SleepCardModel {
   type: 'bed' | 'sleep' | 'out'
-  startTime: string
-  endTime: string
-  day: 'today' | 'tomorrow'
+  startTime: {
+    hour: string
+    day: 'today' | 'tomorrow'
+  }
+  endTime: {
+    hour: string
+    day: 'today' | 'tomorrow'
+  }
 }

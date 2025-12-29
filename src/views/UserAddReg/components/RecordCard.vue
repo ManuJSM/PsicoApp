@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SleepCardView } from '../utils/types'
+import { restarHoras } from '../utils/utils'
 const getTypeStyles = (type: string) => {
   switch (type) {
     case 'bed':
@@ -25,6 +26,16 @@ const getTypeStyles = (type: string) => {
         textColor: 'text-emerald-600 dark:text-emerald-400',
       }
   }
+}
+
+const getDuration = (record: SleepCardView) => {
+  const duration = restarHoras(
+    record.sleepCardModel.startTime.hour,
+    record.sleepCardModel.endTime.hour,
+  )
+  return duration.hh === 0
+    ? `${duration.mm} M`
+    : `${duration.hh} H , ${String(duration.mm).padStart(2, '0')} M`
 }
 defineProps<{ record: SleepCardView }>()
 defineEmits<{ delete: [id: number] }>()
@@ -58,18 +69,17 @@ defineEmits<{ delete: [id: number] }>()
           <span
             class="md:self-end"
             :class="[
-              record.sleepCardModel.day === 'today'
-                ? 'text-xs font-bold px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase tracking-wider'
-                : 'text-xs font-bold px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-100 dark:border-indigo-800/50',
+              'text-xs font-bold px-2 py-1 rounded bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 uppercase tracking-wider border border-indigo-100 dark:border-indigo-800/50',
             ]"
-            >{{ record.sleepCardModel.day === 'today' ? 'Hoy' : 'Mañana' }}</span
+            >{{ getDuration(record) }}</span
           >
         </div>
         <div
           class="flex justify-center items-center gap-2 text-gray-900 dark:text-white font-bold text-lg"
         >
-          {{ record.sleepCardModel.startTime }} <span class="text-gray-400 font-normal">-</span>
-          {{ record.sleepCardModel.endTime }}
+          {{ record.sleepCardModel.startTime.hour }}
+          <span class="text-gray-400 font-normal">-</span>
+          {{ record.sleepCardModel.endTime.hour }}
         </div>
       </div>
     </div>

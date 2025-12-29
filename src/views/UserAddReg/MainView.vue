@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import RecordCard from './components/RecordCard.vue'
 import type { SleepCardModel, SleepCardView } from './utils/types'
 import FormCard from './components/FormCard.vue'
-import { validarSleepCard, scModelToView } from './utils/utils'
+import { scModelToView } from './utils/utils'
 import { useToast } from '@/composables/useToast'
 import { ToastType } from '@/types'
 import { deleteAllArray } from '../components/utils/utils'
@@ -15,39 +15,69 @@ const comentario = ref<string>('')
 const sleepRecords = ref<SleepCardModel[]>([
   {
     type: 'sleep',
-    startTime: '23:30',
-    endTime: '04:15',
-    day: 'today',
+    startTime: {
+      hour: '23:30',
+      day: 'today',
+    },
+    endTime: {
+      hour: '04:15',
+      day: 'tomorrow',
+    },
   },
   {
     type: 'bed',
-    startTime: '04:15',
-    endTime: '05:30',
-    day: 'today',
+    startTime: {
+      hour: '04:15',
+      day: 'tomorrow',
+    },
+    endTime: {
+      hour: '05:30',
+      day: 'tomorrow',
+    },
   },
   {
     type: 'sleep',
-    startTime: '05:30',
-    endTime: '07:45',
-    day: 'today',
+    startTime: {
+      hour: '05:30',
+      day: 'tomorrow',
+    },
+    endTime: {
+      hour: '07:45',
+      day: 'tomorrow',
+    },
   },
   {
     type: 'out',
-    startTime: '08:00',
-    endTime: '12:30',
-    day: 'today',
+    startTime: {
+      hour: '08:00',
+      day: 'tomorrow',
+    },
+    endTime: {
+      hour: '12:30',
+      day: 'tomorrow',
+    },
   },
   {
     type: 'bed',
-    startTime: '14:00',
-    endTime: '15:30',
-    day: 'today',
+    startTime: {
+      hour: '14:00',
+      day: 'today',
+    },
+    endTime: {
+      hour: '15:30',
+      day: 'today',
+    },
   },
   {
     type: 'sleep',
-    startTime: '22:00',
-    endTime: '23:30',
-    day: 'tomorrow',
+    startTime: {
+      hour: '22:00',
+      day: 'today',
+    },
+    endTime: {
+      hour: '23:30',
+      day: 'today',
+    },
   },
 ])
 const sleepRecordsView = ref<SleepCardView[]>([])
@@ -66,36 +96,15 @@ const handleDeleteAll = async () => {
 }
 
 const handleSave = () => {}
-const handleAddCard = (event: Event) => {
-  const data = new FormData(event.target as HTMLFormElement)
-  const type = data.get('interval_type')
-  const startTime = <string>data.get('start_time')
-  const endTime = <string>data.get('end_time')
-  const day = data.get('day')
+const handleAddCard = (sleepCardModel: SleepCardModel) => {
   const id = nextId++
 
-  const sleepCardModel: SleepCardModel = {
-    type: type as SleepCardModel['type'],
-    startTime: startTime,
-    endTime: endTime,
-    day: day as SleepCardModel['day'],
-  }
-  const validation = validarSleepCard(sleepCardModel)
-  if (!validation.isValid) {
-    setToast(ToastType.Error, validation.error)
-    console.error(validation.error)
-    return
-  }
-
   const SleepCardView = <SleepCardView>scModelToView(sleepCardModel, id)
+  console.log(SleepCardView)
 
   sleepRecordsView.value.push(SleepCardView)
   setToast(ToastType.Success, 'Registro agregado correctamente')
-  sleepRecordsView.value.sort((a, b) => {
-    if (a.sleepCardModel.day === 'today' && b.sleepCardModel.day === 'tomorrow') return -1
-    if (a.sleepCardModel.day === 'tomorrow' && b.sleepCardModel.day === 'today') return 1
-    return a.sleepCardModel.startTime.localeCompare(b.sleepCardModel.startTime)
-  })
+  // sleepRecordsView.value.sort(sortCards)
 }
 </script>
 <template>
@@ -156,7 +165,10 @@ const handleAddCard = (event: Event) => {
               />
             </TransitionGroup>
             <div class="md:flex-5 mt-2">
-              <FormCard @submit="handleAddCard" />
+              <FormCard
+                @submit="handleAddCard"
+                :sleepRecords="sleepRecordsView.map((record) => record.sleepCardModel)"
+              />
               <div class="flex flex-col gap-6 p-4 pb-20">
                 <div class="h-px w-full bg-gray-200 dark:bg-gray-800"></div>
                 <div class="flex flex-col gap-3">
