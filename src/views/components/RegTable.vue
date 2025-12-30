@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { es } from 'date-fns/locale'
-import { type SleepRecord } from '@/types'
+import { PACIENT_ROLE, type SleepRecord } from '@/types'
 
 const props = defineProps<{ userRole: 'paciente' | 'psico' }>()
 
@@ -22,6 +22,9 @@ import {
 ========================= */
 
 interface SleepRecordView {
+  id: number
+  day: string
+  date: string
   data: SleepRecord
   isExpanded: boolean
   isMissingData: boolean
@@ -43,8 +46,7 @@ interface SleepRecordView {
 const sleepRecords = ref<SleepRecord[]>([
   {
     id: 1,
-    day: 'Lun',
-    date: '18 Nov',
+    date: '2024-11-18',
     startTime: '22:30',
     endTime: '06:15',
     durationHours: 7.75,
@@ -56,8 +58,7 @@ const sleepRecords = ref<SleepRecord[]>([
   },
   {
     id: 2,
-    day: 'Mar',
-    date: '19 Nov',
+    date: '2024-11-19',
     startTime: '23:00',
     endTime: '06:30',
     durationHours: 7.5,
@@ -70,8 +71,7 @@ const sleepRecords = ref<SleepRecord[]>([
   },
   {
     id: 3,
-    day: 'Mié',
-    date: '20 Nov',
+    date: '2024-11-20',
     startTime: '22:15',
     endTime: '06:15',
     durationHours: 8,
@@ -81,9 +81,8 @@ const sleepRecords = ref<SleepRecord[]>([
     patientComment: 'Noche perfecta, dormí de corrido.',
   },
   {
-    id: 4,
-    day: 'Jue',
-    date: '21 Nov',
+    id: 0,
+    date: '2024-11-21',
     startTime: '',
     endTime: '',
     durationHours: 0,
@@ -93,8 +92,7 @@ const sleepRecords = ref<SleepRecord[]>([
   },
   {
     id: 5,
-    day: 'Vie',
-    date: '22 Nov',
+    date: '2024-11-22',
     startTime: '23:30',
     endTime: '07:30',
     durationHours: 8,
@@ -104,8 +102,7 @@ const sleepRecords = ref<SleepRecord[]>([
   },
   {
     id: 6,
-    day: 'Sáb',
-    date: '23 Nov',
+    date: '2024-11-23',
     startTime: '00:15',
     endTime: '09:00',
     durationHours: 8.75,
@@ -115,9 +112,8 @@ const sleepRecords = ref<SleepRecord[]>([
     patientComment: 'Descansé súper bien, me siento renovado.',
   },
   {
-    id: 7,
-    day: 'Dom',
-    date: '24 Nov',
+    id: 0,
+    date: '2024-11-24',
     startTime: '',
     endTime: '',
     durationHours: 0,
@@ -133,12 +129,19 @@ const sleepRecords = ref<SleepRecord[]>([
 
 const expandedRows = ref<Set<number>>(new Set())
 
-const computedRecords = computed<SleepRecordView[]>(() =>
-  sleepRecords.value.map((record) => {
-    const isMissingData = !record.startTime || !record.endTime
+const computedRecords = computed<SleepRecordView[]>(() => {
+  let nextId = 1
+  return sleepRecords.value.map((record) => {
+    const isMissingData = record.id === 0
+    const newDate = new Date(record.date)
+    const day = newDate.toLocaleString('es-ES', { weekday: 'short' })
+    const date = newDate.toLocaleString('es-ES', { day: 'numeric', month: 'short' })
 
     if (isMissingData) {
       return {
+        day,
+        date,
+        id: nextId++,
         data: record,
         isExpanded: false,
         isMissingData: true,
@@ -158,6 +161,9 @@ const computedRecords = computed<SleepRecordView[]>(() =>
     const qualityPercentage = calculateQualityPercentage(record.qualityRating)
 
     return {
+      day,
+      date,
+      id: nextId++,
       data: record,
       isExpanded: expandedRows.value.has(record.id),
       isMissingData: false,
@@ -171,23 +177,23 @@ const computedRecords = computed<SleepRecordView[]>(() =>
         progress: getProgressBarColor(durationPercentage),
       },
     }
-  }),
-)
+  })
+})
 
 const toggleRowExpansion = (id: number) => {
   if (expandedRows.value.has(id)) {
     expandedRows.value.delete(id)
   } else {
     expandedRows.value.add(id)
-    const record = computedRecords.value.find((r) => r.data.id === id)
+    const record = computedRecords.value.find((r) => r.id === id)
     if (record && record.data.hasNotification) {
       record.data.hasNotification = false
     }
   }
 }
 
-const saveProfessionalNote = (record: SleepRecord) => {
-  console.log('Guardando nota:', record.id)
+const saveProfessionalNote = (record: SleepRecordView) => {
+  console.log('Guardando nota:', record.data.id)
   alert(`Nota guardada para ${record.day}`)
 }
 
@@ -250,8 +256,8 @@ maxDate.setMonth(maxDate.getMonth() + 1)
             <th class="px-6 py-4 rounded-l-xl w-[12%]">Día</th>
             <th class="px-4 py-4 w-[15%]">Inicio</th>
             <th class="px-4 py-4 w-[15%]">Fin</th>
-            <th class="px-4 py-4 w-[25%]">Duración</th>
-            <th class="px-4 py-4 w-[20%]">Calidad</th>
+            <th class="px-4 py-4 w-[25%]">Tiempo Dormido</th>
+            <th class="px-4 py-4 w-[20%]">Eficiencia</th>
             <th class="px-4 py-4 rounded-r-xl w-[13%] text-right">Detalles</th>
           </tr>
         </thead>
@@ -278,24 +284,24 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                 <div class="flex rounded-xl flex-col">
                   <span
                     :class="[
-                      'font-bold text-base',
+                      'font-bold uppercase text-base',
                       record.isMissingData
                         ? 'text-slate-500 dark:text-slate-400'
                         : 'text-slate-900 dark:text-white',
                     ]"
                   >
-                    {{ record.data.day }}
+                    {{ record.day }}
                   </span>
 
                   <span
                     :class="[
-                      'text-xs',
+                      'text-xs uppercase',
                       record.isMissingData
                         ? 'text-slate-400 dark:text-slate-500'
                         : 'text-slate-500 dark:text-slate-400',
                     ]"
                   >
-                    {{ record.data.date }}
+                    {{ record.date }}
                   </span>
                 </div>
               </td>
@@ -313,8 +319,8 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                     </div>
 
                     <router-link
-                      v-if="props.userRole === 'paciente'"
-                      :to="{ name: 'UserAddReg', params: { date: currentDate.toISOString() } }"
+                      v-if="props.userRole === PACIENT_ROLE"
+                      :to="{ name: 'UserEditReg', params: { id: record.data.id } }"
                       class="hidden md:flex items-center gap-1.5 hover:cursor-pointer bg-primary hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95"
                     >
                       <span class="material-symbols-outlined text-sm">add</span>
@@ -339,8 +345,11 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                         No hay datos de sueño sincronizados para este día.
                       </p>
                       <router-link
-                        v-if="props.userRole === 'paciente'"
-                        :to="{ name: 'UserAddReg', params: { date: currentDate.toISOString() } }"
+                        v-if="props.userRole === PACIENT_ROLE"
+                        :to="{
+                          name: 'UserEditReg',
+                          params: { id: record.data.id },
+                        }"
                         class="mt-2 flex items-center gap-2 bg-primary text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm active:scale-95 transition-transform"
                       >
                         <span class="material-symbols-outlined text-sm">add</span>
@@ -386,9 +395,9 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                   </div>
                 </td>
 
-                <!-- Calidad Suenio -->
+                <!-- Eficiencia Suenio -->
                 <td class="px-4 py-4">
-                  <div class="flex items-center gap-2">
+                  <div class="flex justify-center items-center gap-2">
                     <span :class="[record.meta.color, 'material-symbols-outlined text-lg']">
                       {{ record.meta.icon }}
                     </span>
@@ -409,8 +418,8 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                 <td class="px-6 py-4 rounded-r-xl text-right">
                   <div class="flex items-center justify-center md:justify-end gap-2">
                     <router-link
-                      v-if="userRole === 'paciente'"
-                      :to="{ name: 'UserAddReg', params: { date: record.data.date } }"
+                      v-if="userRole === PACIENT_ROLE"
+                      :to="{ name: 'UserEditReg', params: { id: record.data.id } }"
                       class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-primary hover:text-primary dark:hover:text-primary"
                       title="Editar registro"
                     >
@@ -508,7 +517,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                           "
                         ></div>
                         <button
-                          @click.stop="saveProfessionalNote(record.data)"
+                          @click.stop="saveProfessionalNote(record)"
                           :class="[
                             'text-white text-xs font-bold py-2 px-3 rounded-md shadow-sm transition-all flex items-center gap-1.5',
                             record.data.professionalNote?.trim()
@@ -675,7 +684,7 @@ input.toggle-row {
     text-transform: uppercase;
   }
   .modern-row td:nth-child(5)::before {
-    content: 'Calidad';
+    content: 'Eficiencia';
     font-size: 0.75rem;
     color: #64748b;
     font-weight: 600;

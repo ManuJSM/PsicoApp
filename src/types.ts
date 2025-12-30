@@ -14,7 +14,6 @@ export interface MenuItems {
 
 export interface SleepRecord {
   id: number
-  day: string
   date: string
   startTime: string
   endTime: string
@@ -25,6 +24,9 @@ export interface SleepRecord {
   patientComment?: string
   professionalNote?: string
 }
+
+export const PACIENT_ROLE = 'paciente'
+export const PSICO_ROLE = 'psico'
 
 export enum ToastType {
   Success = 'success',

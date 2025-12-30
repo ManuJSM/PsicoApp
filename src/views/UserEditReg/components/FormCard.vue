@@ -213,13 +213,15 @@ const handleSubmit = (event: SubmitEvent) => {
           </div>
         </div>
       </div>
-      <button
-        type="submit"
-        class="flex hover:cursor-pointer items-center justify-center gap-2 w-full py-3.5 rounded-lg bg-primary text-white font-bold hover:bg-blue-600 transition-colors shadow-sm mt-2"
-      >
-        <span class="material-symbols-outlined text-xl">add</span>
-        Añadir Intervalo
-      </button>
+      <div class="flex items-center justify-center">
+        <button
+          type="submit"
+          class="flex hover:cursor-pointer items-center justify-center gap-2 px-4 py-3.5 rounded-lg bg-primary text-white font-bold hover:bg-blue-600 transition-colors shadow-sm mt-2"
+        >
+          <span class="material-symbols-outlined text-xl">add</span>
+          Añadir Intervalo
+        </button>
+      </div>
     </div>
   </form>
 </template>

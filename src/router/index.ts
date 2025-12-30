@@ -24,9 +24,10 @@ const pacientRoutes: Array<RouteRecordRaw> = [
     component: lazyLoad('UserCalendar'),
   },
   {
-    path: 'Add',
-    name: 'UserAddReg',
-    component: lazyLoad('UserAddReg'),
+    path: 'Edit/:id',
+    name: 'UserEditReg',
+    component: lazyLoad('UserEditReg'),
+    props: true,
   },
   {
     path: 'Help',
