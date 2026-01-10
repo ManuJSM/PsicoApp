@@ -3,7 +3,7 @@ import { AutenticationError, AuthorizationError } from '@/types/errors.types'
 import type { HttpOptions } from '@/types/types'
 import { useToast } from '@/composables/useToast'
 import { ToastType } from '@/types/types'
-const apiUrl = 'http://localhost:3000'
+const apiUrl = 'http://192.168.1.24:3000'
 
 export async function http<T>(endpoint: string, options: HttpOptions = {}): Promise<T> {
   const { auth = true, headers: customHeaders, ...restOptions } = options

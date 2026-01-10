@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { login, type LoginResponse } from '@/api/http.auth'
-import { useAuthStore } from '@/stores/auth.store'
-import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { ToastType } from '@/types/types'
 import { AutenticationError } from '@/types/errors.types'
+import { useAuthStore } from '@/stores/auth.store'
+import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const authStore = useAuthStore()
 const { setToast } = useToast()
 
 const mounted = ref(false)
@@ -16,15 +13,13 @@ const showPassword = ref(false)
 const loading = ref(false)
 const email = ref('')
 const password = ref('')
+const authStore = useAuthStore()
+const router = useRouter()
 
-//TODO: Implementar login
 const handleLogin = async () => {
   loading.value = true
   try {
-    const data = <LoginResponse>await login(email.value, password.value)
-    setToast(ToastType.Success, data.message)
-    authStore.setToken(data.accessToken)
-    router.push({ name: 'Dashboard' })
+    await authStore.login(email.value, password.value, router)
   } catch (err: unknown) {
     if (err instanceof AutenticationError) {
       setToast(ToastType.Error, err.message)

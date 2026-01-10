@@ -3,6 +3,7 @@ import { http } from './http'
 export interface LoginResponse {
   accessToken: string
   message: string
+  role: 'user' | 'psico'
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
@@ -16,10 +17,11 @@ export async function login(email: string, password: string): Promise<LoginRespo
 }
 //TODO acabar de implementarlo
 export async function refresh(): Promise<string> {
-  return http<string>('/auth/refresh', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    auth: false,
-  })
+  // return http<string>('/auth/refresh', {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   credentials: 'include',
+  //   auth: false,
+  // })
+  return 'token'
 }
