@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import type { MenuItems } from '@/types'
+import type { MenuItems } from '@/types/types'
 import menuUtils from './utils'
 const route = useRoute()
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
-import type { Patient } from '@/types'
+import type { Patient } from '@/types/types'
 import RegTable from '../../../components/RegTable.vue'
 import StatCard from './components/StatCard.vue'
 import { getQualityEficiency } from './utils/utils'
@@ -17,7 +17,7 @@ defineEmits(['exit', 'edit'])
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark overflow-y-auto h-full"
+    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
     <div class="p-6 space-y-6 overflow-y-auto">
@@ -60,7 +60,7 @@ defineEmits(['exit', 'edit'])
           >
         </nav>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <StatCard
           title="Promedio de sueño (7d)"
           :value="calculateDuration(patient.sleepAverage)"

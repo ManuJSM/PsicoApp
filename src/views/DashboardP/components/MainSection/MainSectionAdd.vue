@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
 import { reactive } from 'vue'
-import { type Patient, Status } from '@/types'
+import { type Patient, Status } from '@/types/types'
 import FormInput from './components/FormInput.vue'
 
 const nonAvatar =

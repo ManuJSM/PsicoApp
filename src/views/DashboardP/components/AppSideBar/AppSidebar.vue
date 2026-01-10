@@ -2,7 +2,7 @@
 import SideFinder from './components/SideFinder.vue'
 import FilterButton from './components/FilterButton.vue'
 import CardList from './components/CardList.vue'
-import { type Patient } from '@/types'
+import { type Patient } from '@/types/types'
 type Filtro = 'All' | 'Active' | 'Inactive'
 import { ref, computed } from 'vue'
 const title: string = 'Pacientes'

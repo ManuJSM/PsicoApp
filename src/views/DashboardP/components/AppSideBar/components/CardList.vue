@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Patient } from '@/types'
+import type { Patient } from '@/types/types'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 

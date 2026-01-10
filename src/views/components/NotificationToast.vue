@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import type { ToastType } from '@/types'
+import type { ToastType } from '@/types/types'
 
 const props = defineProps({
   show: {

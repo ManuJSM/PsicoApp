@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { es } from 'date-fns/locale'
-import { PACIENT_ROLE, type SleepRecord } from '@/types'
+import { PACIENT_ROLE, type SleepRecord } from '@/types/types'
 
 const props = defineProps<{ userRole: 'paciente' | 'psico' }>()
 
@@ -226,6 +226,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
           </span>
         </p>
       </div>
+      <!-- da un warning de scroll no se que en vue nidea -->
       <div class="items-center max-w-[150px] self-center p-2">
         <VueDatePicker
           v-model="currentDate"
@@ -562,17 +563,25 @@ maxDate.setMonth(maxDate.getMonth() + 1)
 .modern-table {
   border-spacing: 0 0.5rem;
   border-collapse: separate;
+  contain: layout style paint;
+  scroll-behavior: auto !important;
 }
 .modern-row {
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  contain: content;
 }
 @media (min-width: 768px) {
   .modern-row:hover {
+    transform: translate3d(0, -1px, 0); /* GPU acceleration */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    will-change: transform, box-shadow; /* Hint para el navegador */
+  }
+  /* .modern-row:hover {
     transform: translateY(-1px);
     box-shadow:
       0 4px 6px -1px rgb(0 0 0 / 0.1),
       0 2px 4px -1px rgb(0 0 0 / 0.06);
-  }
+  } */
   .modern-row {
     background-color: white;
   }
@@ -742,12 +751,22 @@ input.toggle-row {
     padding: 0;
   }
   .detail-panel-content {
+    transform: translateZ(0);
+    transition:
+      max-height 0.3s ease-out,
+      opacity 0.3s ease-out;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+  /*
+  .detail-panel-content {
     border-radius: 0 0 0.75rem 0.75rem;
     border: 1px solid #e2e8f0;
     border-top: none;
     margin: 0;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  }
+  } */
   .dark .detail-panel-content {
     border-color: rgba(255, 255, 255, 0.05);
   }

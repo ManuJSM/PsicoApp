@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { type Patient, Status, ToastType } from '@/types'
+import { type Patient, Status, ToastType } from '@/types/types'
 import SideBar from './components/AppSideBar/AppSidebar.vue'
 import MainSectionShow from './components/MainSection/MainSectionShow.vue'
 import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
 import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
 import { useToast } from '@/composables/useToast'
 import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+import { fetchWithAuth } from '@/api/fetchAuth'
+import { AppError } from '@/types/errors.types'
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -60,6 +63,17 @@ const patients = ref<Patient[]>([
 const props = defineProps<{
   id?: string
 }>()
+onMounted(() => {
+  fetchWithAuth<Patient[]>('/me')
+    .then((data) => {
+      console.log(data)
+    })
+    .catch((err: unknown) => {
+      if (!(err instanceof AppError) && err instanceof Error) {
+        console.log(err.message)
+      }
+    })
+})
 
 const router = useRouter()
 

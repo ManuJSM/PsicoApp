@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import NotiCard from './components/NotiCard.vue'
-import type { Notification } from '@/types'
+import type { Notification } from '@/types/types'
 import AppNav from './components/AppMenu/MainView.vue'
 import MenuButton from './components/MenuButton.vue'
 import HeaderLogo from './components/HeaderLogo.vue'

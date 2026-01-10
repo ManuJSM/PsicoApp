@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import RegTable from '../components/RegTable.vue'
 import { calculateDuration, getBorderColor, getQualityColor } from '@/views/components/utils/utils'
-import { PACIENT_ROLE } from '@/types'
+import { PACIENT_ROLE } from '@/types/types'
 
 const userRole = PACIENT_ROLE
 const eficiencia = 98

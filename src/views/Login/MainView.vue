@@ -1,16 +1,39 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { login, type LoginResponse } from '@/api/http.auth'
+import { useAuthStore } from '@/stores/auth.store'
 import { useRouter } from 'vue-router'
+import { useToast } from '@/composables/useToast'
+import { ToastType } from '@/types/types'
+import { AutenticationError } from '@/types/errors.types'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const { setToast } = useToast()
 
 const mounted = ref(false)
 const showPassword = ref(false)
+const loading = ref(false)
+const email = ref('')
+const password = ref('')
 
 //TODO: Implementar login
-const handleLogin = () => {
-  console.log('Login button clicked')
-  router.push({ name: 'Dashboard' })
+const handleLogin = async () => {
+  loading.value = true
+  try {
+    const data = <LoginResponse>await login(email.value, password.value)
+    setToast(ToastType.Success, data.message)
+    authStore.setToken(data.accessToken)
+    router.push({ name: 'Dashboard' })
+  } catch (err: unknown) {
+    if (err instanceof AutenticationError) {
+      setToast(ToastType.Error, err.message)
+    } else {
+      console.log(err)
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
@@ -130,7 +153,7 @@ const togglePassword = () => {
                 class="form-input h-12 w-full flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 bg-white/50 dark:bg-black/30 px-4 py-2.5 text-base font-normal text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 transition-all duration-300 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
                 placeholder="Introduce tu usuario o correo"
                 type="email"
-                value=""
+                v-model="email"
               />
             </label>
           </div>
@@ -155,7 +178,7 @@ const togglePassword = () => {
                   :type="showPassword ? 'text' : 'password'"
                   class="form-input h-12 w-full flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 bg-white/50 dark:bg-black/30 px-4 py-2.5 pr-12 text-base font-normal text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 transition-all duration-300 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
                   placeholder="Introduce tu contraseña"
-                  value=""
+                  v-model="password"
                 />
                 <button
                   @click.prevent="togglePassword"
@@ -202,6 +225,7 @@ const togglePassword = () => {
             <button
               class="group flex h-12 min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-5 text-base font-bold text-white shadow-lg hover:bg-primary/90 hover:shadow-xl active:scale-95 transition-all duration-300"
               @click.prevent="handleLogin"
+              type="submit"
             >
               <span class="truncate group-hover:scale-105 transition-transform duration-300">
                 Iniciar Sesión

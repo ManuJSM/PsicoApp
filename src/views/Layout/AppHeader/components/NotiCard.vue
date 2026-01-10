@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Notification } from '@/types'
+import type { Notification } from '@/types/types'
 import noNotiCard from './noNotiCard.vue'
 
 const notificationIcons = {

@@ -47,7 +47,12 @@ const psicoRoutes: Array<RouteRecordRaw> = [
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/Login',
-    name: 'Login',
+    name: 'login',
+    component: Login,
+  },
+  {
+    path: '/Forbidden',
+    name: 'unauthorized',
     component: Login,
   },
   {

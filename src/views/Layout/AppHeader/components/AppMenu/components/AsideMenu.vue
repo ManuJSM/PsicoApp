@@ -3,7 +3,7 @@ import MenuButton from '@/views/Layout/AppHeader/components/MenuButton.vue'
 import HeaderLogo from '@/views/Layout/AppHeader/components/HeaderLogo.vue'
 import { RouterLink } from 'vue-router'
 import { useRoute } from 'vue-router'
-import type { MenuItems } from '@/types'
+import type { MenuItems } from '@/types/types'
 import menuUtils from './utils'
 
 const appName = 'SleepHealth'

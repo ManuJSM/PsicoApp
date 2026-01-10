@@ -2,7 +2,7 @@
 import AsideMenu from './components/AsideMenu.vue'
 import MovilMenu from './components/MovilMenu.vue'
 import { useAsideMenu } from '@/composables/useAsideMenu'
-import type { MenuItems } from '@/types'
+import type { MenuItems } from '@/types/types'
 const menuItems: MenuItems[] = [
   {
     title: 'Pacientes',

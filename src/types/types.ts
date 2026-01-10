@@ -24,6 +24,9 @@ export interface SleepRecord {
   patientComment?: string
   professionalNote?: string
 }
+export interface HttpOptions extends RequestInit {
+  auth?: boolean // si true, añade Authorization header
+}
 
 export const PACIENT_ROLE = 'paciente'
 export const PSICO_ROLE = 'psico'

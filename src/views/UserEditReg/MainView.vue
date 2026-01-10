@@ -5,7 +5,7 @@ import type { SleepCardModel, SleepCardView } from './utils/types'
 import FormCard from './components/FormCard.vue'
 import { scModelToView } from './utils/utils'
 import { useToast } from '@/composables/useToast'
-import { ToastType } from '@/types'
+import { ToastType } from '@/types/types'
 import { deleteAllArray } from '../components/utils/utils'
 
 const { setToast } = useToast()

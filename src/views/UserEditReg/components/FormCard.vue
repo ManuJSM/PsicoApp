@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { SleepCardModel } from '../utils/types'
 import { validarSleepCard } from '../utils/utils'
 import { useToast } from '@/composables/useToast'
-import { ToastType } from '@/types'
+import { ToastType } from '@/types/types'
 
 const { setToast } = useToast()
 const nextDay = ref<boolean>(false)

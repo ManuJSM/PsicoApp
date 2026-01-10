@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { ToastType } from '@/types'
+import { ToastType } from '@/types/types'
 
 const showToast = ref(false)
 const toastType = ref<ToastType>(ToastType.Success)

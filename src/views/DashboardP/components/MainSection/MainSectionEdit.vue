@@ -2,7 +2,7 @@
 import BackButton from './components/BackButton.vue'
 import DeleteModal from './components/DeleteModal.vue'
 import FormInput from './components/FormInput.vue'
-import { Status, type Patient } from '@/types'
+import { Status, type Patient } from '@/types/types'
 import { ref, computed, reactive, watch } from 'vue'
 
 const props = defineProps<{
