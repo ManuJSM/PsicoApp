@@ -3,7 +3,6 @@ import { http } from './http'
 export interface LoginResponse {
   accessToken: string
   message: string
-  role: 'user' | 'psico'
 }
 
 export async function login(email: string, password: string): Promise<LoginResponse> {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import MenuButton from '@/views/Layout/AppHeader/components/MenuButton.vue'
-import HeaderLogo from '@/views/Layout/AppHeader/components/HeaderLogo.vue'
+import MenuButton from '../../MenuButton.vue'
+import HeaderLogo from '../../HeaderLogo.vue'
 import { RouterLink } from 'vue-router'
 import { useRoute } from 'vue-router'
 import type { MenuItems } from '@/types/types'

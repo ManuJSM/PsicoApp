@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToast } from '@/composables/useToast'
-import { ToastType } from '@/types/types'
+import { role, ToastType } from '@/types/types'
 import { AutenticationError } from '@/types/errors.types'
 import { useAuthStore } from '@/stores/auth.store'
 import { useRouter } from 'vue-router'
-
 const { setToast } = useToast()
 
 const mounted = ref(false)
@@ -15,11 +14,13 @@ const email = ref('')
 const password = ref('')
 const authStore = useAuthStore()
 const router = useRouter()
-
 const handleLogin = async () => {
   loading.value = true
   try {
-    await authStore.login(email.value, password.value, router)
+    const res = await authStore.login(email.value, password.value)
+    setToast(ToastType.Success, 'Login exitoso')
+    if (res === role.psico) router.push({ name: 'DashboardP' })
+    if (res === role.user) router.push({ name: 'DashboardU' })
   } catch (err: unknown) {
     if (err instanceof AutenticationError) {
       setToast(ToastType.Error, err.message)

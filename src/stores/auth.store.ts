@@ -1,44 +1,56 @@
 import { defineStore } from 'pinia'
 import { http } from '@/api/http'
 import { login ,type LoginResponse } from '@/api/http.auth'
-import type { Router } from 'vue-router'
-import { userRoutes } from '@/router/user.route'
-import { psicoRoutes} from '@/router/psico.route'
 import { useToast } from '@/composables/useToast'
-import { AppError } from '@/types/errors.types'
-import { ToastType } from '@/types/types'
-
+import { AppError, AutenticationError } from '@/types/errors.types'
+import { role, ToastType } from '@/types/types'
+interface jwtData {
+  role: role
+  id : number
+}
 
 const { setToast } = useToast()
+export function parseJwt(token: string) {
+  try {
+    const base64Payload = token.split('.')[1]
+    if(base64Payload === undefined){
+      return null
+    }
+    const payload = atob(base64Payload)
+    return JSON.parse(payload) as jwtData
+  } catch (err) {
+    console.error('Invalid JWT', err)
+    return null
+  }
+}
 
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     accessToken: null as string | null,
-    role: null as 'user' | 'psico' | null,
+    role: null as role | null,
     isLoggedIn: false,
-    routesLoaded: false,
     bootstrapped: false,
   }),
   actions: {
-    setToken(token: string, role: 'user' | 'psico') {
+    setToken(token: string, role: role) {
       this.accessToken = token
       this.role = role
       this.isLoggedIn = true
     },
 
-    async login(email: string, password: string, router?: Router) {
+    async login(email: string, password: string) {
       const res = await login(email, password)
-
-      this.setToken(res.accessToken, res.role)
-      if (router) {
-        const routes = res.role === 'psico' ? psicoRoutes: userRoutes
-        routes.forEach(r => router.addRoute(r))
-        router.replace({ name: res.role === 'psico' ? 'Dashboard' : 'Dashboard' })
+      const data = parseJwt(res.accessToken)
+      if(data === null){
+        throw new AutenticationError('Invalid token')
       }
+      console.log(data)
+      this.setToken(res.accessToken, data.role)
+      return data.role
     },
 
-    async bootstrapAuth(router?: Router) {
+    async bootstrapAuth() {
       try {
         const res = await http<LoginResponse>('/auth/refresh', {
           method: 'POST',
@@ -46,32 +58,23 @@ export const useAuthStore = defineStore('auth', {
           auth: false,
         })
 
-        this.setToken(res.accessToken, res.role)
+        this.setToken(res.accessToken, role.psico)
 
-        if (router && !this.routesLoaded) {
-          const routes = res.role === 'psico' ? psicoRoutes: userRoutes
-          routes.forEach(r => router.addRoute(r))
-          this.routesLoaded = true
-        }
       } catch (e: unknown){
         if(e instanceof AppError){
           setToast(ToastType.Error, e.message)
         }
-        this.logout(router)
+        this.logout()
       } finally {
         this.bootstrapped = true
       }
     },
 
-    logout(router?: Router) {
+    logout() {
       this.accessToken = null
       this.role = null
       this.isLoggedIn = false
-      this.routesLoaded = false
-
-      if (router) {
-        router.replace({name: 'login'} )
-      }
+      //TODO: deslogear en el backend
     },
   },
 })

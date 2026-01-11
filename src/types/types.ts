@@ -28,8 +28,10 @@ export interface HttpOptions extends RequestInit {
   auth?: boolean // si true, añade Authorization header
 }
 
-export const PACIENT_ROLE = 'paciente'
-export const PSICO_ROLE = 'psico'
+export enum role{
+  user = 'USER',
+  psico = 'PSICO'
+}
 
 export enum ToastType {
   Success = 'success',

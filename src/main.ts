@@ -6,11 +6,11 @@ import { useAuthStore } from '@/stores/auth.store'
 
 const app = createApp(App)
 const pinia = createPinia()
-const router = createAppRouter()
 app.use(pinia)
-app.use(router)
 
 const auth = useAuthStore()
-await auth.bootstrapAuth(router)
+await auth.bootstrapAuth()
 
+const router = createAppRouter()
+app.use(router)
 app.mount('#app')

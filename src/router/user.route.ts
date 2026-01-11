@@ -1,18 +1,17 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { lazyLoad } from './utils.ts'
-import Layout from '@/views/Layout/MainView.vue'
-
+import Layout from '@/views/Layout/MainViewU.vue'
+import { role } from '@/types/types.ts'
 const routes: Array<RouteRecordRaw> = [
   {
-    path: 'Dashboard/:id?',
-    name: 'Dashboard',
-    component: lazyLoad('DashboardP'),
-    props: true,
+    path: 'Dashboard',
+    name: 'DashboardU',
+    component: lazyLoad('DashboardU'),
   },
   {
-    path: 'User',
-    name: 'User',
-    component: lazyLoad('UserMain'),
+    path: 'myAccount',
+    name: 'myAccountU',
+    component: lazyLoad('MiCuenta'),
   },
   {
     path: 'Calendar',
@@ -20,14 +19,14 @@ const routes: Array<RouteRecordRaw> = [
     component: lazyLoad('UserCalendar'),
   },
   {
-    path: 'Edit/:id',
+    path: 'Calendar/Edit/:id',
     name: 'UserEditReg',
     component: lazyLoad('UserEditReg'),
     props: true,
   },
   {
     path: 'Help',
-    name: 'Help',
+    name: 'HelpU',
     component: lazyLoad('Help'),
   },
 ]
@@ -35,7 +34,10 @@ export const userRoutes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: Layout,
-    redirect: '/login',
+    meta: {
+      requiresAuth: true,
+      role: role.user,
+    },
     children: routes,
   },
 ]

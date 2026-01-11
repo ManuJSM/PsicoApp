@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BackButton from './components/BackButton.vue'
-import type { Patient } from '@/types/types'
+import { role, type Patient } from '@/types/types'
 import RegTable from '../../../components/RegTable.vue'
 import StatCard from './components/StatCard.vue'
 import { getQualityEficiency } from './utils/utils'
@@ -8,7 +8,7 @@ import { calculateDurationPercentage, calculateDuration } from '@/views/componen
 
 const targetHours = 8
 
-const role = 'psico'
+const rol = role.psico
 
 defineProps<{
   patient: Patient
@@ -75,7 +75,7 @@ defineEmits(['exit', 'edit'])
         />
         <StatCard title="Último registro" :value="patient.lastNote" />
       </div>
-      <RegTable :userRole="role" />
+      <RegTable :userRole="rol" />
     </div>
   </section>
 </template>

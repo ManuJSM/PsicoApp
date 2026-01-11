@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Patient } from '@/types/types'
 import { useRoute } from 'vue-router'
+import { DASHBOARD_P } from '@/router/psico.route'
 const route = useRoute()
 
 const activePatientId = computed<number>(() => Number(route.params.id))
@@ -22,7 +23,7 @@ defineProps<{
         'bg-transparent hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-l-4 border-transparent':
           activePatientId !== patient.id,
       }"
-      :to="{ name: 'Dashboard', params: { id: String(patient.id) } }"
+      :to="{ name: DASHBOARD_P, params: { id: String(patient.id) } }"
     >
       <div class="flex items-center gap-4">
         <div

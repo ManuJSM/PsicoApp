@@ -7,9 +7,16 @@ export const publicRoutes: Array<RouteRecordRaw> = [
     name: 'login',
     component: Login,
   },
+  //TODO poner una pagina de prohibido
   {
     path: '/Forbidden',
     name: 'unauthorized',
+    component: Login,
+  },
+  //TODO poner una pagina de no encontrado
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
     component: Login,
   },
 ]

@@ -3,9 +3,9 @@ import { ref, computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { es } from 'date-fns/locale'
-import { PACIENT_ROLE, type SleepRecord } from '@/types/types'
+import { role, type SleepRecord } from '@/types/types'
 
-const props = defineProps<{ userRole: 'paciente' | 'psico' }>()
+const props = defineProps<{ userRole: role }>()
 
 import {
   calculateDuration,
@@ -320,7 +320,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                     </div>
 
                     <router-link
-                      v-if="props.userRole === PACIENT_ROLE"
+                      v-if="props.userRole === role.user"
                       :to="{ name: 'UserEditReg', params: { id: record.data.id } }"
                       class="hidden md:flex items-center gap-1.5 hover:cursor-pointer bg-primary hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all active:scale-95"
                     >
@@ -346,7 +346,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                         No hay datos de sueño sincronizados para este día.
                       </p>
                       <router-link
-                        v-if="props.userRole === PACIENT_ROLE"
+                        v-if="props.userRole === role.user"
                         :to="{
                           name: 'UserEditReg',
                           params: { id: record.data.id },
@@ -419,7 +419,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                 <td class="px-6 py-4 rounded-r-xl text-right">
                   <div class="flex items-center justify-center md:justify-end gap-2">
                     <router-link
-                      v-if="userRole === PACIENT_ROLE"
+                      v-if="userRole === role.user"
                       :to="{ name: 'UserEditReg', params: { id: record.data.id } }"
                       class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 dark:text-primary hover:text-primary dark:hover:text-primary"
                       title="Editar registro"
@@ -499,7 +499,7 @@ maxDate.setMonth(maxDate.getMonth() + 1)
                     </h5>
                     <div
                       class="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3"
-                      v-if="props.userRole === 'psico'"
+                      v-if="props.userRole === role.psico"
                     >
                       <div class="flex gap-4 items-start">
                         <textarea

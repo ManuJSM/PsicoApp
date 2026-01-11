@@ -1,33 +1,25 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { lazyLoad } from './utils.ts'
-import Layout from '@/views/Layout/MainView.vue'
+import Layout from '@/views/Layout/MainViewP.vue'
+import { role } from '@/types/types.ts'
+export const DASHBOARD_P = 'DashboardP'
 
 const routes: Array<RouteRecordRaw> = [
  {
     path: 'Dashboard/:id?',
-    name: 'Dashboard',
-    component: lazyLoad('DashboardP'),
+    name: DASHBOARD_P,
+    component: lazyLoad(DASHBOARD_P),
     props: true,
   },
-  {
-    path: 'User',
-    name: 'User',
-    component: lazyLoad('UserMain'),
+ {
+    path: 'myAccount',
+    name: 'myAccountP',
+    component: lazyLoad('MiCuenta'),
   },
-  {
-    path: 'Calendar',
-    name: 'UserCalendar',
-    component: lazyLoad('UserCalendar'),
-  },
-  {
-    path: 'Edit/:id',
-    name: 'UserEditReg',
-    component: lazyLoad('UserEditReg'),
-    props: true,
-  },
+
   {
     path: 'Help',
-    name: 'Help',
+    name: 'HelpP',
     component: lazyLoad('Help'),
   },
 ]
@@ -36,7 +28,10 @@ export const psicoRoutes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: Layout,
-    redirect: '/login',
+    meta: {
+      requiresAuth: true,
+      role: role.psico
+    },
     children: routes,
   },
 ]

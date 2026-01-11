@@ -3,24 +3,12 @@ import AsideMenu from './components/AsideMenu.vue'
 import MovilMenu from './components/MovilMenu.vue'
 import { useAsideMenu } from '@/composables/useAsideMenu'
 import type { MenuItems } from '@/types/types'
-const menuItems: MenuItems[] = [
-  {
-    title: 'Pacientes',
-    icon: 'groups',
-    routeName: 'Dashboard',
-  },
-  {
-    title: 'Mi Perfil',
-    icon: 'person',
-    routeName: 'User',
-  },
-  {
-    title: 'Ayuda',
-    icon: 'help',
-    routeName: 'Help',
-  },
-]
+import { inject } from 'vue'
 
+const menuItems = inject<MenuItems[]>('menuItems')
+if (!menuItems) {
+  throw new Error('MenuItems not found')
+}
 const { isOpen, close } = useAsideMenu()
 </script>
 <template>

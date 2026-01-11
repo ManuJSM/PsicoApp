@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 import { fetchWithAuth } from '@/api/fetchAuth'
 import { AppError } from '@/types/errors.types'
+import { DASHBOARD_P } from '@/router/psico.route'
 const patients = ref<Patient[]>([
   {
     id: 1,
@@ -91,12 +92,12 @@ const handleBack = () => {
   currentView.value = 'show'
 }
 const handleExit = () => {
-  router.push({ name: 'Dashboard' })
+  router.push({ name: DASHBOARD_P })
 }
 
 const handleAdd = (patient: Patient) => {
   patients.value.push(patient)
-  router.push({ name: 'Dashboard', params: { id: String(patient.id) } })
+  router.push({ name: DASHBOARD_P, params: { id: String(patient.id) } })
   currentView.value = 'show'
   setToast(ToastType.Success, 'Paciente añadido correctamente')
 }
