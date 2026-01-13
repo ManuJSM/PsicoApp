@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useToast } from '@/composables/useToast'
-import { role, ToastType } from '@/types/types'
-import { AutenticationError } from '@/types/errors.types'
-import { useAuthStore } from '@/stores/auth.store'
-import { useRouter } from 'vue-router'
-const { setToast } = useToast()
+  import { ref, onMounted } from 'vue'
+  import { useToast } from '@/composables/useToast'
+  import { ToastType } from '@/types/types'
+  import { AutenticationError } from '@/types/errors.types'
+  import { useAuthStore } from '@/stores/auth.store'
+  const { setToast } = useToast()
 
-const mounted = ref(false)
-const showPassword = ref(false)
-const loading = ref(false)
-const email = ref('')
-const password = ref('')
-const authStore = useAuthStore()
-const router = useRouter()
-const handleLogin = async () => {
-  loading.value = true
-  try {
-    const res = await authStore.login(email.value, password.value)
-    setToast(ToastType.Success, 'Login exitoso')
-    if (res === role.psico) router.push({ name: 'DashboardP' })
-    if (res === role.user) router.push({ name: 'DashboardU' })
-  } catch (err: unknown) {
-    if (err instanceof AutenticationError) {
-      setToast(ToastType.Error, err.message)
-    } else {
-      console.log(err)
+  const mounted = ref(false)
+  const showPassword = ref(false)
+  const loading = ref(false)
+  const email = ref('')
+  const password = ref('')
+  const authStore = useAuthStore()
+  const handleLogin = async () => {
+    loading.value = true
+    try {
+      await authStore.login(email.value, password.value)
+      //FIXME: de momento redirige al dashboard creado dinamicamente al refrescar la app
+      // setToast(ToastType.Success, 'Login exitoso')
+      window.location.assign('/Dashboard')
+    } catch (err: unknown) {
+      if (err instanceof AutenticationError) {
+        setToast(ToastType.Error, err.message)
+      } else {
+        console.log(err)
+      }
+      loading.value = false
     }
-    loading.value = false
   }
-}
 
-onMounted(() => {
-  mounted.value = true
-})
+  onMounted(() => {
+    mounted.value = true
+  })
 
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
+  const togglePassword = () => {
+    showPassword.value = !showPassword.value
+  }
 </script>
 
 <template>
   <main
     class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 min-h-screen overflow-hidden"
   >
-    <div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
+    <div
+      class="relative flex min-h-screen w-full flex-col items-center justify-center p-4"
+    >
       <!-- Fondo con círculos animados -->
       <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <!-- Círculo 1 - se mueve de izquierda a derecha -->
@@ -90,7 +90,9 @@ const togglePassword = () => {
           }"
           style="transition: opacity 0.6s ease 0.2s"
         >
-          <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg">
+          <div
+            class="flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg"
+          >
             <img src="@/assets/appIcon.svg" alt="icon" class="h-8 w-8" />
           </div>
         </div>
@@ -143,7 +145,9 @@ const togglePassword = () => {
             "
           >
             <label class="flex flex-col gap-2">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Correo Electrónico
+              </p>
               <input
                 class="form-input h-12 w-full flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 bg-white/50 dark:bg-black/30 px-4 py-2.5 text-base font-normal text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 transition-all duration-300 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
                 placeholder="Introduce tu usuario o correo"
@@ -167,7 +171,9 @@ const togglePassword = () => {
             "
           >
             <label class="flex flex-col gap-2">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Contraseña</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Contraseña
+              </p>
               <div class="relative flex w-full items-center">
                 <input
                   :type="showPassword ? 'text' : 'password'"
@@ -222,7 +228,10 @@ const togglePassword = () => {
               @click.prevent="handleLogin"
               type="submit"
             >
-              <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
+              <div
+                v-if="loading"
+                class="absolute inset-0 flex items-center justify-center"
+              >
                 <svg
                   class="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +253,10 @@ const togglePassword = () => {
                   ></path>
                 </svg>
               </div>
-              <span v-else class="truncate group-hover:scale-105 transition-transform duration-300">
+              <span
+                v-else
+                class="truncate group-hover:scale-105 transition-transform duration-300"
+              >
                 Iniciar Sesión
               </span>
             </button>
@@ -256,94 +268,94 @@ const togglePassword = () => {
 </template>
 
 <style scoped>
-/* Animaciones SOLO para los círculos de fondo */
+  /* Animaciones SOLO para los círculos de fondo */
 
-@keyframes float-x {
-  0%,
-  100% {
-    transform: translateX(0) translateY(0);
+  @keyframes float-x {
+    0%,
+    100% {
+      transform: translateX(0) translateY(0);
+    }
+    25% {
+      transform: translateX(100px) translateY(-50px);
+    }
+    50% {
+      transform: translateX(200px) translateY(0);
+    }
+    75% {
+      transform: translateX(100px) translateY(50px);
+    }
   }
-  25% {
-    transform: translateX(100px) translateY(-50px);
-  }
-  50% {
-    transform: translateX(200px) translateY(0);
-  }
-  75% {
-    transform: translateX(100px) translateY(50px);
-  }
-}
 
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
+  @keyframes float-y {
+    0%,
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+    33% {
+      transform: translateY(-100px) translateX(30px);
+    }
+    66% {
+      transform: translateY(100px) translateX(-30px);
+    }
   }
-  33% {
-    transform: translateY(-100px) translateX(30px);
+
+  @keyframes float-diagonal {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(-150px, -80px);
+    }
+    50% {
+      transform: translate(-300px, 0);
+    }
+    75% {
+      transform: translate(-150px, 80px);
+    }
   }
-  66% {
-    transform: translateY(100px) translateX(-30px);
+
+  @keyframes orbit {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+      transform: translate(200px, 150px) rotate(360deg);
+    }
   }
-}
 
-@keyframes float-diagonal {
-  0%,
-  100% {
-    transform: translate(0, 0);
+  .animate-float-x {
+    animation: float-x 20s ease-in-out infinite;
   }
-  25% {
-    transform: translate(-150px, -80px);
+
+  .animate-float-y {
+    animation: float-y 15s ease-in-out infinite;
   }
-  50% {
-    transform: translate(-300px, 0);
+
+  .animate-float-diagonal {
+    animation: float-diagonal 25s ease-in-out infinite;
   }
-  75% {
-    transform: translate(-150px, 80px);
+
+  .animate-orbit {
+    animation: orbit 30s linear infinite;
   }
-}
 
-@keyframes orbit {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
+  /* Delays para que no estén todos sincronizados */
+  .delay-1000 {
+    animation-delay: 1s;
   }
-  100% {
-    transform: translate(200px, 150px) rotate(360deg);
+
+  .delay-2000 {
+    animation-delay: 2s;
   }
-}
 
-.animate-float-x {
-  animation: float-x 20s ease-in-out infinite;
-}
+  /* Transición suave para inputs */
+  .form-input {
+    transition: all 0.3s ease;
+  }
 
-.animate-float-y {
-  animation: float-y 15s ease-in-out infinite;
-}
-
-.animate-float-diagonal {
-  animation: float-diagonal 25s ease-in-out infinite;
-}
-
-.animate-orbit {
-  animation: orbit 30s linear infinite;
-}
-
-/* Delays para que no estén todos sincronizados */
-.delay-1000 {
-  animation-delay: 1s;
-}
-
-.delay-2000 {
-  animation-delay: 2s;
-}
-
-/* Transición suave para inputs */
-.form-input {
-  transition: all 0.3s ease;
-}
-
-/* Fondo de la tarjeta con desenfoque */
-.backdrop-blur-sm {
-  backdrop-filter: blur(8px);
-}
+  /* Fondo de la tarjeta con desenfoque */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
 </style>

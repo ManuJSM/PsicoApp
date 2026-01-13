@@ -2,10 +2,13 @@ import type { RouteRecordRaw } from 'vue-router'
 import { lazyLoad } from './utils.ts'
 import Layout from '@/views/Layout/MainViewU.vue'
 import { role } from '@/types/types.ts'
+
+export const DASHBOARD_U = 'DashboardU'
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: 'Dashboard',
-    name: 'DashboardU',
+    name: DASHBOARD_U,
     component: lazyLoad('DashboardU'),
   },
   {

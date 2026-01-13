@@ -5,7 +5,10 @@ export interface LoginResponse {
   message: string
 }
 
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export async function login(
+  email: string,
+  password: string
+): Promise<LoginResponse> {
   return http<LoginResponse>('/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -15,12 +18,10 @@ export async function login(email: string, password: string): Promise<LoginRespo
   })
 }
 //TODO acabar de implementarlo
-export async function refresh(): Promise<string> {
-  // return http<string>('/auth/refresh', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   credentials: 'include',
-  //   auth: false,
-  // })
-  return 'token'
+export async function refresh(): Promise<LoginResponse> {
+  return http<LoginResponse>('/auth/refresh', {
+    method: 'GET',
+    credentials: 'include',
+    auth: false,
+  })
 }

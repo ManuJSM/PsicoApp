@@ -3,9 +3,12 @@ import { AutenticationError, AuthorizationError } from '@/types/errors.types'
 import type { HttpOptions } from '@/types/types'
 import { useToast } from '@/composables/useToast'
 import { ToastType } from '@/types/types'
-const apiUrl = 'http://192.168.1.24:3000'
+const apiUrl = 'http://192.168.1.24:80/api'
 
-export async function http<T>(endpoint: string, options: HttpOptions = {}): Promise<T> {
+export async function http<T>(
+  endpoint: string,
+  options: HttpOptions = {}
+): Promise<T> {
   const { auth = true, headers: customHeaders, ...restOptions } = options
   const url = `${apiUrl}${endpoint}`
   const headers = new Headers(customHeaders)
@@ -27,11 +30,11 @@ export async function http<T>(endpoint: string, options: HttpOptions = {}): Prom
       const errData = await response.json()
       errorMessage = errData?.error || errorMessage
     } catch {}
-    if(response.status == 401){
+    if (response.status == 401) {
       setToast(ToastType.Error, errorMessage)
       throw new AutenticationError(errorMessage)
     }
-    if(response.status == 403){
+    if (response.status == 403) {
       setToast(ToastType.Error, errorMessage)
       throw new AuthorizationError(errorMessage)
     }

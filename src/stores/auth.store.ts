@@ -1,19 +1,18 @@
 import { defineStore } from 'pinia'
-import { http } from '@/api/http'
-import { login ,type LoginResponse } from '@/api/http.auth'
+import { login, refresh } from '@/api/http.auth'
 import { useToast } from '@/composables/useToast'
 import { AppError, AutenticationError } from '@/types/errors.types'
 import { role, ToastType } from '@/types/types'
 interface jwtData {
   role: role
-  id : number
+  id: number
 }
 
 const { setToast } = useToast()
 export function parseJwt(token: string) {
   try {
     const base64Payload = token.split('.')[1]
-    if(base64Payload === undefined){
+    if (base64Payload === undefined) {
       return null
     }
     const payload = atob(base64Payload)
@@ -24,7 +23,6 @@ export function parseJwt(token: string) {
   }
 }
 
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     accessToken: null as string | null,
@@ -33,38 +31,33 @@ export const useAuthStore = defineStore('auth', {
     bootstrapped: false,
   }),
   actions: {
-    setToken(token: string, role: role) {
+    setToken(token: string): role {
       this.accessToken = token
-      this.role = role
+      const data = parseJwt(token)
+      if (data === null) {
+        throw new AutenticationError('Invalid token')
+      }
+      this.role = data.role
       this.isLoggedIn = true
+      return this.role
     },
 
     async login(email: string, password: string) {
       const res = await login(email, password)
-      const data = parseJwt(res.accessToken)
-      if(data === null){
-        throw new AutenticationError('Invalid token')
-      }
-      console.log(data)
-      this.setToken(res.accessToken, data.role)
-      return data.role
+      const rol = this.setToken(res.accessToken)
+      return rol
     },
 
-    async bootstrapAuth() {
+    async bootstrapAuth(): Promise<role | null> {
       try {
-        const res = await http<LoginResponse>('/auth/refresh', {
-          method: 'POST',
-          credentials: 'include',
-          auth: false,
-        })
-
-        this.setToken(res.accessToken, role.psico)
-
-      } catch (e: unknown){
-        if(e instanceof AppError){
+        const res = await refresh()
+        return this.setToken(res.accessToken)
+      } catch (e: unknown) {
+        if (e instanceof AppError) {
           setToast(ToastType.Error, e.message)
         }
         this.logout()
+        return null
       } finally {
         this.bootstrapped = true
       }
@@ -78,4 +71,3 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 })
-
