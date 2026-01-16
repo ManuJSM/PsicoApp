@@ -1,199 +1,198 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import RecordCard from './components/RecordCard.vue'
-import type { SleepCardModel, SleepCardView } from './utils/types'
-import FormCard from './components/FormCard.vue'
-import { scModelToView } from './utils/utils'
-import { useToast } from '@/composables/useToast'
-import { ToastType } from '@/types/types'
-import { deleteAllArray } from '../components/utils/utils'
+  import { ref, computed } from 'vue'
+  import HourSelector from './components/HourSelector.vue'
+  import type { TimeValue } from '@/types/regEdit.types'
 
-const { setToast } = useToast()
-const fechaHoy = 'Martes, 28 de Mayo'
-const comentario = ref<string>('')
+  const bedtime = ref<TimeValue>({
+    hour: 10,
+    minute: 30,
+    amPm: 'pm',
+  })
 
-const sleepRecords = ref<SleepCardModel[]>([
-  {
-    type: 'sleep',
-    startTime: {
-      hour: '23:30',
-      day: 'today',
-    },
-    endTime: {
-      hour: '04:15',
-      day: 'tomorrow',
-    },
-  },
-  {
-    type: 'bed',
-    startTime: {
-      hour: '04:15',
-      day: 'tomorrow',
-    },
-    endTime: {
-      hour: '05:30',
-      day: 'tomorrow',
-    },
-  },
-  {
-    type: 'sleep',
-    startTime: {
-      hour: '05:30',
-      day: 'tomorrow',
-    },
-    endTime: {
-      hour: '07:45',
-      day: 'tomorrow',
-    },
-  },
-  {
-    type: 'out',
-    startTime: {
-      hour: '08:00',
-      day: 'tomorrow',
-    },
-    endTime: {
-      hour: '12:30',
-      day: 'tomorrow',
-    },
-  },
-  {
-    type: 'bed',
-    startTime: {
-      hour: '14:00',
-      day: 'today',
-    },
-    endTime: {
-      hour: '15:30',
-      day: 'today',
-    },
-  },
-  {
-    type: 'sleep',
-    startTime: {
-      hour: '22:00',
-      day: 'today',
-    },
-    endTime: {
-      hour: '23:30',
-      day: 'today',
-    },
-  },
-])
-const sleepRecordsView = ref<SleepCardView[]>([])
-let nextId = 1
+  const wakeup = ref<TimeValue>({
+    hour: 7,
+    minute: 15,
+    amPm: 'am',
+  })
 
-onMounted(() => {
-  sleepRecordsView.value = sleepRecords.value.map((record) => scModelToView(record, nextId++))
-})
+  // Formatos y cálculos
+  const formattedBedtime = computed<string>(() => {
+    return `${bedtime.value.hour.toString().padStart(2, '0')}:${bedtime.value.minute.toString().padStart(2, '0')} ${bedtime.value.amPm.toUpperCase()}`
+  })
 
-const deleteRecord = (id: number) => {
-  sleepRecordsView.value = sleepRecordsView.value.filter((record) => record.id !== id)
-}
+  const formattedWakeup = computed<string>(() => {
+    return `${wakeup.value.hour.toString().padStart(2, '0')}:${wakeup.value.minute.toString().padStart(2, '0')} ${wakeup.value.amPm.toUpperCase()}`
+  })
 
-const handleDeleteAll = async () => {
-  await deleteAllArray(sleepRecordsView.value)
-}
+  const totalTimeInBed = computed<string>(() => {
+    // Convertir a horas 24
+    let bedtimeHour24 = bedtime.value.hour
+    if (bedtime.value.amPm === 'pm' && bedtimeHour24 !== 12) bedtimeHour24 += 12
+    if (bedtime.value.amPm === 'am' && bedtimeHour24 === 12) bedtimeHour24 = 0
 
-const handleSave = () => {}
-const handleAddCard = (sleepCardModel: SleepCardModel) => {
-  const id = nextId++
+    let wakeupHour24 = wakeup.value.hour
+    if (wakeup.value.amPm === 'pm' && wakeupHour24 !== 12) wakeupHour24 += 12
+    if (wakeup.value.amPm === 'am' && wakeupHour24 === 12) wakeupHour24 = 0
 
-  const SleepCardView = <SleepCardView>scModelToView(sleepCardModel, id)
-  console.log(SleepCardView)
+    // Calcular diferencia
+    const bedtimeMinutesTotal = bedtimeHour24 * 60 + bedtime.value.minute
+    const wakeupMinutesTotal = wakeupHour24 * 60 + wakeup.value.minute
 
-  sleepRecordsView.value.push(SleepCardView)
-  setToast(ToastType.Success, 'Registro agregado correctamente')
-  // sleepRecordsView.value.sort(sortCards)
-}
+    let diffMinutes = wakeupMinutesTotal - bedtimeMinutesTotal
+    if (diffMinutes < 0) diffMinutes += 24 * 60 // Si pasa de medianoche
+
+    const hours = Math.floor(diffMinutes / 60)
+    const minutes = diffMinutes % 60
+
+    return `${hours}h ${minutes.toString().padStart(2, '0')}m`
+  })
+
+  const nextStep = (): void => {
+    // Aquí iría la lógica para ir al siguiente paso
+    alert(
+      `Configuración guardada:\nAcostado: ${formattedBedtime.value}\nLevantado: ${formattedWakeup.value}\nTotal en cama: ${totalTimeInBed.value}`
+    )
+  }
 </script>
 <template>
   <main
-    class="relative flex w-full flex-col font-display dark group/design-root overflow-y-auto px-4 md:px-40"
+    class="max-w-7xl mx-auto pb-safe-sm px-4 py-8 mb-2 sm:px-6 lg:px-8 overflow-y-auto"
   >
-    <div class="layout-container flex h-full grow flex-col">
-      <div class="flex flex-1 justify-center py-5 sm:px-4">
-        <div class="layout-content-container flex flex-col flex-1">
-          <div
-            class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark sticky top-0 z-10"
+    <div
+      class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
+    >
+      <div class="space-y-2">
+        <div
+          class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]"
+        >
+          -&gt; PASO 1 DE 3
+        </div>
+        <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+          Ventana de Descanso
+        </h2>
+        <p class="text-slate-400 max-w-lg">
+          Define las horas principales en las que te acostaste y te levantaste
+          para establecer el marco de tu registro.
+        </p>
+      </div>
+      <div class="w-full md:w-72 space-y-2.5">
+        <div class="flex justify-between items-end">
+          <span
+            class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+            >PROGRESO ACTUAL</span
           >
-            <p class="text-gray-900 dark:text-white text-lg font-semibold text-center">
-              {{ fechaHoy }}
+          <span class="text-sm font-bold text-primary">33%</span>
+        </div>
+        <div
+          class="h-1.5 w-full progress-container rounded-full overflow-hidden"
+        >
+          <div class="h-full bg-primary rounded-full" style="width: 33%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div class="lg:col-span-8 space-y-6">
+        <div
+          class="bg-card-dark border border-border-dark rounded-xl p-8 shadow-sm"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <HourSelector v-model:time="bedtime" :title="'Hora Acostado'" />
+            <HourSelector v-model:time="wakeup" :title="'Hora Levantado'" />
+          </div>
+        </div>
+        <div
+          class="bg-card-dark/40 border border-border-dark rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+            >
+              <span class="material-symbols-outlined">timer</span>
+            </div>
+            <div>
+              <p
+                class="text-xs font-bold text-slate-500 uppercase tracking-wider"
+              >
+                Tiempo Total de hoy
+              </p>
+              <p class="text-2xl font-black text-white">{{ totalTimeInBed }}</p>
+            </div>
+          </div>
+          <div class="h-px w-full md:h-12 md:w-px bg-border-dark"></div>
+          <div class="flex items-center gap-8">
+            <div class="text-center">
+              <span class="block text-[10px] font-bold text-slate-500 uppercase"
+                >Inicio</span
+              >
+              <span class="text-sm font-bold">{{ formattedBedtime }}</span>
+            </div>
+            <div class="text-center">
+              <span class="block text-[10px] font-bold text-slate-500 uppercase"
+                >Fin</span
+              >
+              <span class="text-sm font-bold">{{ formattedWakeup }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-4 space-y-6">
+        <div class="bg-card-dark border border-border-dark rounded-xl p-6">
+          <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">info</span>
+            Instrucciones
+          </h3>
+          <ul class="space-y-4">
+            <li class="flex gap-3">
+              <span class="text-primary font-bold">01.</span>
+              <p class="text-sm text-slate-400">
+                Desliza las ruedas de horas y minutos para ajustar tu horario.
+              </p>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-primary font-bold">02.</span>
+              <p class="text-sm text-slate-400">
+                Usa el selector superior para alternar entre AM y PM.
+              </p>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-primary font-bold">03.</span>
+              <p class="text-sm text-slate-400">
+                Puedes usar los botones de ±15m para ajustes rápidos de
+                precisión.
+              </p>
+            </li>
+            <li class="flex gap-3">
+              <span class="text-primary font-bold">04.</span>
+              <p class="text-sm text-slate-400">
+                También puedes hacer clic directamente en los números para
+                seleccionarlos.
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="p-4 rounded-xl border border-dashed border-border-dark bg-primary/5"
+        >
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined text-primary"
+              >lightbulb</span
+            >
+            <p class="text-xs text-slate-400 leading-relaxed italic">
+              Establecer una ventana de descanso coherente ayuda al sistema a
+              calcular mejor tu eficiencia de sueño en el paso 3.
             </p>
-            <div class="md:self-end flex gap-2">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-base font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] transition-allbg-gray-200"
-                @click="handleSave"
-              >
-                <span>Guardar Cambios</span>
-              </button>
-
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
-                @click="$router.back()"
-              >
-                <span>Cerrar</span>
-              </button>
-            </div>
           </div>
-          <div class="">
-            <div class="flex items-center justify-center mb-2 gap-2 lg:mt-0 mt-4">
-              <h3
-                class="text-lg font-extrabold text-gray-900 dark:text-white flex items-center gap-2"
-              >
-                <span class="material-symbols-outlined text-primary">list_alt</span>
-                Registros
-              </h3>
-              <button
-                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-600 hover:cursor-pointer dark:hover:text-red-400 bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800"
-                @click="handleDeleteAll"
-              >
-                <span class="material-symbols-outlined text-[18px]">delete</span>
-                Borrar Todos
-              </button>
-              <span
-                class="text-xs font-bold text-primary bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-800"
-                >{{ sleepRecordsView.length }} eventos</span
-              >
-            </div>
-            <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 overflow-hidden">
-              <RecordCard
-                v-for="record in sleepRecordsView"
-                :key="record.id"
-                :record="record"
-                @delete="deleteRecord"
-              />
-            </TransitionGroup>
-            <div class="md:flex-5 mt-2">
-              <FormCard
-                @submit="handleAddCard"
-                :sleepRecords="sleepRecordsView.map((record) => record.sleepCardModel)"
-              />
-              <div class="flex flex-col gap-6 p-4 pb-20">
-                <div class="h-px w-full bg-gray-200 dark:bg-gray-800"></div>
-                <div class="flex flex-col gap-3">
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="material-symbols-outlined text-gray-500 dark:text-gray-400"
-                      >notes</span
-                    >
-                    <h2 class="text-gray-900 dark:text-white text-lg font-bold">Comentario</h2>
-                  </div>
-                  <div class="relative">
-                    <textarea
-                      class="w-full min-h-[220px] rounded-xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 text-base focus:ring-primary focus:border-primary resize-y"
-                      placeholder="Escribe aquí cualquier observación sobre tu sueño de hoy... (ej. me desperté por ruido, tuve pesadillas, etc.)"
-                      v-model="comentario"
-                    ></textarea>
-                    <div
-                      class="absolute bottom-3 right-3 text-xs text-gray-400 pointer-events-none"
-                    >
-                      Opcional
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
+        <div
+          class="mt-12 mb-2 pt-8 border-t border-border-dark flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <button
+            @click="nextStep"
+            class="w-full sm:w-[240px] bg-primary hover:brightness-110 text-white font-bold py-4 rounded-lg transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+          >
+            Siguiente Paso
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
         </div>
       </div>
     </div>

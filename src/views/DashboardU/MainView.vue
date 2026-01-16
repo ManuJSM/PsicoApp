@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import SleepC from './components/SleepC.vue'
-import AppFooter from '../components/AppFooter.vue'
+  import SleepC from './components/SleepC.vue'
+  import AppFooter from '../components/AppFooter.vue'
 </script>
 <template>
   <main
-    class="flex flex-col flex-1 px-6 pt-6 pb-safe-sm md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent overflow-y-auto"
+    class="flex flex-col pb-safe-sm flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent md:px-20 overflow-y-auto"
   >
     <div class="flex items-center flex-col gap-1 lg:gap-2">
       <h1
@@ -12,18 +12,22 @@ import AppFooter from '../components/AppFooter.vue'
       >
         Tu Centro de Bienestar
       </h1>
-      <p class="text-gray-500 dark:text-gray-400 text-sm lg:text-base font-normal">
+      <p
+        class="text-gray-500 dark:text-gray-400 text-sm lg:text-base font-normal"
+      >
         Accede a tus herramientas de salud y seguimiento.
       </p>
     </div>
     <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-8 gap-6">
       <SleepC />
-      <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-3 lg:gap-6">
+      <div
+        class="lg:col-span-7 xl:col-span-8 mb-2 flex flex-col gap-3 lg:gap-6"
+      >
         <h3 class="text-gray-900 dark:text-white font-bold text-lg lg:text-xl">
           Otras Herramientas
         </h3>
         <div
-          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
+          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 lg:gap-6"
         >
           <div
             class="bg-white dark:bg-[#1e2936] rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 lg:gap-4 text-center cursor-pointer hover:shadow-md hover:border-primary/20 transition-all active:scale-95 group"
@@ -88,15 +92,18 @@ import AppFooter from '../components/AppFooter.vue'
             <div
               class="size-8 lg:size-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center"
             >
-              <span class="material-symbols-outlined text-xl lg:text-2xl">add</span>
+              <span class="material-symbols-outlined text-xl lg:text-2xl"
+                >add</span
+              >
             </div>
-            <span class="font-medium text-gray-400 dark:text-gray-500 text-xs lg:text-sm"
+            <span
+              class="font-medium text-gray-400 dark:text-gray-500 text-xs lg:text-sm"
               >Más apps</span
             >
           </div>
         </div>
       </div>
     </div>
-    <AppFooter />
   </main>
+  <AppFooter />
 </template>

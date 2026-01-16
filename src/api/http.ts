@@ -31,6 +31,10 @@ export async function http<T>(
       errorMessage = errData?.error || errorMessage
     } catch {}
     if (response.status == 401) {
+      const rol = await authStore.bootstrapAuth()
+      if (rol) {
+        return http<T>(endpoint, options)
+      }
       setToast(ToastType.Error, errorMessage)
       throw new AutenticationError(errorMessage)
     }

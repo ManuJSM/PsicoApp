@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppFooter from '../components/AppFooter.vue'
+  import AppFooter from '../components/AppFooter.vue'
 </script>
 
 <template>
@@ -7,7 +7,9 @@ import AppFooter from '../components/AppFooter.vue'
   <main
     class="flex-1 pb-safe-sm md:overflow-y-auto flex flex-col items-center px-4 overflow-y-auto"
   >
-    <div class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1 gap-8">
+    <div
+      class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1 gap-8"
+    >
       <!-- Page Heading -->
       <div class="flex flex-col items-center gap-3 py-4 md:py-8">
         <p
@@ -18,8 +20,9 @@ import AppFooter from '../components/AppFooter.vue'
         <p
           class="text-[#637588] dark:text-[#9dabb9] text-base font-normal leading-normal max-w-2xl"
         >
-          Estamos aquí para ayudarte. Encuentra respuestas rápidas en nuestras preguntas frecuentes
-          o ponte en contacto directo con nuestro equipo de soporte.
+          Estamos aquí para ayudarte. Encuentra respuestas rápidas en nuestras
+          preguntas frecuentes o ponte en contacto directo con nuestro equipo de
+          soporte.
         </p>
       </div>
       <!-- Two Column Layout: FAQ & Contact Form -->
@@ -36,8 +39,12 @@ import AppFooter from '../components/AppFooter.vue'
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
-              <summary class="flex cursor-pointer items-center justify-between gap-6 py-3">
-                <p class="text-[#111418] dark:text-white text-base font-semibold leading-normal">
+              <summary
+                class="flex cursor-pointer items-center justify-between gap-6 py-3"
+              >
+                <p
+                  class="text-[#111418] dark:text-white text-base font-semibold leading-normal"
+                >
                   ¿Cómo registro mi sueño?
                 </p>
                 <span
@@ -48,17 +55,21 @@ import AppFooter from '../components/AppFooter.vue'
               <div
                 class="text-[#637588] dark:text-[#9dabb9] text-sm font-normal leading-relaxed pb-4 pt-1 pr-4 border-t border-transparent group-open:border-[#e5e7eb] dark:group-open:border-[#283039] transition-all"
               >
-                Para registrar tu sueño, ve a la sección "Diario" en la barra inferior. Pulsa el
-                botón "+" y selecciona "Registro de Sueño". Podrás ingresar las horas dormidas y la
-                calidad del descanso.
+                Para registrar tu sueño, ve a la sección "Diario" en la barra
+                inferior. Pulsa el botón "+" y selecciona "Registro de Sueño".
+                Podrás ingresar las horas dormidas y la calidad del descanso.
               </div>
             </details>
             <!-- Accordion Item 2 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
-              <summary class="flex cursor-pointer items-center justify-between gap-6 py-3">
-                <p class="text-[#111418] dark:text-white text-base font-semibold leading-normal">
+              <summary
+                class="flex cursor-pointer items-center justify-between gap-6 py-3"
+              >
+                <p
+                  class="text-[#111418] dark:text-white text-base font-semibold leading-normal"
+                >
                   ¿Cómo contacto a mi psicólogo?
                 </p>
                 <span
@@ -69,17 +80,21 @@ import AppFooter from '../components/AppFooter.vue'
               <div
                 class="text-[#637588] dark:text-[#9dabb9] text-sm font-normal leading-relaxed pb-4 pt-1 pr-4 border-t border-transparent group-open:border-[#e5e7eb] dark:group-open:border-[#283039] transition-all"
               >
-                Puedes enviar un mensaje directo a tu especialista desde la pestaña "Chat". Si
-                necesitas una sesión urgente, te recomendamos verificar su disponibilidad en la
-                sección "Calendario".
+                Puedes enviar un mensaje directo a tu especialista desde la
+                pestaña "Chat". Si necesitas una sesión urgente, te recomendamos
+                verificar su disponibilidad en la sección "Calendario".
               </div>
             </details>
             <!-- Accordion Item 3 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
-              <summary class="flex cursor-pointer items-center justify-between gap-6 py-3">
-                <p class="text-[#111418] dark:text-white text-base font-semibold leading-normal">
+              <summary
+                class="flex cursor-pointer items-center justify-between gap-6 py-3"
+              >
+                <p
+                  class="text-[#111418] dark:text-white text-base font-semibold leading-normal"
+                >
                   Problemas de acceso
                 </p>
                 <span
@@ -90,17 +105,21 @@ import AppFooter from '../components/AppFooter.vue'
               <div
                 class="text-[#637588] dark:text-[#9dabb9] text-sm font-normal leading-relaxed pb-4 pt-1 pr-4 border-t border-transparent group-open:border-[#e5e7eb] dark:group-open:border-[#283039] transition-all"
               >
-                Si olvidaste tu contraseña, usa el enlace "¿Olvidaste tu contraseña?" en la pantalla
-                de inicio de sesión. Si el problema persiste, verifica tu conexión a internet o
-                contacta a soporte.
+                Si olvidaste tu contraseña, usa el enlace "¿Olvidaste tu
+                contraseña?" en la pantalla de inicio de sesión. Si el problema
+                persiste, verifica tu conexión a internet o contacta a soporte.
               </div>
             </details>
             <!-- Accordion Item 4 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
-              <summary class="flex cursor-pointer items-center justify-between gap-6 py-3">
-                <p class="text-[#111418] dark:text-white text-base font-semibold leading-normal">
+              <summary
+                class="flex cursor-pointer items-center justify-between gap-6 py-3"
+              >
+                <p
+                  class="text-[#111418] dark:text-white text-base font-semibold leading-normal"
+                >
                   ¿Cómo agendo una cita?
                 </p>
                 <span
@@ -111,8 +130,9 @@ import AppFooter from '../components/AppFooter.vue'
               <div
                 class="text-[#637588] dark:text-[#9dabb9] text-sm font-normal leading-relaxed pb-4 pt-1 pr-4 border-t border-transparent group-open:border-[#e5e7eb] dark:group-open:border-[#283039] transition-all"
               >
-                Navega a la sección "Calendario", selecciona un día disponible y elige el horario
-                que mejor te convenga. Recibirás una confirmación por correo electrónico.
+                Navega a la sección "Calendario", selecciona un día disponible y
+                elige el horario que mejor te convenga. Recibirás una
+                confirmación por correo electrónico.
               </div>
             </details>
           </div>
@@ -125,11 +145,12 @@ import AppFooter from '../components/AppFooter.vue'
             Contactar Soporte
           </h2>
           <div
-            class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-slate-800 p-6 shadow-md"
+            class="flex mb-2 flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-slate-800 p-6 shadow-md"
           >
-            <form action="#" class="flex flex-col gap-4">
+            <form class="flex flex-col gap-4">
               <div class="flex flex-col gap-1">
-                <label class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
+                <label
+                  class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
                   >Nombre completo</label
                 >
                 <input
@@ -139,7 +160,8 @@ import AppFooter from '../components/AppFooter.vue'
                 />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
+                <label
+                  class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
                   >Correo electrónico</label
                 >
                 <input
@@ -149,7 +171,8 @@ import AppFooter from '../components/AppFooter.vue'
                 />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
+                <label
+                  class="text-[#111418] dark:text-white text-sm font-medium leading-normal"
                   >Mensaje</label
                 >
                 <textarea
@@ -174,8 +197,12 @@ import AppFooter from '../components/AppFooter.vue'
                   <span class="material-symbols-outlined">chat</span>
                 </div>
                 <div class="flex flex-col">
-                  <p class="text-[#111418] dark:text-white text-sm font-bold">Chat en vivo</p>
-                  <a class="text-primary text-xs font-medium hover:underline" href="#"
+                  <p class="text-[#111418] dark:text-white text-sm font-bold">
+                    Chat en vivo
+                  </p>
+                  <a
+                    class="text-primary text-xs font-medium hover:underline"
+                    href="#"
                     >Iniciar conversación</a
                   >
                 </div>
@@ -187,8 +214,12 @@ import AppFooter from '../components/AppFooter.vue'
                   <span class="material-symbols-outlined">call</span>
                 </div>
                 <div class="flex flex-col">
-                  <p class="text-[#111418] dark:text-white text-sm font-bold">Llámanos</p>
-                  <p class="text-[#637588] dark:text-[#9dabb9] text-xs font-medium">
+                  <p class="text-[#111418] dark:text-white text-sm font-bold">
+                    Llámanos
+                  </p>
+                  <p
+                    class="text-[#637588] dark:text-[#9dabb9] text-xs font-medium"
+                  >
                     +1 (555) 123-4567
                   </p>
                 </div>
@@ -198,6 +229,6 @@ import AppFooter from '../components/AppFooter.vue'
         </div>
       </div>
     </div>
-    <AppFooter />
   </main>
+  <AppFooter />
 </template>

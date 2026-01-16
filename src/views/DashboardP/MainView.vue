@@ -73,7 +73,6 @@
 
   type ViewMode = 'show' | 'add' | 'edit'
   const currentView = ref<ViewMode>('show')
-  const AddButtonT = 'Añadir Nuevo Paciente'
 
   const { setToast } = useToast()
 
@@ -123,6 +122,7 @@
   <!-- Mobile: Show either sidebar or main section -->
   <div class="md:hidden pb-safe-sm overflow-y-auto flex-1">
     <SideBar
+      @add="showAdd"
       v-if="!selectedPatient && currentView !== 'add'"
       :patients="patients"
     />
@@ -149,7 +149,7 @@
   <!-- Desktop: Show both side by side -->
   <div class="hidden md:flex overflow-y-auto flex-1">
     <div class="w-1/3 lg:w-1/4">
-      <SideBar :patients="patients" />
+      <SideBar @add="showAdd" :patients="patients" />
     </div>
     <div class="flex-1">
       <MainSectionShow
@@ -172,14 +172,6 @@
       />
     </div>
   </div>
-  <button
-    v-if="currentView !== 'add'"
-    class="fixed bottom-20 md:bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
-    :title="AddButtonT"
-    @click="showAdd"
-  >
-    <span class="material-symbols-outlined">add</span>
-  </button>
 </template>
 
 <style scoped>

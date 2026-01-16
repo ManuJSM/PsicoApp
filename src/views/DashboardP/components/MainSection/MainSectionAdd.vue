@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import BackButton from './components/BackButton.vue'
-import { reactive } from 'vue'
-import { type Patient, Status } from '@/types/types'
-import FormInput from './components/FormInput.vue'
+  import BackButton from './components/BackButton.vue'
+  import { reactive } from 'vue'
+  import { type Patient, Status } from '@/types/types'
+  import FormInput from './components/FormInput.vue'
 
-const nonAvatar =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuAWoHqaA7dq_qhMrfVmh63nndpIKFwxN75_b7OljfUVc56ky7dYjCTH85UY1FN9IqLr1VMVT54YbWCcz4hzQ3gO5z7rgEb8yhg0aR332ljniRntCHJoGlUYsWE2Z55ORRoOa7_27DvnS0paNvmK_ZJmX-_Wu1m3U0wfXlM8IoqefMR7_wqb6Ww0fY7Il2D_AccwGea5zYPooCtxmVAyGW70QunAk7r35-7XSIHxQEnC-Kh3VV7_k4pYXzOY1y4XbL2EzSWJn9kE-rk'
-const emit = defineEmits(['back', 'save'])
-const editPatient = reactive<Patient>({
-  id: -1,
-  name: '',
-  email: '',
-  phone: '',
-  status: Status.Active,
-  avatar: nonAvatar,
-  sleepAverage: '',
-  lastNote: '',
-  Eficiency: 0,
-})
+  const nonAvatar =
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuAWoHqaA7dq_qhMrfVmh63nndpIKFwxN75_b7OljfUVc56ky7dYjCTH85UY1FN9IqLr1VMVT54YbWCcz4hzQ3gO5z7rgEb8yhg0aR332ljniRntCHJoGlUYsWE2Z55ORRoOa7_27DvnS0paNvmK_ZJmX-_Wu1m3U0wfXlM8IoqefMR7_wqb6Ww0fY7Il2D_AccwGea5zYPooCtxmVAyGW70QunAk7r35-7XSIHxQEnC-Kh3VV7_k4pYXzOY1y4XbL2EzSWJn9kE-rk'
+  const emit = defineEmits(['back', 'save'])
+  const editPatient = reactive<Patient>({
+    id: -1,
+    name: '',
+    email: '',
+    phone: '',
+    status: Status.Active,
+    avatar: nonAvatar,
+    sleepAverage: 0,
+    lastNote: '',
+    Eficiency: 0,
+  })
 </script>
 <template>
   <section
-    class="relative z-0 md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
+    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
   >
     <BackButton @click="$emit('back')" label="Cerrar" />
-    <div class="w-full mx-auto overflow-y-auto">
+    <div class="max-w-2xl md:self-center overflow-y-auto">
       <section class="flex flex-col items-center mb-5">
         <div class="relative group">
           <div
@@ -35,7 +35,9 @@ const editPatient = reactive<Patient>({
           <button
             class="absolute bottom-1 right-1 flex items-center justify-center bg-primary rounded-full size-9 text-white hover:bg-primary/90 transition-colors duration-200 ring-2 ring-white dark:ring-gray-800 touch-manipulation shadow-md"
           >
-            <span class="material-symbols-outlined text-lg md:text-xl">edit</span>
+            <span class="material-symbols-outlined text-lg md:text-xl"
+              >edit</span
+            >
           </button>
         </div>
       </section>
@@ -46,7 +48,9 @@ const editPatient = reactive<Patient>({
           <h3
             class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-2"
           >
-            <span class="material-symbols-outlined text-primary text-2xl">person</span>
+            <span class="material-symbols-outlined text-primary text-2xl"
+              >person</span
+            >
             Información del Paciente
           </h3>
           <form class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">

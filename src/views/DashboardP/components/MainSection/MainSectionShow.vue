@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import BackButton from './components/BackButton.vue'
-import { role, type Patient } from '@/types/types'
-import RegTable from '../../../components/RegTable.vue'
-import StatCard from './components/StatCard.vue'
-import { getQualityEficiency } from './utils/utils'
-import { calculateDurationPercentage, calculateDuration } from '@/views/components/utils/utils'
+  import BackButton from './components/BackButton.vue'
+  import { role, type Patient } from '@/types/types'
+  import RegTable from '../../../components/RegTable.vue'
+  import StatCard from './components/StatCard.vue'
+  import { getQualityEficiency } from './utils/utils'
+  import {
+    calculateDurationPercentage,
+    calculateDuration,
+  } from '@/views/components/utils/utils'
 
-const targetHours = 8
+  const targetHours = 8
 
-const rol = role.psico
+  const rol = role.psico
 
-defineProps<{
-  patient: Patient
-}>()
-defineEmits(['exit', 'edit'])
+  defineProps<{
+    patient: Patient
+  }>()
+  defineEmits(['exit', 'edit'])
 </script>
 <template>
   <section
     class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
-    <div class="p-6 space-y-6 overflow-y-auto">
+    <div class="p-6 space-y-6 overflow-y-auto md:px-20">
       <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div
@@ -29,7 +32,9 @@ defineEmits(['exit', 'edit'])
             :style="{ backgroundImage: `url(${patient.avatar})` }"
           ></div>
           <div class="grow">
-            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">{{ patient.name }}</h1>
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+              {{ patient.name }}
+            </h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">
               {{ patient.email }} • {{ patient.phone }}
             </p>
@@ -45,7 +50,9 @@ defineEmits(['exit', 'edit'])
       </div>
       <div class="border-b border-white/10">
         <nav class="flex gap-6 -mb-px">
-          <a class="py-3 px-1 border-b-2 border-primary text-primary font-semibold" href="#"
+          <a
+            class="py-3 px-1 border-b-2 border-primary text-primary font-semibold"
+            href="#"
             >Calendario de Sueño</a
           >
           <a
@@ -65,7 +72,9 @@ defineEmits(['exit', 'edit'])
           title="Promedio de sueño (7d)"
           :value="calculateDuration(patient.sleepAverage)"
           :color="
-            getQualityEficiency(calculateDurationPercentage(patient.sleepAverage, targetHours))
+            getQualityEficiency(
+              calculateDurationPercentage(patient.sleepAverage, targetHours)
+            )
           "
         />
         <StatCard

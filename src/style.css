@@ -6,6 +6,11 @@
   --color-primary: #137fec;
   --color-background-light: #f6f7f8;
   --color-background-dark: #101922;
+  --color-border-dark: #30363d;
+  --color-card-dark: #1c2127;
+  --color-sleep: #a855f7;
+  --color-awake-bed: #f97316;
+  --color-out-bed: #22c55e;
 
   /* Fuentes */
   --font-family-display: 'Manrope', sans-serif;
@@ -18,6 +23,7 @@
 
   /* Modo oscuro - clase */
   --dark: initial;
+
 }
 
 /* Clase de utilidad para fuente */
@@ -30,6 +36,15 @@
   @apply pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0;
 }
 
+/* Ocultar scrollbar pero mantener scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
 
 
 :root {

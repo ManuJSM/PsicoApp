@@ -1,46 +1,45 @@
 <script setup lang="ts">
-import BackButton from './components/BackButton.vue'
-import DeleteModal from './components/DeleteModal.vue'
-import FormInput from './components/FormInput.vue'
-import { Status, type Patient } from '@/types/types'
-import { ref, computed, reactive, watch } from 'vue'
+  import BackButton from './components/BackButton.vue'
+  import DeleteModal from './components/DeleteModal.vue'
+  import FormInput from './components/FormInput.vue'
+  import { Status, type Patient } from '@/types/types'
+  import { ref, computed, reactive, watch } from 'vue'
 
-const props = defineProps<{
-  patient: Patient
-}>()
-const emit = defineEmits<{
-  (e: 'back'): void
-  (e: 'delete'): void
-  (e: 'save', patient: Patient): void
-}>()
-const showDeleteModal = ref(false)
-const editPatient = reactive<Patient>({
-  ...props.patient,
-})
-const isActive = computed<boolean>(() => editPatient.status === Status.Active)
+  const props = defineProps<{
+    patient: Patient
+  }>()
+  const emit = defineEmits<{
+    (e: 'back'): void
+    (e: 'delete'): void
+    (e: 'save', patient: Patient): void
+  }>()
+  const showDeleteModal = ref(false)
+  const editPatient = reactive<Patient>({
+    ...props.patient,
+  })
+  const isActive = computed<boolean>(() => editPatient.status === Status.Active)
 
-const toggleStatus = () => {
-  editPatient.status = isActive.value ? Status.Inactive : Status.Active
-}
+  const toggleStatus = () => {
+    editPatient.status = isActive.value ? Status.Inactive : Status.Active
+  }
 
-const handleDelete = () => {
-  emit('delete')
-  showDeleteModal.value = false
-}
-watch(
-  () => props.patient,
-  (newPatient) => {
-    Object.assign(editPatient, newPatient)
-  },
-  { immediate: true, deep: true },
-)
+  const handleDelete = () => {
+    emit('delete')
+    showDeleteModal.value = false
+  }
+  watch(
+    () => props.patient,
+    newPatient => {
+      Object.assign(editPatient, newPatient)
+    },
+    { immediate: true, deep: true }
+  )
 </script>
 <template>
   <section
-    class="relative z-0 md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full overflow-y-auto"
+    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
   >
     <BackButton @click="emit('back')" />
-
     <Transition name="modal" appear>
       <DeleteModal
         v-show="showDeleteModal"
@@ -49,7 +48,7 @@ watch(
         @back="showDeleteModal = false"
       />
     </Transition>
-    <div class="w-full mx-auto overflow-y-auto">
+    <div class="pt-2 md:self-center overflow-y-auto scrollbar-hide max-w-2xl">
       <section class="flex flex-col items-center mb-10">
         <div class="relative group">
           <div
@@ -60,7 +59,9 @@ watch(
           <button
             class="absolute bottom-1 right-1 flex items-center justify-center bg-primary rounded-full size-9 text-white hover:bg-primary/90 transition-colors duration-200 ring-2 ring-white dark:ring-gray-800 touch-manipulation shadow-md"
           >
-            <span class="material-symbols-outlined text-lg md:text-xl">edit</span>
+            <span class="material-symbols-outlined text-lg md:text-xl"
+              >edit</span
+            >
           </button>
         </div>
         <h1
@@ -81,7 +82,9 @@ watch(
           <h3
             class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-2"
           >
-            <span class="material-symbols-outlined text-primary text-2xl">person</span>
+            <span class="material-symbols-outlined text-primary text-2xl"
+              >person</span
+            >
             Información del Paciente
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -125,7 +128,9 @@ watch(
                 rows="4"
               ></textarea>
             </div>
-            <div class="md:col-span-2 pt-6 border-t border-gray-100 dark:border-gray-700 mt-2">
+            <div
+              class="md:col-span-2 pt-6 border-t border-gray-100 dark:border-gray-700 mt-2"
+            >
               <div class="flex items-center justify-between">
                 <div class="flex flex-col">
                   <label
@@ -139,7 +144,10 @@ watch(
                 </div>
                 <div class="flex items-center gap-3">
                   <span
-                    :class="['text-sm font-medium', isActive ? 'text-primary' : 'text-gray-500']"
+                    :class="[
+                      'text-sm font-medium',
+                      isActive ? 'text-primary' : 'text-gray-500',
+                    ]"
                     >{{ editPatient.status }}</span
                   >
                   <button
@@ -169,7 +177,9 @@ watch(
         <div
           class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700/50 flex flex-col md:flex-row md:items-start justify-between gap-6"
         >
-          <div class="w-full md:w-auto order-last md:order-first flex flex-col gap-3">
+          <div
+            class="w-full md:w-auto order-last md:order-first flex flex-col gap-3"
+          >
             <button
               class="w-full md:w-auto flex cursor-pointer items-center justify-center gap-2.5 rounded-xl min-h-[52px] px-6 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-base font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-all duration-200 border border-red-100 dark:border-red-900/30 touch-manipulation whitespace-nowrap"
               @click="showDeleteModal = true"
@@ -200,11 +210,11 @@ watch(
   </section>
 </template>
 <style scoped>
-.modal-enter-active {
-  transition: opacity 160ms ease-in;
-}
+  .modal-enter-active {
+    transition: opacity 160ms ease-in;
+  }
 
-.modal-enter-from {
-  opacity: 0;
-}
+  .modal-enter-from {
+    opacity: 0;
+  }
 </style>
