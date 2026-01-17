@@ -8,9 +8,9 @@
   --color-background-dark: #101922;
   --color-border-dark: #30363d;
   --color-card-dark: #1c2127;
-  --color-sleep: #a855f7;
-  --color-awake-bed: #f97316;
-  --color-out-bed: #22c55e;
+  --color-state-asleep: #4f46e5;
+  --color-state-inbed: #d97706;
+  --color-state-awake: #059669;
 
   /* Fuentes */
   --font-family-display: 'Manrope', sans-serif;
