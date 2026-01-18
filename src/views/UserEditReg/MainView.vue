@@ -3,12 +3,12 @@
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
   import { ref } from 'vue'
-  const step = ref(2)
+  const step = ref(1)
   const percentage = Math.floor((step.value / 3) * 100)
 </script>
 <template>
   <main
-    class="max-w-7xl mx-auto pb-safe-sm px-4 py-8 mb-2 sm:px-6 lg:px-8 overflow-y-auto"
+    class="max-w-7xl mx-auto pb-safe-sm p-2 mb-2 sm:px-6 lg:px-8 overflow-y-auto"
   >
     <div
       class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
@@ -45,8 +45,8 @@
         </div>
       </div>
     </div>
-    <Step1 v-if="step === 1" />
-    <Step2 v-if="step === 2" />
+    <Step1 v-if="step === 1" @next="step++" />
+    <Step2 v-if="step === 2" @next="step++" @back="step--" />
     <Step3 v-if="step === 3" />
   </main>
 </template>

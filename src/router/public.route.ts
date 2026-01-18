@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import Login from '@/views/Login/MainView.vue'
+import NotFound from '@/views/NotFound/MainView.vue'
 
 export const publicRoutes: Array<RouteRecordRaw> = [
   {
@@ -17,6 +18,6 @@ export const publicRoutes: Array<RouteRecordRaw> = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: Login,
+    component: NotFound,
   },
 ]

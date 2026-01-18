@@ -194,7 +194,7 @@
       </div>
 
       <!-- Nota -->
-      <div class="p-4 rounded-xl border border-dashed border-border-dark">
+      <div class="p-2 rounded-xl border border-dashed border-border-dark">
         <p class="text-xs text-slate-500 leading-relaxed italic">
           Debes completar todo el rango desde
           <strong>{{ formattedBedtime }}</strong> hasta
@@ -283,13 +283,10 @@
                   'h-full rounded-full timeline-pill flex items-center justify-center transition-all',
                   getStateClass(interval.state),
                 ]"
-                :style="{ width: getIntervalWidth(interval) }"
+                :style="{ width: getIntervalWidth(interval) + '%' }"
               >
                 <span
-                  v-if="
-                    getIntervalWidth(interval) !== '0%' &&
-                    getIntervalWidth(interval) !== '0px'
-                  "
+                  v-show="getIntervalWidth(interval) > 8"
                   class="material-symbols-outlined text-white text-xs"
                 >
                   {{ getStateIcon(interval.state) }}
@@ -308,35 +305,49 @@
 
           <!-- Totales -->
           <div class="mt-4 flex justify-between items-center px-2">
-            <div class="flex flex-col">
+            <div class="flex flex-col items-center">
               <span
                 class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter"
               >
                 Progreso del Rango
               </span>
-              <span class="text-xl font-black text-white"
+              <span class="text-sm font-black text-white"
                 >{{ progressPercentage }}%</span
               >
+            </div>
+            <div class="flex flex-col items-center">
+              <span
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter"
+              >
+                Previsualización de Rango</span
+              >
+              <div class="flex gap-2 rounded-full">
+                <span class="text-sm font-bold text-primary">06:15</span>
+                <span class="material-symbols-outlined text-primary/40 text-sm"
+                  >trending_flat</span
+                >
+                <span class="text-sm font-bold text-primary">07:45</span>
+              </div>
             </div>
             <div class="flex gap-4">
               <div class="text-right">
                 <span
                   class="block text-[10px] font-bold text-slate-500 uppercase"
                 >
-                  Registrado
+                  Dormido
                 </span>
-                <span class="text-sm font-bold text-white">{{
-                  formatDuration(registeredMinutes)
+                <span class="text-sm font-bold text-state-asleep">{{
+                  formatDuration(totalTimeSleep)
                 }}</span>
               </div>
               <div class="text-right">
                 <span
                   class="block text-[10px] font-bold text-slate-500 uppercase"
                 >
-                  Total
+                  Despierto
                 </span>
                 <span class="text-sm font-bold text-slate-400">{{
-                  formatDuration(totalTimeInBedMinutes)
+                  formatDuration(totalTimeAwake)
                 }}</span>
               </div>
             </div>
@@ -345,8 +356,8 @@
       </div>
 
       <!-- Lista de intervalos -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between px-1">
+      <div class="flex flex-col h-93 min-h-0">
+        <div class="flex items-center mb-2 justify-between px-1">
           <h3
             class="text-sm font-bold text-slate-500 uppercase tracking-widest"
           >
@@ -373,97 +384,96 @@
         </div>
 
         <!-- Intervalos -->
-        <div
-          v-for="(interval, index) in intervals"
-          :key="index"
-          :class="[
-            'group bg-card-dark border rounded-xl p-4 shadow-sm transition-colors flex items-center justify-between',
-            index === intervals.length - 1
-              ? 'border-state-asleep/40 bg-state-asleep/2'
-              : 'border-border-dark hover:border-' +
-                getStateHoverClass(interval.state),
-          ]"
-        >
-          <div class="flex items-center gap-4">
-            <div
-              :class="[
-                'h-10 w-10 rounded-lg flex items-center justify-center',
-                getStateBgClass(interval.state),
-              ]"
-            >
-              <span class="material-symbols-outlined">
-                {{ getStateIcon(interval.state) }}
-              </span>
-            </div>
-            <div>
-              <div class="flex items-center justify-start gap-2">
-                <h4 class="font-bold text-sm">
-                  {{ getStateLabel(interval.state) }}
-                </h4>
-                <span
-                  :class="[
-                    'text-[10px] px-2 py-0.5 rounded-full font-bold border',
-                    getStateBorderClass(interval.state),
-                  ]"
-                >
-                  {{ formatTime(interval.startTime) }} -
-                  {{ formatTime(interval.endTime) }}
+        <section class="overflow-y-auto space-y-4">
+          <div
+            v-for="(interval, index) in intervals"
+            :key="index"
+            :class="[
+              'group bg-card-dark border rounded-xl p-4 shadow-sm transition-colors flex items-center justify-between',
+              index === intervals.length - 1
+                ? 'border-state-asleep/40 bg-state-asleep/2'
+                : 'border-border-dark hover:border-' +
+                  getStateHoverClass(interval.state),
+            ]"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                :class="[
+                  'h-10 w-10 rounded-lg flex items-center justify-center',
+                  getStateBgClass(interval.state),
+                ]"
+              >
+                <span class="material-symbols-outlined">
+                  {{ getStateIcon(interval.state) }}
                 </span>
               </div>
-              <p class="text-xs text-slate-400">
-                {{ getDescription(interval) }}
-              </p>
+              <div>
+                <div class="flex items-center justify-start gap-2">
+                  <h4 class="font-bold text-sm">
+                    {{ getStateLabel(interval.state) }}
+                  </h4>
+                  <span
+                    :class="[
+                      'text-[10px] px-2 py-0.5 rounded-full font-bold border',
+                      getStateBorderClass(interval.state),
+                    ]"
+                  >
+                    {{ formatTime(interval.startTime) }} -
+                    {{ formatTime(interval.endTime) }}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400">
+                  {{ getDescription(interval) }}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-bold text-sm">{{
+                formatIntervalDuration(interval)
+              }}</span>
+              <button
+                @click="removeInterval(index)"
+                class="text-slate-500 flex items-center hover:text-red-500 transition-colors"
+              >
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
             </div>
           </div>
-          <div class="flex items-center gap-4">
-            <span class="font-bold text-sm">{{
-              formatIntervalDuration(interval)
-            }}</span>
-            <button
-              @click="removeInterval(index)"
-              class="text-slate-500 flex items-center hover:text-red-500 transition-colors"
-            >
-              <span class="material-symbols-outlined text-lg">delete</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botones de navegación -->
-      <div
-        class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border-dark"
-      >
-        <button
-          @click="goToStep1"
-          class="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2"
-        >
-          <span class="material-symbols-outlined text-lg">arrow_back</span>
-          Volver al Paso 1
-        </button>
-        <button
-          @click="saveAndContinue"
-          :disabled="!isRangeComplete"
-          :class="[
-            'w-full sm:w-[240px] font-bold py-4 rounded-lg transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest text-sm',
-            isRangeComplete
-              ? 'bg-primary hover:brightness-110 text-white shadow-primary/20 cursor-pointer'
-              : 'bg-border-dark text-slate-500 cursor-not-allowed',
-          ]"
-        >
-          {{
-            isRangeComplete
-              ? 'Continuar y Guardar'
-              : 'Complete el rango primero'
-          }}
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
+        </section>
       </div>
     </div>
+  </div>
+  <!-- Botones de navegación -->
+  <div
+    class="pt-6 mt-2 flex flex-col w-full sm:flex-row items-center justify-center md:justify-between gap-4 border-t border-border-dark"
+  >
+    <button
+      @click="goToStep1"
+      class="sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2"
+    >
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      Volver al Paso 1
+    </button>
+    <button
+      @click="saveAndContinue"
+      :disabled="!isRangeComplete"
+      :class="[
+        'font-bold p-4 rounded-lg transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest text-sm',
+        isRangeComplete
+          ? 'bg-primary hover:brightness-110 text-white shadow-primary/20 cursor-pointer'
+          : 'bg-border-dark text-slate-500 cursor-not-allowed',
+      ]"
+    >
+      {{
+        isRangeComplete ? 'Continuar y Guardar' : 'Complete el rango primero'
+      }}
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed } from 'vue'
   import sleepStateConfig from '../../utils/css.util.ts'
   const getStateClass = (state: SleepState) => sleepStateConfig[state].class
   const getStateBgClass = (state: SleepState) => sleepStateConfig[state].bgClass
@@ -473,6 +483,8 @@
     sleepStateConfig[state].hoverClass
   const getStateIcon = (state: SleepState) => sleepStateConfig[state].icon
   const getStateLabel = (state: SleepState) => sleepStateConfig[state].label
+
+  const emits = defineEmits(['back', 'next'])
 
   // Tipos
   type SleepState = 'asleep' | 'inBed' | 'awake'
@@ -484,7 +496,8 @@
     endTime: Date
   }
 
-  // Fechas fijas de acostado y levantado que vienen del paso 1
+  // Fechas fijas de acostado y levantado
+  // FIXME: These dates should come from the previous step
   const bedtimeDate = ref(new Date(2024, 0, 1, 22, 30)) // 22:30
   const wakeupDate = ref(new Date(2024, 0, 2, 7, 15)) // 07:15
 
@@ -494,9 +507,28 @@
     return Math.floor(diffMs / 60000) // minutos
   })
 
+  const totalTimeSleep = computed(() => {
+    return intervals.value
+      .filter(interval => interval.state === 'asleep')
+      .reduce(
+        (total, interval) => total + interval.hours * 60 + interval.minutes,
+        0
+      )
+  })
+  const totalTimeAwake = computed(() => {
+    return intervals.value
+      .filter(
+        interval => interval.state === 'inBed' || interval.state === 'awake'
+      )
+      .reduce(
+        (total, interval) => total + interval.hours * 60 + interval.minutes,
+        0
+      )
+  })
+
   // Estado del nuevo intervalo
   const newInterval = ref({
-    state: 'asleep' as SleepState,
+    state: 'inBed' as SleepState,
     hours: 1,
     minutes: 30,
   })
@@ -687,11 +719,11 @@
   }
 
   // Calcular ancho del intervalo para la barra
-  const getIntervalWidth = (interval: Interval) => {
-    if (totalTimeInBedMinutes.value === 0) return '0%'
+  const getIntervalWidth = (interval: Interval): number => {
+    if (totalTimeInBedMinutes.value === 0) return 0
     const intervalMinutes = interval.hours * 60 + interval.minutes
     const percentage = (intervalMinutes / totalTimeInBedMinutes.value) * 100
-    return `${Math.max(5, percentage)}%`
+    return Math.max(5, percentage)
   }
 
   // Ancho del espacio restante
@@ -735,7 +767,7 @@
   }
 
   // Navegación
-  const goToStep1 = () => alert('Navegando al Paso 1...')
+  const goToStep1 = () => emits('back')
   const saveAndContinue = () => {
     if (!isRangeComplete.value) return
     console.log('Guardando secuencia completa:', intervals.value)
@@ -744,19 +776,8 @@
         registeredMinutes.value
       )}\nProgreso: 100%`
     )
+    emits('next')
   }
-
-  // Inicializar con ejemplo para pruebas
-  onMounted(() => {
-    const startTime = new Date(bedtimeDate.value)
-    intervals.value.push({
-      state: 'inBed',
-      hours: 0,
-      minutes: 30,
-      startTime: startTime,
-      endTime: new Date(startTime.getTime() + 30 * 60000),
-    })
-  })
 </script>
 <style scoped>
   /* Chrome, Edge, Safari */

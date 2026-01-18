@@ -4,6 +4,8 @@
   import type { TimeValue } from '@/types/regEdit.types'
   const today = new Date(2024, 0, 1)
 
+  const emits = defineEmits(['next'])
+
   const bedtime = ref<TimeValue>({
     hour: 10,
     minute: 30,
@@ -55,9 +57,7 @@
   const nextStep = (): void => {
     // Aquí iría la lógica para ir al siguiente paso
     console.log(bedtimeDate.value, wakeupDate.value)
-    alert(
-      `Configuración guardada:\nAcostado: ${formattedBedtime.value}\nLevantado: ${formattedWakeup.value}\nTotal en cama: ${totalTimeInBed.value}`
-    )
+    emits('next')
   }
 </script>
 <template>
@@ -156,7 +156,7 @@
       >
         <button
           @click="nextStep"
-          class="w-full sm:w-[240px] bg-primary hover:brightness-110 text-white font-bold py-4 rounded-lg transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+          class="w-full sm:w-[240px] bg-primary hover:cursor-pointer hover:brightness-110 text-white font-bold py-4 rounded-lg transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
         >
           Siguiente Paso
           <span class="material-symbols-outlined">chevron_right</span>
