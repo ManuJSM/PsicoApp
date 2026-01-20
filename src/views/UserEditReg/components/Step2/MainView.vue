@@ -13,7 +13,7 @@
         @update:minutes="value => (newInterval.minutes = value)"
       />
 
-      <section class="mt-2" v-show="!isRangeComplete">
+      <!-- <section class="mt-2" v-show="!isRangeComplete">
         <div
           class="bg-primary/5 border border-primary/20 rounded-lg py-3 px-4 flex items-center justify-center gap-3"
         >
@@ -27,7 +27,7 @@
             formatTime(previewInterval.endTime)
           }}</span>
         </div>
-      </section>
+      </section> -->
 
       <!-- Nota -->
       <div
@@ -189,6 +189,44 @@
             </div>
           </div>
         </div>
+        <button
+          @click="addInterval"
+          :disabled="!canAddInterval"
+          :class="[
+            'w-full mt-2 bg-primary/5 border border-primary/20 rounded-lg p-3 flex items-center justify-between transition-all',
+            canAddInterval
+              ? 'hover:bg-primary/10 hover:border-primary/40 cursor-pointer'
+              : 'opacity-50 cursor-not-allowed',
+          ]"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="material-symbols-outlined"
+              :class="canAddInterval ? 'text-primary' : 'text-primary/40'"
+            >
+              add_circle
+            </span>
+            <span
+              class="font-medium text-sm"
+              :class="canAddInterval ? 'text-primary' : 'text-primary/60'"
+            >
+              Añadir
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary/60 text-sm">
+              schedule
+            </span>
+            <span
+              class="font-bold text-sm"
+              :class="canAddInterval ? 'text-primary' : 'text-primary/60'"
+            >
+              {{ formatTime(previewInterval.startTime) }} →
+              {{ formatTime(previewInterval.endTime) }}
+            </span>
+          </div>
+        </button>
       </div>
 
       <!-- Lista de intervalos -->
