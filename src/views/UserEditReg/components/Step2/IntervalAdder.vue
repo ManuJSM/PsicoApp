@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-card-dark border border-border-dark rounded-xl p-4 shadow-sm">
+  <section>
     <!-- Encabezado compacto -->
     <div class="flex items-center justify-between mb-4">
       <h3 class="flex items-center gap-2 text-base font-semibold">
@@ -202,7 +202,7 @@
         </button> -->
       </div>
     </div>
-  </div>
+  </section>
 </template>
 <script setup lang="ts">
   import { computed } from 'vue'

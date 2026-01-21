@@ -3,7 +3,7 @@
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
   import { ref, computed } from 'vue'
-  const step = ref(1)
+  const step = ref(2)
   const percentage = computed(() => Math.floor((step.value / 3) * 100))
 </script>
 <template>
