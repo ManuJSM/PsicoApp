@@ -1,11 +1,17 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue'
+  import InstructionsPanel from '../InstructionsPanel.vue'
   import HourSelector from './HourSelector.vue'
   import type { TimeValue } from '@/types/regEdit.types'
   const today = new Date(2024, 0, 1)
 
   const emits = defineEmits(['next'])
-
+  const instruccionesTimePicker = [
+    'Desliza las ruedas de horas y minutos para ajustar tu horario.',
+    'Usa el selector superior para alternar entre AM y PM.',
+    'Puedes usar los botones de ±15m para ajustes rápidos de precisión.',
+    'También puedes hacer clic directamente en los números para seleccionarlos.',
+  ]
   const bedtime = ref<TimeValue>({
     hour: 10,
     minute: 30,
@@ -107,39 +113,7 @@
       </div>
     </div>
     <div class="lg:col-span-4 space-y-6">
-      <div class="bg-card-dark border border-border-dark rounded-xl p-6">
-        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary">info</span>
-          Instrucciones
-        </h3>
-        <ul class="space-y-4">
-          <li class="flex gap-3">
-            <span class="text-primary font-bold">01.</span>
-            <p class="text-sm text-slate-400">
-              Desliza las ruedas de horas y minutos para ajustar tu horario.
-            </p>
-          </li>
-          <li class="flex gap-3">
-            <span class="text-primary font-bold">02.</span>
-            <p class="text-sm text-slate-400">
-              Usa el selector superior para alternar entre AM y PM.
-            </p>
-          </li>
-          <li class="flex gap-3">
-            <span class="text-primary font-bold">03.</span>
-            <p class="text-sm text-slate-400">
-              Puedes usar los botones de ±15m para ajustes rápidos de precisión.
-            </p>
-          </li>
-          <li class="flex gap-3">
-            <span class="text-primary font-bold">04.</span>
-            <p class="text-sm text-slate-400">
-              También puedes hacer clic directamente en los números para
-              seleccionarlos.
-            </p>
-          </li>
-        </ul>
-      </div>
+      <InstructionsPanel :instructions="instruccionesTimePicker" />
       <div
         class="p-4 rounded-xl border border-dashed border-border-dark bg-primary/5"
       >

@@ -1,93 +1,7 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-2 xl:gap-6">
-    <!-- Panel izquierdo: Añadir intervalo -->
-    <div class="lg:col-span-4">
-      <div
-        class="bg-card-dark border border-border-dark rounded-xl p-4 shadow-sm"
-      >
-        <IntervalAdder
-          v-model="newInterval"
-          :is-range-complete="isRangeComplete"
-          :remaining-time="remainingTime"
-          :total-time-in-bed-minutes="totalTimeInBedMinutes"
-          :can-add="canAddInterval"
-          @add="addInterval"
-          @update:hours="value => (newInterval.hours = value)"
-          @update:minutes="value => (newInterval.minutes = value)"
-        />
-        <button
-          @click="addInterval"
-          :disabled="!canAddInterval"
-          :class="[
-            'w-full mt-2 rounded-xl p-4 flex items-center justify-center gap-3 transition-all shadow-lg',
-            canAddInterval
-              ? 'bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white cursor-pointer hover:shadow-xl hover:shadow-primary/20'
-              : 'bg-linear-to-r from-slate-800 to-slate-900 text-slate-500 cursor-not-allowed',
-          ]"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              :class="[
-                'h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-sm',
-                canAddInterval ? 'bg-white/20' : 'bg-slate-700/50',
-              ]"
-            >
-              <span class="material-symbols-outlined text-xl"> add </span>
-            </div>
-            <div class="text-left">
-              <p class="font-bold text-sm">
-                {{ canAddInterval ? 'Añadir intervalo' : '' }}
-              </p>
-              <p class="text-xs opacity-90"></p>
-            </div>
-          </div>
-
-          <span
-            v-if="canAddInterval"
-            class="ml-auto bg-white/20 px-3 py-1 rounded-full text-xs font-bold"
-          >
-            {{ formatTime(previewInterval.startTime) }} ->
-            {{ formatTime(previewInterval.endTime) }}
-          </span>
-        </button>
-      </div>
-
-      <!-- Nota -->
-      <section
-        class="p-2 my-2 hidden lg:block rounded-xl border border-dashed border-border-dark"
-      >
-        <p class="text-xs text-slate-500 leading-relaxed italic">
-          Debes completar todo el rango desde
-          <strong>{{ formattedBedtime }}</strong> hasta
-          <strong>{{ formattedWakeup }}</strong> ({{
-            formatDuration(totalTimeInBedMinutes)
-          }}
-          en total).
-        </p>
-        <p class="text-xs text-slate-400 mt-2">
-          Registrado:
-          <span class="font-bold text-white">{{
-            formatDuration(registeredMinutes)
-          }}</span>
-          / Total:
-          <span class="font-bold text-white">{{
-            formatDuration(totalTimeInBedMinutes)
-          }}</span>
-        </p>
-        <div
-          class="mt-2 h-1.5 w-full bg-slate-800 rounded-full overflow-hidden"
-        >
-          <div
-            class="h-full bg-primary rounded-full"
-            :style="{ width: `${progressPercentage}%` }"
-          ></div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Panel derecho: Visualización y lista - NUEVO LAYOUT -->
-    <div class="lg:col-span-8 space-y-2">
-      <!-- NUEVA LÍNEA DE TIEMPO -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+    <!-- Panel izquierdo: Interval Adder -->
+    <section class="lg:col-span-8 space-y-2">
       <div
         class="bg-card-dark border border-border-dark rounded-xl shadow-xl overflow-hidden"
       >
@@ -146,7 +60,7 @@
                   <div
                     v-if="editingIntervalIndex !== index"
                     :class="[
-                      'h-full rounded-full timeline-pill flex items-center justify-center transition-all cursor-pointer hover:scale-105',
+                      'h-full rounded-full timeline-pill flex items-center justify-center transition-all cursor-pointer ',
                       getStateClass(interval.state),
                     ]"
                     :style="{ width: getIntervalWidth(interval) + '%' }"
@@ -165,7 +79,7 @@
                     v-else
                     @click="cancelEditing"
                     :class="[
-                      'h-full rounded-full timeline-pill flex items-center justify-center  scale-110 z-10 cursor-pointer',
+                      'h-full rounded-full timeline-pill flex items-center justify-center  scale-105 z-10 cursor-pointer',
                       getStateClass(editingIntervalState),
                     ]"
                     :style="{ width: getEditingIntervalWidth() + '%' }"
@@ -214,8 +128,9 @@
           class="bg-background-dark/60 border-t border-border-dark p-3 space-y-4"
         >
           <!-- Proyección del tiempo -->
-          <div class="grid grid-cols-2 items-center gap-3">
+          <div class="flex justify-around items-center gap-3">
             <div
+              v-show="canAddInterval || editingMode"
               class="flex items-center justify-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20"
             >
               <span
@@ -254,7 +169,7 @@
             </div>
             <div
               v-else-if="isRangeComplete"
-              class="flex items-center justify-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full"
+              class="flex w-full items-center justify-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full"
             >
               <span class="material-symbols-outlined text-green-500 text-sm"
                 >check_circle</span
@@ -411,9 +326,9 @@
             @click="editingMode ? updateInterval() : addInterval()"
             :disabled="!canAddInterval && !editingMode"
             :class="[
-              'w-full h-14 rounded-xl text-white font-bold shadow-lg transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-sm',
+              'w-full h-14 rounded-xl cursor-pointer font-bold shadow-lg transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-sm ',
               editingMode
-                ? 'bg-green-600 hover:bg-green-700 shadow-green-600/20'
+                ? 'bg-green-600/20 hover:bg-green-600/30 border text-green-400 border-green-600/30 hover:text-green-300'
                 : canAddInterval
                   ? 'bg-primary hover:brightness-110 shadow-primary/20'
                   : 'bg-slate-800 cursor-not-allowed',
@@ -424,160 +339,75 @@
             </span>
             {{ editingMode ? 'Actualizar Intervalo' : 'Añadir a la Secuencia' }}
           </button>
+          <!-- Botón de borrar intervalo (solo en modo edición) -->
+          <button
+            v-if="editingMode"
+            @click="deleteEditingInterval()"
+            class="w-full h-10 rounded-lg bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 cursor-pointer font-bold transition-all flex items-center justify-center gap-2 text-sm border border-red-600/30"
+          >
+            <span class="material-symbols-outlined text-base">delete</span>
+            Eliminar este Intervalo
+          </button>
 
           <!-- Botón de cancelar edición -->
           <button
             v-if="editingMode"
             @click="cancelEditing()"
-            class="w-full h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold transition-all flex items-center justify-center gap-2 text-sm"
+            class="w-full h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 cursor-pointer font-bold transition-all flex items-center justify-center gap-2 text-sm"
           >
             <span class="material-symbols-outlined text-base">close</span>
             Cancelar Edición
           </button>
         </div>
       </div>
-
-      <!-- Lista de intervalos -->
-      <div class="flex flex-col h-90 min-h-0">
-        <div class="flex items-center mb-2 justify-between px-1">
-          <h3
-            class="text-sm font-bold text-slate-500 uppercase tracking-widest"
-          >
-            Intervalos Registrados ({{ intervals.length }})
-          </h3>
-          <span class="text-xs font-bold text-primary">
-            {{ formatDuration(registeredMinutes) }} /
-            {{ formatDuration(totalTimeInBedMinutes) }}
-          </span>
-        </div>
-
-        <!-- Mensaje si no hay intervalos -->
-        <div
-          v-show="intervals.length === 0"
-          class="bg-card-dark border border-dashed border-border-dark rounded-xl p-8 text-center"
+    </section>
+    <!-- Panel derecho: Instrucciones y navegación -->
+    <div class="flex flex-col lg:col-span-4 gap-2">
+      <InstructionsPanel :instructions="instructions" />
+      <!-- Botones de navegación -->
+      <section
+        class="pt-6 flex flex-col w-full sm:flex-row items-center justify-center md:justify-between gap-4 border-t border-border-dark"
+      >
+        <button
+          @click="goToStep1"
+          class="sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2"
         >
-          <span class="material-symbols-outlined text-4xl text-slate-500 mb-3">
-            timeline
-          </span>
-          <p class="text-slate-400">No hay intervalos registrados aún.</p>
-          <p class="text-sm text-slate-500 mt-1">
-            Añade tu primer intervalo usando el panel.
-          </p>
-        </div>
-
-        <!-- Intervalos -->
-        <section class="overflow-y-auto space-y-4">
-          <div
-            v-for="(interval, index) in intervals"
-            :key="index"
-            :class="[
-              'group bg-card-dark border rounded-xl p-4 shadow-sm transition-colors flex items-center justify-between cursor-pointer',
-              index === intervals.length - 1
-                ? 'border-state-asleep/40 bg-state-asleep/2'
-                : 'border-border-dark hover:border-' +
-                  getStateHoverClass(interval.state),
-              editingIntervalIndex === index
-                ? 'ring-2 ring-green-500 ring-offset-1'
-                : '',
-            ]"
-            @click="selectIntervalForEditing(index)"
-          >
-            <div class="flex items-center gap-4">
-              <div
-                :class="[
-                  'h-10 w-10 rounded-lg flex items-center justify-center',
-                  getStateBgClass(interval.state),
-                ]"
-              >
-                <span class="material-symbols-outlined">
-                  {{ getStateIcon(interval.state) }}
-                </span>
-              </div>
-              <div>
-                <div class="flex items-center justify-start gap-2">
-                  <h4 class="font-bold text-sm">
-                    {{ getStateLabel(interval.state) }}
-                  </h4>
-                  <span
-                    :class="[
-                      'text-[10px] px-2 py-0.5 rounded-full font-bold border',
-                      getStateBorderClass(interval.state),
-                    ]"
-                  >
-                    {{ formatTime(interval.startTime) }} -
-                    {{ formatTime(interval.endTime) }}
-                  </span>
-                </div>
-                <p class="text-xs text-slate-400">
-                  {{ getDescription(interval) }}
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-4">
-              <span class="font-bold text-sm">{{
-                formatIntervalDuration(interval)
-              }}</span>
-              <button
-                @click.stop="removeInterval(index)"
-                class="text-slate-500 flex items-center hover:text-red-500 transition-colors"
-              >
-                <span class="material-symbols-outlined text-lg">delete</span>
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+          <span class="material-symbols-outlined text-lg">arrow_back</span>
+          Volver al Paso 1
+        </button>
+        <button
+          @click="saveAndContinue"
+          :disabled="!isRangeComplete"
+          :class="[
+            'font-bold p-4 rounded-lg transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest text-sm',
+            isRangeComplete
+              ? 'bg-primary hover:brightness-110 text-white shadow-primary/20 cursor-pointer'
+              : 'bg-border-dark text-slate-500 cursor-not-allowed',
+          ]"
+        >
+          {{
+            isRangeComplete
+              ? 'Continuar y Guardar'
+              : 'Complete el rango primero'
+          }}
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </section>
     </div>
-  </div>
-
-  <!-- Botones de navegación -->
-  <div
-    class="pt-6 flex flex-col w-full sm:flex-row items-center justify-center md:justify-between gap-4 border-t border-border-dark"
-  >
-    <button
-      @click="goToStep1"
-      class="sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:text-white transition-colors flex items-center gap-2"
-    >
-      <span class="material-symbols-outlined text-lg">arrow_back</span>
-      Volver al Paso 1
-    </button>
-    <button
-      @click="saveAndContinue"
-      :disabled="!isRangeComplete"
-      :class="[
-        'font-bold p-4 rounded-lg transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest text-sm',
-        isRangeComplete
-          ? 'bg-primary hover:brightness-110 text-white shadow-primary/20 cursor-pointer'
-          : 'bg-border-dark text-slate-500 cursor-not-allowed',
-      ]"
-    >
-      {{
-        isRangeComplete ? 'Continuar y Guardar' : 'Complete el rango primero'
-      }}
-      <span class="material-symbols-outlined">chevron_right</span>
-    </button>
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
   import sleepStateConfig from '../../utils/css.util'
+  import InstructionsPanel from '../InstructionsPanel.vue'
   import {
-    formatTime12Hour,
     formatDuration,
-    formatIntervalDuration,
     formatTime,
   } from '@/views/UserEditReg/utils/time.util'
-  import IntervalAdder from './IntervalAdder.vue'
 
   const getStateClass = (state: SleepState) => sleepStateConfig[state].class
-  const getStateBgClass = (state: SleepState) => sleepStateConfig[state].bgClass
-  const getStateBorderClass = (state: SleepState) =>
-    sleepStateConfig[state].borderClass
-  const getStateHoverClass = (state: SleepState) =>
-    sleepStateConfig[state].hoverClass
   const getStateIcon = (state: SleepState) => sleepStateConfig[state].icon
-  const getStateLabel = (state: SleepState) => sleepStateConfig[state].label
 
   const emits = defineEmits(['back', 'next'])
 
@@ -626,6 +456,13 @@
     hours: 1,
     minutes: 30,
   })
+  const instructions = [
+    'Selecciona un estado (Dormido, En Cama o Despierto) y ajusta la duración con los controles de horas/minutos.',
+    'Observa cómo se distribuyen tus intervalos en la barra superior. Los colores representan cada estado.',
+    'Haz clic en cualquier intervalo de la lista para editarlo. Puedes cambiar su estado, duración o eliminarlo.',
+    'Asegúrate de que la suma de todos los intervalos cubra completamente desde la hora de inicio hasta la hora de fin.',
+    'Una vez completado el rango, haz clic en "Continuar y Guardar" para registrar tu sesión de sueño.',
+  ]
 
   // Modo de edición
   const editingMode = ref(false)
@@ -668,6 +505,13 @@
   // Lista de intervalos
   const intervals = ref<Interval[]>([])
 
+  // Eliminar el intervalo que se está editando
+  const deleteEditingInterval = () => {
+    if (editingIntervalIndex.value === null) return
+    removeInterval(editingIntervalIndex.value)
+    cancelEditing()
+  }
+
   // Calcular tiempo registrado
   const registeredMinutes = computed(() => {
     return intervals.value.reduce(
@@ -685,14 +529,6 @@
   // Verificar si el rango está completo
   const isRangeComplete = computed(() => {
     return remainingTime.value <= 0 && intervals.value.length > 0
-  })
-
-  // Porcentaje de progreso
-  const progressPercentage = computed(() => {
-    if (totalTimeInBedMinutes.value === 0) return 0
-    const percentage =
-      (registeredMinutes.value / totalTimeInBedMinutes.value) * 100
-    return Math.min(100, Math.round(percentage))
   })
 
   // Marcas de tiempo para la línea de tiempo
@@ -717,12 +553,6 @@
 
     return markers
   })
-
-  // Formatear hora de acostado
-  const formattedBedtime = computed(() => formatTime12Hour(bedtimeDate.value))
-
-  // Formatear hora de levantado
-  const formattedWakeup = computed(() => formatTime12Hour(wakeupDate.value))
 
   // Verificar si se puede añadir intervalo (solo para añadir)
   const canAddInterval = computed(() => {
@@ -781,8 +611,11 @@
     editingIntervalMinutes.value = interval.minutes
     editingIntervalState.value = interval.state
 
-    // Resetear el preview de añadir
-    newInterval.value = { state: 'inBed', hours: 0, minutes: 0 }
+    resetAddInterval()
+  }
+  // Resetear el preview de añadir
+  const resetAddInterval = () => {
+    newInterval.value = { state: 'asleep', hours: 0, minutes: 0 }
   }
 
   // Cancelar edición
@@ -793,8 +626,7 @@
     editingIntervalMinutes.value = 0
     editingIntervalState.value = 'inBed'
 
-    // Resetear el preview de añadir
-    newInterval.value = { state: 'inBed', hours: 0, minutes: 0 }
+    resetAddInterval()
   }
 
   // Calcular ancho del intervalo para la barra
@@ -982,8 +814,7 @@
       endTime: new Date(previewInterval.value.endTime),
     })
 
-    // Resetear valores
-    newInterval.value = { state: 'asleep', hours: 0, minutes: 0 }
+    resetAddInterval()
 
     // Recalcular tiempos
     recalculateIntervalTimes()
@@ -1029,31 +860,6 @@
     return totalRegistered <= totalTimeInBedMinutes.value
   }
 
-  // Descripción según intervalo
-  const getDescription = (interval: Interval) => {
-    const duration = interval.hours * 60 + interval.minutes
-
-    if (interval.state === 'asleep') {
-      if (duration >= 240) return 'Sueño profundo ininterrumpido'
-      if (duration >= 120) return 'Ciclo de sueño completo'
-      return 'Sueño ligero'
-    }
-
-    if (interval.state === 'inBed') {
-      if (interval.startTime.getHours() === 22)
-        return 'Inicio de la sesión de descanso'
-      return 'Periodo en cama'
-    }
-
-    if (interval.state === 'awake') {
-      if (interval.startTime.getHours() >= 7) return 'Actividad matutina final'
-      return 'Periodo despierto'
-    }
-
-    return 'Intervalo registrado'
-  }
-
-  // Navegación
   const goToStep1 = () => emits('back')
   const saveAndContinue = () => {
     if (!isRangeComplete.value) return
