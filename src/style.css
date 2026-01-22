@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/*activa el modo dark incluso si el navegador esta en light*/
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Configuración Tema*/
 @theme {
   /* Colores */

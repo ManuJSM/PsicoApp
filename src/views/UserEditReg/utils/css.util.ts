@@ -1,3 +1,4 @@
+import type { SleepState } from '@/types/regEdit.types'
 const sleepStateConfig = {
   asleep: {
     class: 'bg-state-asleep',
@@ -25,4 +26,7 @@ const sleepStateConfig = {
   },
 } as const
 
+export const getStateClass = (state: SleepState) =>
+  sleepStateConfig[state].class
+export const getStateIcon = (state: SleepState) => sleepStateConfig[state].icon
 export default sleepStateConfig

@@ -1,7 +1,7 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8">
+  <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
     <!-- Panel izquierdo: Interval Adder -->
-    <section class="lg:col-span-8 space-y-2">
+    <section class="md:min-w-2xl space-y-2">
       <div
         class="bg-card-dark border border-border-dark rounded-xl shadow-xl overflow-hidden"
       >
@@ -80,7 +80,7 @@
                     @click="cancelEditing"
                     :class="[
                       'h-full rounded-full timeline-pill flex items-center justify-center  scale-105 z-10 cursor-pointer',
-                      getStateClass(editingIntervalState),
+                      getStateClass(editingInterval.state),
                     ]"
                     :style="{ width: getEditingIntervalWidth() + '%' }"
                   >
@@ -88,7 +88,7 @@
                       v-show="getEditingIntervalWidth() > 8"
                       class="material-symbols-outlined text-white text-xs"
                     >
-                      {{ getStateIcon(editingIntervalState) }}
+                      {{ getStateIcon(editingInterval.state) }}
                     </span>
                   </div>
                 </template>
@@ -184,10 +184,10 @@
           <div class="flex items-center justify-center gap-6">
             <div class="flex flex-col items-center gap-2">
               <button
-                @click="updateState('asleep')"
+                @click="updateState(SleepState.ASLEEP)"
                 :class="[
                   'w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all',
-                  getCurrentState() === 'asleep'
+                  getCurrentState() === SleepState.ASLEEP
                     ? 'bg-state-asleep text-white ring-4 ring-state-asleep/20'
                     : 'bg-card-dark border border-border-dark text-slate-500 hover:bg-slate-800',
                 ]"
@@ -198,7 +198,7 @@
               <span
                 class="text-[9px] font-bold uppercase"
                 :class="
-                  getCurrentState() === 'asleep'
+                  getCurrentState() === SleepState.ASLEEP
                     ? 'text-state-asleep'
                     : 'text-slate-500'
                 "
@@ -209,10 +209,10 @@
 
             <div class="flex flex-col items-center gap-2">
               <button
-                @click="updateState('inBed')"
+                @click="updateState(SleepState.INBED)"
                 :class="[
                   'w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all',
-                  getCurrentState() === 'inBed'
+                  getCurrentState() === SleepState.INBED
                     ? 'bg-state-inbed text-white ring-4 ring-state-inbed/20'
                     : 'bg-card-dark border border-border-dark text-slate-500 hover:bg-slate-800',
                 ]"
@@ -225,7 +225,7 @@
               <span
                 class="text-[9px] font-bold uppercase"
                 :class="
-                  getCurrentState() === 'inBed'
+                  getCurrentState() === SleepState.INBED
                     ? 'text-state-inbed'
                     : 'text-slate-500'
                 "
@@ -236,10 +236,10 @@
 
             <div class="flex flex-col items-center gap-2">
               <button
-                @click="updateState('awake')"
+                @click="updateState(SleepState.AWAKE)"
                 :class="[
                   'w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all',
-                  getCurrentState() === 'awake'
+                  getCurrentState() === SleepState.AWAKE
                     ? 'bg-state-awake text-white ring-4 ring-state-awake/20'
                     : 'bg-card-dark border border-border-dark text-slate-500 hover:bg-slate-800',
                 ]"
@@ -252,7 +252,7 @@
               <span
                 class="text-[9px] font-bold uppercase"
                 :class="
-                  getCurrentState() === 'awake'
+                  getCurrentState() === SleepState.AWAKE
                     ? 'text-state-awake'
                     : 'text-slate-500'
                 "
@@ -399,27 +399,15 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
-  import sleepStateConfig from '../../utils/css.util'
+  import { getStateClass, getStateIcon } from '../../utils/css.util'
   import InstructionsPanel from '../InstructionsPanel.vue'
+  import { SleepState, type Interval } from '@/types/regEdit.types'
   import {
     formatDuration,
     formatTime,
   } from '@/views/UserEditReg/utils/time.util'
 
-  const getStateClass = (state: SleepState) => sleepStateConfig[state].class
-  const getStateIcon = (state: SleepState) => sleepStateConfig[state].icon
-
   const emits = defineEmits(['back', 'next'])
-
-  // Tipos
-  type SleepState = 'asleep' | 'inBed' | 'awake'
-  type Interval = {
-    state: SleepState
-    hours: number
-    minutes: number
-    startTime: Date
-    endTime: Date
-  }
 
   // Fechas fijas de acostado y levantado
   const bedtimeDate = ref(new Date(2024, 0, 1, 22, 30)) // 22:30
@@ -431,30 +419,16 @@
     return Math.floor(diffMs / 60000) // minutos
   })
 
-  // const totalTimeSleep = computed(() => {
-  //   return intervals.value
-  //     .filter(interval => interval.state === 'asleep')
-  //     .reduce(
-  //       (total, interval) => total + interval.hours * 60 + interval.minutes,
-  //       0
-  //     )
-  // })
-  // const totalTimeAwake = computed(() => {
-  //   return intervals.value
-  //     .filter(
-  //       interval => interval.state === 'inBed' || interval.state === 'awake'
-  //     )
-  //     .reduce(
-  //       (total, interval) => total + interval.hours * 60 + interval.minutes,
-  //       0
-  //     )
-  // })
-
   // Estado del nuevo intervalo (solo para añadir)
   const newInterval = ref({
-    state: 'inBed' as SleepState,
+    state: SleepState.INBED,
     hours: 1,
     minutes: 30,
+  })
+  const editingInterval = ref({
+    hours: 0,
+    minutes: 0,
+    state: SleepState.INBED,
   })
   const instructions = [
     'Selecciona un estado (Dormido, En Cama o Despierto) y ajusta la duración con los controles de horas/minutos.',
@@ -467,9 +441,6 @@
   // Modo de edición
   const editingMode = ref(false)
   const editingIntervalIndex = ref<number | null>(null)
-  const editingIntervalHours = ref(0)
-  const editingIntervalMinutes = ref(0)
-  const editingIntervalState = ref<SleepState>('inBed')
 
   const remainTime = computed<{ hours: number; minutes: number }>(() => {
     const hours = Math.floor(remainingTime.value / 60)
@@ -566,21 +537,21 @@
   // Obtener estado actual (para los botones de estado)
   const getCurrentState = (): SleepState => {
     return editingMode.value
-      ? editingIntervalState.value
+      ? editingInterval.value.state
       : newInterval.value.state
   }
 
   // Obtener horas actuales
   const getCurrentHours = (): number => {
     return editingMode.value
-      ? editingIntervalHours.value
+      ? editingInterval.value.hours
       : newInterval.value.hours
   }
 
   // Obtener minutos actuales
   const getCurrentMinutes = (): number => {
     return editingMode.value
-      ? editingIntervalMinutes.value
+      ? editingInterval.value.minutes
       : newInterval.value.minutes
   }
 
@@ -596,7 +567,7 @@
   // Actualizar estado
   const updateState = (state: SleepState) => {
     if (editingMode.value) {
-      editingIntervalState.value = state
+      editingInterval.value.state = state
     } else {
       newInterval.value.state = state
     }
@@ -607,24 +578,28 @@
     const interval = intervals.value[index] as Interval
     editingMode.value = true
     editingIntervalIndex.value = index
-    editingIntervalHours.value = interval.hours
-    editingIntervalMinutes.value = interval.minutes
-    editingIntervalState.value = interval.state
+    editingInterval.value.hours = interval.hours
+    editingInterval.value.minutes = interval.minutes
+    editingInterval.value.state = interval.state
 
     resetAddInterval()
   }
   // Resetear el preview de añadir
   const resetAddInterval = () => {
-    newInterval.value = { state: 'asleep', hours: 0, minutes: 0 }
+    newInterval.value = {
+      state: SleepState.INBED,
+      hours: 0,
+      minutes: 0,
+    }
   }
 
   // Cancelar edición
   const cancelEditing = () => {
     editingMode.value = false
     editingIntervalIndex.value = null
-    editingIntervalHours.value = 0
-    editingIntervalMinutes.value = 0
-    editingIntervalState.value = 'inBed'
+    editingInterval.value.hours = 0
+    editingInterval.value.minutes = 0
+    editingInterval.value.state = SleepState.INBED
 
     resetAddInterval()
   }
@@ -641,7 +616,7 @@
   const getEditingIntervalWidth = (): number => {
     if (totalTimeInBedMinutes.value === 0) return 0
     const intervalMinutes =
-      editingIntervalHours.value * 60 + editingIntervalMinutes.value
+      editingInterval.value.hours * 60 + editingInterval.value.minutes
     const percentage = (intervalMinutes / totalTimeInBedMinutes.value) * 100
     return Math.max(2, percentage)
   }
@@ -670,8 +645,8 @@
   const getEditingEndTime = (): Date => {
     const startTime = getEditingStartTime()
     const endTime = new Date(startTime)
-    endTime.setHours(startTime.getHours() + editingIntervalHours.value)
-    endTime.setMinutes(startTime.getMinutes() + editingIntervalMinutes.value)
+    endTime.setHours(startTime.getHours() + editingInterval.value.hours)
+    endTime.setMinutes(startTime.getMinutes() + editingInterval.value.minutes)
     return endTime
   }
 
@@ -694,7 +669,7 @@
     // Si estamos editando, calcular con el intervalo editado
     if (editingMode.value) {
       const editingMinutes =
-        editingIntervalHours.value * 60 + editingIntervalMinutes.value
+        editingInterval.value.hours * 60 + editingInterval.value.minutes
       const totalWithEditing = totalRegisteredWithoutEditing + editingMinutes
       const remaining = totalTimeInBedMinutes.value - totalWithEditing
       return Math.max(0, (remaining / totalTimeInBedMinutes.value) * 100)
@@ -713,7 +688,7 @@
     if (editingIntervalIndex.value === null) return
 
     const newDuration =
-      editingIntervalHours.value * 60 + editingIntervalMinutes.value
+      editingInterval.value.hours * 60 + editingInterval.value.minutes
 
     // Validar que no exceda el tiempo total
     if (!validateIntervalDuration(editingIntervalIndex.value, newDuration)) {
@@ -726,9 +701,9 @@
     const interval = intervals.value[editingIntervalIndex.value] as Interval
 
     // Actualizar intervalo
-    interval.state = editingIntervalState.value
-    interval.hours = editingIntervalHours.value
-    interval.minutes = editingIntervalMinutes.value
+    interval.state = editingInterval.value.state
+    interval.hours = editingInterval.value.hours
+    interval.minutes = editingInterval.value.minutes
 
     // Recalcular todos los tiempos
     recalculateIntervalTimes()
@@ -741,24 +716,24 @@
   const adjustDuration = (type: 'hours' | 'minutes', amount: number) => {
     if (editingMode.value) {
       if (type === 'hours') {
-        editingIntervalHours.value = Math.max(
+        editingInterval.value.hours = Math.max(
           0,
-          Math.min(12, editingIntervalHours.value + amount)
+          Math.min(12, editingInterval.value.hours + amount)
         )
       } else {
-        editingIntervalMinutes.value = Math.max(
+        editingInterval.value.minutes = Math.max(
           0,
-          Math.min(55, editingIntervalMinutes.value + amount)
+          Math.min(55, editingInterval.value.minutes + amount)
         )
 
         // Ajustar a múltiplos de 5 si es necesario
-        if (editingIntervalMinutes.value % 5 !== 0) {
+        if (editingInterval.value.minutes % 5 !== 0) {
           if (amount > 0) {
-            editingIntervalMinutes.value =
-              Math.ceil(editingIntervalMinutes.value / 5) * 5
+            editingInterval.value.minutes =
+              Math.ceil(editingInterval.value.minutes / 5) * 5
           } else {
-            editingIntervalMinutes.value =
-              Math.floor(editingIntervalMinutes.value / 5) * 5
+            editingInterval.value.minutes =
+              Math.floor(editingInterval.value.minutes / 5) * 5
           }
         }
       }

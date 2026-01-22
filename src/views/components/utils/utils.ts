@@ -28,10 +28,10 @@ const getQualityIcon = (percentage: number): string => {
 
 // Función para obtener el color según la calidad
 const getQualityColor = (percentage: number): string => {
-  if (percentage >= 90) return 'text-blue-500'
-  if (percentage >= 80) return 'text-green-500'
-  if (percentage >= 70) return 'text-yellow-500'
-  return 'text-red-500'
+  if (percentage >= 90) return 'text-blue-400'
+  if (percentage >= 80) return 'text-green-400'
+  if (percentage >= 70) return 'text-yellow-400'
+  return 'text-red-400'
 }
 
 // Función para obtener el color del borde según la calidad
@@ -53,7 +53,7 @@ const getBgColor = (percentage: number): string => {
 async function deleteAllArray<T>(array: T[]): Promise<void> {
   while (array.length > 0) {
     array.pop()
-    await new Promise((resolve) => setTimeout(resolve, 300)) // espera 300ms
+    await new Promise(resolve => setTimeout(resolve, 300)) // espera 300ms
   }
 }
 
