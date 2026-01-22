@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
     <!-- Panel izquierdo: Interval Adder -->
-    <section class="md:min-w-2xl space-y-2">
+    <section class="md:min-w-110 space-y-2">
       <div
         class="bg-card-dark border border-border-dark rounded-xl shadow-xl overflow-hidden"
       >
@@ -131,21 +131,21 @@
           <div class="flex justify-around items-center gap-3">
             <div
               v-show="canAddInterval || editingMode"
-              class="flex items-center justify-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20"
+              class="flex items-center justify-center gap-2 bg-primary/10 px-3 rounded-full border border-primary/20"
             >
               <span
-                class="hidden md:block text-sm font-bold text-slate-500 uppercase"
+                class="hidden md:block text-xs font-bold text-slate-500 uppercase"
                 >{{ editingMode ? 'Editando:' : 'Proyectando:' }}</span
               >
-              <span class="text-sm font-black text-primary">{{
+              <span class="text-xs font-black text-primary">{{
                 editingMode
                   ? formatTime(getEditingStartTime())
                   : formatTime(previewInterval.startTime)
               }}</span>
-              <span class="material-symbols-outlined text-primary/40 text-sm"
+              <span class="material-symbols-outlined text-primary/40 text-xs"
                 >trending_flat</span
               >
-              <span class="text-sm font-black text-primary">{{
+              <span class="text-xs font-black text-primary">{{
                 editingMode
                   ? formatTime(getEditingEndTime())
                   : formatTime(previewInterval.endTime)
@@ -158,10 +158,10 @@
             >
               <div class="flex items-center gap-2">
                 <span
-                  class="hidden md:block text-sm font-bold text-slate-500 uppercase"
+                  class="hidden md:block text-xs font-bold text-slate-500 uppercase"
                   >Restante</span
                 >
-                <span class="flex items-center text-sm text-primary font-bold">
+                <span class="flex items-center text-xs text-primary font-bold">
                   {{ remainTime.hours }}h
                   {{ remainTime.minutes.toString().padStart(2, '0') }}m
                 </span>
@@ -398,20 +398,22 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import { getStateClass, getStateIcon } from '../../utils/css.util'
   import InstructionsPanel from '../InstructionsPanel.vue'
-  import { SleepState, type Interval } from '@/types/regEdit.types'
+  import { SleepState, type Interval, type Reg } from '@/types/regEdit.types'
   import {
     formatDuration,
     formatTime,
   } from '@/views/UserEditReg/utils/time.util'
+  const registro = inject('registro') as Reg
 
   const emits = defineEmits(['back', 'next'])
 
   // Fechas fijas de acostado y levantado
-  const bedtimeDate = ref(new Date(2024, 0, 1, 22, 30)) // 22:30
-  const wakeupDate = ref(new Date(2024, 0, 2, 7, 15)) // 07:15
+  const bedtimeDate = ref<Date>(registro.bedtime || new Date())
+  const wakeupDate = ref<Date>(registro.wakeup || new Date())
+  const intervals = ref<Interval[]>(registro.intervals)
 
   // Calcular tiempo total en cama
   const totalTimeInBedMinutes = computed(() => {
@@ -472,9 +474,6 @@
     }
     return interval
   })
-
-  // Lista de intervalos
-  const intervals = ref<Interval[]>([])
 
   // Eliminar el intervalo que se está editando
   const deleteEditingInterval = () => {
@@ -705,10 +704,8 @@
     interval.hours = editingInterval.value.hours
     interval.minutes = editingInterval.value.minutes
 
-    // Recalcular todos los tiempos
     recalculateIntervalTimes()
 
-    // Salir del modo edición
     cancelEditing()
   }
 
@@ -838,12 +835,7 @@
   const goToStep1 = () => emits('back')
   const saveAndContinue = () => {
     if (!isRangeComplete.value) return
-    console.log('Guardando secuencia completa:', intervals.value)
-    alert(
-      `✅ Rango completo guardado!\nTotal registrado: ${formatDuration(
-        registeredMinutes.value
-      )}\nProgreso: 100%`
-    )
+    registro.intervals = intervals.value
     emits('next')
   }
 </script>

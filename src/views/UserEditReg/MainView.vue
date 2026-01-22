@@ -1,10 +1,25 @@
 <script setup lang="ts">
+  import type { Reg } from '@/types/regEdit.types'
   import Step1 from './components/Step1/MainView.vue'
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
-  import { ref, computed } from 'vue'
-  const step = ref(3)
+  import { ref, computed, provide } from 'vue'
+  const step = ref(1)
   const percentage = computed(() => Math.floor((step.value / 3) * 100))
+  //FIXME se pasara por prop
+  const fecha = new Date()
+  const registro: Reg = {
+    fecha: fecha,
+    bedtime: null,
+    wakeup: null,
+    intervals: [],
+    observaciones: '',
+  }
+  provide<Reg>('registro', registro)
+
+  const saveReg = () => {
+    console.log('Registro guardado')
+  }
 </script>
 <template>
   <main class="pb-safe-sm p-2 mb-2 sm:px-6 lg:px-8 h-full overflow-y-auto">
@@ -45,6 +60,6 @@
     </div>
     <Step1 v-if="step === 1" @next="step++" />
     <Step2 v-if="step === 2" @next="step++" @back="step--" />
-    <Step3 v-if="step === 3" @back="step--" />
+    <Step3 v-if="step === 3" @back="step--" @save="saveReg" />
   </main>
 </template>

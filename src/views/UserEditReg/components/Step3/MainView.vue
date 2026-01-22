@@ -153,8 +153,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
-  import { SleepState, type Interval } from '@/types/regEdit.types'
+  import { ref, computed, inject } from 'vue'
+  import { SleepState, type Interval, type Reg } from '@/types/regEdit.types'
   import { getIntervalWidth } from '@/views/UserEditReg/utils/bar.util'
   import { getStateClass } from '@/views/UserEditReg/utils/css.util'
   import {
@@ -166,49 +166,12 @@
     formatDuration,
   } from '@/views/UserEditReg/utils/time.util'
 
+  const registro = inject('registro') as Reg
   const emits = defineEmits(['back', 'save'])
 
-  // Datos mock (en producción vendrían del paso anterior)
-  const intervals = ref<Interval[]>([
-    {
-      state: SleepState.INBED,
-      hours: 0,
-      minutes: 45,
-      startTime: new Date(2024, 0, 1, 22, 30),
-      endTime: new Date(2024, 0, 1, 23, 15),
-    },
-    {
-      state: SleepState.ASLEEP,
-      hours: 7,
-      minutes: 30,
-      startTime: new Date(2024, 0, 1, 23, 15),
-      endTime: new Date(2024, 0, 2, 3, 45),
-    },
-    {
-      state: SleepState.AWAKE,
-      hours: 0,
-      minutes: 16,
-      startTime: new Date(2024, 0, 2, 3, 45),
-      endTime: new Date(2024, 0, 2, 4, 0),
-    },
-    {
-      state: SleepState.ASLEEP,
-      hours: 2,
-      minutes: 45,
-      startTime: new Date(2024, 0, 2, 4, 0),
-      endTime: new Date(2024, 0, 2, 6, 45),
-    },
-    {
-      state: SleepState.INBED,
-      hours: 0,
-      minutes: 30,
-      startTime: new Date(2024, 0, 2, 6, 45),
-      endTime: new Date(2024, 0, 2, 7, 15),
-    },
-  ])
-
-  const bedtimeDate = ref(new Date(2024, 0, 1, 22, 30))
-  const wakeupDate = ref(new Date(2024, 0, 2, 7, 15))
+  const intervals = ref<Interval[]>(registro.intervals)
+  const bedtimeDate = ref(registro.bedtime as Date)
+  const wakeupDate = ref(registro.wakeup as Date)
   const observaciones = ref('')
 
   // Calcular ancho del intervalo
@@ -256,22 +219,7 @@
   }
 
   const guardarRegistro = () => {
-    const registro = {
-      fecha: new Date(),
-      bedtime: bedtimeDate.value,
-      wakeup: wakeupDate.value,
-      intervals: intervals.value,
-      observaciones: observaciones.value,
-      estadisticas: {
-        tiempoDormido: tiempoDormido.value,
-        tiempoEnCama: tiempoEnCama.value,
-        tiempoDespierto: tiempoDespierto.value,
-        eficiencia: eficiencia.value,
-      },
-    }
-
-    console.log('Registro guardado:', registro)
-    alert('✅ Registro guardado exitosamente!')
-    emits('save', registro)
+    registro.observaciones = observaciones.value
+    emits('save')
   }
 </script>

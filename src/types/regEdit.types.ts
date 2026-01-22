@@ -16,3 +16,12 @@ export type Interval = {
   startTime: Date
   endTime: Date
 }
+export interface Reg {
+  fecha: Date
+  bedtime: Date | null
+  wakeup: Date | null
+  intervals: Interval[]
+  observaciones: string
+}
+
+export type IntervalModel = Pick<Interval, 'state' | 'startTime' | 'endTime'>

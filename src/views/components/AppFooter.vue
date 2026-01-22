@@ -7,7 +7,7 @@
 
 <template>
   <footer
-    class="hidden py-6 md:flex justify-center pb-8 bg-gray-50 dark:bg-background-dark"
+    class="hidden md:flex justify-center pb-1 mt-1 bg-gray-50 dark:bg-background-dark"
   >
     <div
       class="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"

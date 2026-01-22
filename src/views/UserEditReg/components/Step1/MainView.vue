@@ -3,7 +3,9 @@
   import InstructionsPanel from '../InstructionsPanel.vue'
   import HourSelector from './HourSelector.vue'
   import type { TimeValue } from '@/types/regEdit.types'
-  const today = new Date(2024, 0, 1)
+  import type { Reg } from '@/types/regEdit.types'
+  import { inject } from 'vue'
+  const registro = inject('registro') as Reg
 
   const emits = defineEmits(['next'])
   const instruccionesTimePicker = [
@@ -25,14 +27,14 @@
   })
   const bedtimeDate = computed(() => {
     const hour24 = to24Hour(bedtime.value)
-    const date = new Date(today)
+    const date = new Date(registro.fecha)
     date.setHours(hour24, bedtime.value.minute)
     return date
   })
 
   const wakeupDate = computed(() => {
     const hour24 = to24Hour(wakeup.value)
-    const date = new Date(today)
+    const date = new Date(registro.fecha)
     date.setHours(hour24, wakeup.value.minute)
     if (date <= bedtimeDate.value) date.setDate(date.getDate() + 1)
     return date
@@ -62,7 +64,8 @@
 
   const nextStep = (): void => {
     // Aquí iría la lógica para ir al siguiente paso
-    console.log(bedtimeDate.value, wakeupDate.value)
+    registro.bedtime = bedtimeDate.value
+    registro.wakeup = wakeupDate.value
     emits('next')
   }
 </script>
