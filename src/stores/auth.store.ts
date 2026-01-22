@@ -1,14 +1,12 @@
 import { defineStore } from 'pinia'
-import { login, refresh } from '@/api/http.auth'
-import { useToast } from '@/composables/useToast'
-import { AppError, AutenticationError } from '@/types/errors.types'
-import { role, ToastType } from '@/types/types'
+import { loginAPI, refresh } from '@/api/http.auth'
+import { AutenticationError } from '@/types/errors.types'
+import { role } from '@/types/types'
 interface jwtData {
   role: role
   id: number
 }
 
-const { setToast } = useToast()
 export function parseJwt(token: string) {
   try {
     const base64Payload = token.split('.')[1]
@@ -31,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
     bootstrapped: false,
   }),
   actions: {
-    setToken(token: string): role {
+    setToken(token: string) {
       this.accessToken = token
       const data = parseJwt(token)
       if (data === null) {
@@ -39,25 +37,21 @@ export const useAuthStore = defineStore('auth', {
       }
       this.role = data.role
       this.isLoggedIn = true
-      return this.role
     },
 
     async login(email: string, password: string) {
-      const res = await login(email, password)
-      const rol = this.setToken(res.accessToken)
-      return rol
+      const res = await loginAPI(email, password)
+      this.setToken(res.accessToken)
     },
 
-    async bootstrapAuth(): Promise<role | null> {
+    async bootstrapAuth(): Promise<void> {
       try {
         const res = await refresh()
-        return this.setToken(res.accessToken)
-      } catch (e: unknown) {
-        if (e instanceof AppError) {
-          setToast(ToastType.Error, e.message)
+        if (res.accessToken) {
+          this.setToken(res.accessToken)
         }
+      } catch {
         this.logout()
-        return null
       } finally {
         this.bootstrapped = true
       }

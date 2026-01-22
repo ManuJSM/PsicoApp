@@ -5,7 +5,7 @@ export interface LoginResponse {
   message: string
 }
 
-export async function login(
+export async function loginAPI(
   email: string,
   password: string
 ): Promise<LoginResponse> {
