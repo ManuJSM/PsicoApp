@@ -11,7 +11,7 @@
       </h3>
       <div class="flex items-baseline gap-3">
         <p class="text-white text-4xl font-black leading-none">
-          {{ formatDuration(totalValue) }}
+          {{ formatDuration(averageTimeAsleep) }}
         </p>
         <span
           :class="[
@@ -30,24 +30,6 @@
 
     <!-- Chart Container -->
     <div class="relative flex-1 w-full mt-2">
-      <!-- Tooltip -->
-      <div
-        v-if="activePoint !== null && showTooltip"
-        class="absolute z-10 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm"
-        :style="{
-          left: `${tooltipPosition.x}px`,
-          top: `${tooltipPosition.y}px`,
-          transform: 'translate(-50%, -100%)',
-        }"
-      >
-        <div class="font-bold">
-          {{ formatDuration(dataPoints[activePoint].value) }}
-        </div>
-        <div class="text-gray-300 text-xs">
-          {{ days[activePoint % days.length] }}
-        </div>
-      </div>
-
       <!-- Chart SVG -->
       <svg
         :viewBox="`0 0 ${viewBoxWidth} ${viewBoxHeight}`"
@@ -61,15 +43,6 @@
             <stop offset="0%" :stop-color="chartColor" stop-opacity="0.5" />
             <stop offset="100%" :stop-color="chartColor" stop-opacity="0" />
           </linearGradient>
-
-          <!-- Glow effect for active point -->
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
         <!-- Chart area -->
@@ -84,21 +57,14 @@
           stroke-linecap="round"
         />
 
-        <!-- Data points -->
+        <!-- Data points pequeños -->
         <circle
           v-for="(point, index) in dataPoints"
           :key="index"
           :cx="point.x"
           :cy="point.y"
           :fill="chartColor"
-          r="5"
-          :class="[
-            'cursor-pointer transition-all duration-200',
-            activePoint === index ? 'animate-pulse r-7' : 'hover:r-7',
-          ]"
-          :style="activePoint === index ? { filter: 'url(#glow)' } : {}"
-          @mouseenter="e => handlePointHover(e, index)"
-          @mouseleave="clearActivePoint"
+          r="4"
         />
       </svg>
 
@@ -115,58 +81,64 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
 
   // Interfaces
+  interface ChartSegment {
+    value: number // en minutos
+    type: 'asleep' | 'inBed' | 'awake'
+  }
+
+  interface ChartDayData {
+    day: string
+    segments: ChartSegment[]
+  }
+
   interface DataPoint {
     x: number
     y: number
     value: number
   }
 
-  interface TooltipPosition {
-    x: number
-    y: number
-  }
-
-  interface SleepChartProps {
+  interface SleepLineChartProps {
     title?: string
-    data: number[]
-    labels?: string[]
+    chartData: ChartDayData[]
     days?: string[]
     chartColor?: string
-    previousPeriodData?: number[]
-    showTooltip?: boolean
+    previousPeriodData?: ChartDayData[]
   }
 
-  // Props con TypeScript
-  const props = withDefaults(defineProps<SleepChartProps>(), {
-    title: 'Duración del Sueño',
-    labels: () => [],
+  // Props
+  const props = withDefaults(defineProps<SleepLineChartProps>(), {
+    title: 'Tiempo Dormido Semanal',
     days: () => ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-    chartColor: '#137fec',
+    chartColor: '#137f0c',
     previousPeriodData: () => [],
-    showTooltip: true,
   })
 
-  // Refs
+  // Constantes
   const viewBoxWidth: number = 800
-  const viewBoxHeight: number = 250 // Reducido para menos padding
-  const activePoint = ref<number | null>(null)
-  const tooltipPosition = ref<TooltipPosition>({ x: 0, y: 0 })
+  const viewBoxHeight: number = 250
+
+  // Extraer solo los datos de tiempo dormido para la línea
+  const asleepData = computed(() => {
+    return props.chartData.map(day => getTimeByType(day.segments, 'asleep'))
+  })
 
   // Calcular puntos del gráfico
   const dataPoints = computed<DataPoint[]>(() => {
-    const maxValue = Math.max(...props.data)
-    const minValue = Math.min(...props.data)
-    const range = maxValue - minValue || 1 // evitar división por cero
+    const data = asleepData.value
+    if (data.length === 0) return []
 
-    const spacing = viewBoxWidth / (props.data.length - 1 || 1)
+    const maxValue = Math.max(...data)
+    const minValue = Math.min(...data)
+    const range = maxValue - minValue || 1
 
-    return props.data.map((value, index) => {
-      // Normalizar el valor para el eje Y (invertido porque SVG Y=0 es arriba)
-      const normalizedY = ((value - minValue) / range) * 180 // Reducido de 200 a 180
-      const y = viewBoxHeight - 30 - normalizedY // Reducido margen inferior de 50 a 30
+    const spacing = viewBoxWidth / (data.length - 1 || 1)
+
+    return data.map((value, index) => {
+      const normalizedY = ((value - minValue) / range) * 180
+      const y = viewBoxHeight - 30 - normalizedY
 
       return {
         x: index * spacing,
@@ -176,17 +148,18 @@
     })
   })
 
-  // Generar la línea del gráfico con curvas Bézier
+  // Generar la línea del gráfico
   const chartPath = computed<string>(() => {
-    if (dataPoints.value.length < 2) return ''
+    const dp = dataPoints.value
+    if (dp.length < 2) return ''
+    const first = dp[0] as DataPoint
 
-    let path = `M${dataPoints.value[0].x},${dataPoints.value[0].y}`
+    let path = `M${first.x},${first.y}`
 
-    for (let i = 1; i < dataPoints.value.length; i++) {
-      const prev = dataPoints.value[i - 1]
-      const curr = dataPoints.value[i]
+    for (let i = 1; i < dp.length; i++) {
+      const prev = dp[i - 1] as DataPoint
+      const curr = dp[i] as DataPoint
 
-      // Punto de control para crear curvas suaves
       const cp1x = prev.x + (curr.x - prev.x) / 3
       const cp1y = prev.y
       const cp2x = curr.x - (curr.x - prev.x) / 3
@@ -202,27 +175,45 @@
   const areaPath = computed<string>(() => {
     if (dataPoints.value.length === 0) return ''
 
-    const lastPoint = dataPoints.value[dataPoints.value.length - 1]
-    const firstPoint = dataPoints.value[0]
+    const lastPoint = dataPoints.value[dataPoints.value.length - 1] as DataPoint
+    const firstPoint = dataPoints.value[0] as DataPoint
 
     return ` L${lastPoint.x},${viewBoxHeight} L${firstPoint.x},${viewBoxHeight} Z`
   })
 
-  // Calcular valor total (promedio en este caso)
-  const totalValue = computed<number>(() => {
-    if (props.data.length === 0) return 0
-    const sum = props.data.reduce((a, b) => a + b, 0)
-    return Math.round(sum / props.data.length)
+  // Métodos de utilidad
+  const getTimeByType = (
+    segments: ChartSegment[],
+    type: 'asleep' | 'inBed' | 'awake'
+  ): number => {
+    return segments
+      .filter(segment => segment.type === type)
+      .reduce((total, segment) => total + segment.value, 0)
+  }
+
+  // Calcular promedio de tiempo dormido
+  const averageTimeAsleep = computed<number>(() => {
+    if (props.chartData.length === 0) return 0
+    const total = props.chartData.reduce(
+      (sum, day) => sum + getTimeByType(day.segments, 'asleep'),
+      0
+    )
+    return Math.round(total / props.chartData.length)
   })
 
   // Calcular cambio porcentual
   const changePercent = computed<number>(() => {
     if (props.previousPeriodData.length === 0) return 0
 
-    const currentAvg = totalValue.value
-    const previousAvg =
-      props.previousPeriodData.reduce((a, b) => a + b, 0) /
-      props.previousPeriodData.length
+    const currentAvg = averageTimeAsleep.value
+
+    const previousTotal = props.previousPeriodData.reduce(
+      (sum, day) => sum + getTimeByType(day.segments, 'asleep'),
+      0
+    )
+    const previousAvg = Math.round(
+      previousTotal / props.previousPeriodData.length
+    )
 
     if (previousAvg === 0) return 0
 
@@ -233,51 +224,13 @@
   const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60)
     const mins = minutes % 60
-    return `${hours}h ${mins}m`
-  }
 
-  // Manejar hover en los puntos
-  const handlePointHover = (event: MouseEvent, index: number): void => {
-    activePoint.value = index
-
-    if (!props.showTooltip) return
-
-    // Obtener posición del mouse relativa al SVG
-    const svgRect = (event.currentTarget as HTMLElement)
-      .closest('svg')
-      ?.getBoundingClientRect()
-
-    if (svgRect) {
-      // Calcular posición del tooltip relativa al contenedor del gráfico
-      const containerRect = (event.currentTarget as HTMLElement)
-        .closest('.relative')
-        ?.getBoundingClientRect()
-
-      if (containerRect) {
-        tooltipPosition.value = {
-          x: event.clientX - containerRect.left,
-          y: event.clientY - containerRect.top,
-        }
-      }
+    if (hours === 0) {
+      return `${mins}m`
+    } else if (mins === 0) {
+      return `${hours}h`
+    } else {
+      return `${hours}h ${mins}m`
     }
-  }
-
-  // Limpiar punto activo
-  const clearActivePoint = (): void => {
-    activePoint.value = null
   }
 </script>
-
-<style scoped>
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.7;
-      transform: scale(1.1);
-    }
-  }
-</style>

@@ -4,10 +4,27 @@
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
   import { ref, computed, provide } from 'vue'
+  import { useRouter } from 'vue-router'
   const step = ref(1)
   const percentage = computed(() => Math.floor((step.value / 3) * 100))
+  const header = [
+    {
+      title: 'Ventana de Descanso',
+      text: 'Define las horas principales en las que te acostaste y te levantaste para establecer el marco de tu registro.',
+    },
+    {
+      title: 'Registro de Sueño',
+      text: 'Añade los intervalos secuenciales. Visualiza el rango exacto en las estadísticas antes de confirmar.',
+    },
+    {
+      title: 'Finalizar Registro',
+      text: 'Añade observaciones adicionales y revisa el resumen de tu noche antes de guardar.',
+    },
+  ]
+  const router = useRouter()
   //FIXME se pasara por prop
   const fecha = new Date()
+
   const registro: Reg = {
     fecha: fecha,
     bedtime: null,
@@ -18,6 +35,8 @@
   provide<Reg>('registro', registro)
 
   const saveReg = () => {
+    router.back()
+    //TODO guardarlo en BD
     console.log('Registro guardado')
   }
 </script>
@@ -33,11 +52,10 @@
           -&gt; PASO {{ step }} DE 3
         </div>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-          Ventana de Descanso
+          {{ header[step - 1]?.title }}
         </h2>
         <p class="text-slate-400 max-w-lg">
-          Define las horas principales en las que te acostaste y te levantaste
-          para establecer el marco de tu registro.
+          {{ header[step - 1]?.text }}
         </p>
       </div>
       <div class="w-full md:w-72 space-y-2.5">
