@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-linear-to-br from-[#224c75] to-[#0d1520] rounded-2xl p-4 shadow-xl"
+    class="dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-xl"
   >
     <!-- Header -->
     <div class="mb-3">
@@ -83,15 +83,10 @@
 <script setup lang="ts">
   import { computed } from 'vue'
 
-  // Interfaces
-  interface ChartSegment {
-    value: number // en minutos
-    type: 'asleep' | 'inBed' | 'awake'
-  }
-
+  // Interfaces simplificadas
   interface ChartDayData {
     day: string
-    segments: ChartSegment[]
+    value: number // minutos dormidos
   }
 
   interface DataPoint {
@@ -112,7 +107,7 @@
   const props = withDefaults(defineProps<SleepLineChartProps>(), {
     title: 'Tiempo Dormido Semanal',
     days: () => ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-    chartColor: '#137f0c',
+    chartColor: '#137fec',
     previousPeriodData: () => [],
   })
 
@@ -120,14 +115,14 @@
   const viewBoxWidth: number = 800
   const viewBoxHeight: number = 250
 
-  // Extraer solo los datos de tiempo dormido para la línea
-  const asleepData = computed(() => {
-    return props.chartData.map(day => getTimeByType(day.segments, 'asleep'))
+  // Extraer solo los valores
+  const chartValues = computed(() => {
+    return props.chartData.map(day => day.value)
   })
 
   // Calcular puntos del gráfico
   const dataPoints = computed<DataPoint[]>(() => {
-    const data = asleepData.value
+    const data = chartValues.value
     if (data.length === 0) return []
 
     const maxValue = Math.max(...data)
@@ -181,23 +176,10 @@
     return ` L${lastPoint.x},${viewBoxHeight} L${firstPoint.x},${viewBoxHeight} Z`
   })
 
-  // Métodos de utilidad
-  const getTimeByType = (
-    segments: ChartSegment[],
-    type: 'asleep' | 'inBed' | 'awake'
-  ): number => {
-    return segments
-      .filter(segment => segment.type === type)
-      .reduce((total, segment) => total + segment.value, 0)
-  }
-
   // Calcular promedio de tiempo dormido
   const averageTimeAsleep = computed<number>(() => {
     if (props.chartData.length === 0) return 0
-    const total = props.chartData.reduce(
-      (sum, day) => sum + getTimeByType(day.segments, 'asleep'),
-      0
-    )
+    const total = props.chartData.reduce((sum, day) => sum + day.value, 0)
     return Math.round(total / props.chartData.length)
   })
 
@@ -208,7 +190,7 @@
     const currentAvg = averageTimeAsleep.value
 
     const previousTotal = props.previousPeriodData.reduce(
-      (sum, day) => sum + getTimeByType(day.segments, 'asleep'),
+      (sum, day) => sum + day.value,
       0
     )
     const previousAvg = Math.round(

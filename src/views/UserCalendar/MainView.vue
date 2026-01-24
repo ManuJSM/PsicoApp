@@ -5,13 +5,12 @@
     getBorderColor,
     getQualityColor,
   } from '@/views/components/utils/utils'
-  import { role } from '@/types/types'
 
-  const userRole = role.user
   const eficiencia = 98
   const hours = 7.34
   const duration = calculateDuration(hours)
 </script>
+
 <template>
   <main
     class="flex justify-center pb-safe-sm px-4 py-6 sm:py-8 w-full overflow-y-auto sm:px-40"
@@ -63,7 +62,6 @@
           </p>
         </div>
       </div>
-      <RegTable :userRole="userRole" class="pb-4" />
     </div>
   </main>
 </template>

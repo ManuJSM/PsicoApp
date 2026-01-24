@@ -1,207 +1,209 @@
 <template>
   <div
-    class="bg-white dark:bg-[#1a232e] border border-slate-200 dark:border-[#3b4754] rounded-xl p-6 flex flex-col h-[450px]"
+    class="bg-card-dark rounded-xl border border-white/10 p-6 shadow-2xl relative overflow-hidden"
   >
-    <div class="flex flex-col mb-6">
-      <div class="flex justify-between items-center">
-        <h3 class="font-bold text-slate-700 dark:text-slate-300">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h3
+          class="text-[#9dabb9] text-sm font-bold uppercase tracking-widest mb-1"
+        >
           {{ title }}
         </h3>
-        <button
-          v-if="showInfoButton"
-          class="text-slate-400 hover:text-primary transition-colors"
-          @click="$emit('info-click')"
-        >
-          <span class="material-symbols-outlined">info</span>
-        </button>
+        <p class="text-sm text-slate-500 mt-1">{{ subtitle }}</p>
       </div>
-      <div class="flex gap-2 mt-2">
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-sm bg-state-asleep"></span>
-          <span class="text-[10px] text-slate-500 font-bold uppercase">
-            Dormido
-          </span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-sm bg-state-inbed"></span>
-          <span class="text-[10px] text-slate-500 font-bold uppercase">
-            En Cama
-          </span>
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-sm bg-state-awake"></span>
-          <span class="text-[10px] text-slate-500 font-bold uppercase">
-            Despierto
-          </span>
+    </div>
+
+    <div
+      class="w-full h-56 rounded-xl border border-white/5 flex items-end justify-between p-4 gap-2"
+      :class="gradientClass"
+    >
+      <div
+        v-for="(bar, index) in chartData"
+        :key="index"
+        class="w-full rounded-t-sm cursor-help relative"
+        :style="{
+          height: calculateBarHeight(bar.value) + '%',
+          backgroundColor: getBarColor(index, bar.value),
+        }"
+        @click="activeTooltip = activeTooltip === index ? null : index"
+      >
+        <!-- Tooltip -->
+        <div
+          v-if="activeTooltip === index"
+          class="absolute -top-16 bg-card-dark left-1/2 -translate-x-1/2 bg-github-dark border border-github-border px-3 py-1.5 rounded-lg text-sm font-bold shadow-xl min-w-[80px] text-center"
+        >
+          <div class="font-semibold text-white mb-1">{{ bar.label }}</div>
+          <div class="font-bold" :class="getTooltipTextColor(index, bar.value)">
+            {{ formatValue(bar.value) }}
+          </div>
+
+          <!-- Flecha -->
+          <div
+            class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-github-border"
+          ></div>
         </div>
       </div>
     </div>
 
-    <div class="flex-1 flex items-end justify-between gap-2 px-2">
+    <!-- Leyenda de días -->
+    <div class="flex justify-around mt-4">
       <div
-        v-for="(dayData, index) in chartData"
+        v-for="(bar, index) in chartData"
         :key="index"
-        class="flex-1 flex flex-col items-center gap-2 h-full justify-end relative"
-        @click="toggleTooltip(index)"
+        class="text-sm text-slate-500 font-medium text-center"
       >
-        <div
-          class="w-full flex flex-col-reverse rounded-t-lg cursor-pointer hover:brightness-110 overflow-hidden"
-          :style="{ height: getTotalHeight(dayData) + '%' }"
-        >
-          <div
-            v-for="(segment, segIndex) in dayData.segments"
-            :key="segIndex"
-            :class="getStateClass(segment.type)"
-            :style="{
-              height: getSegmentHeight(segment, dayData) + '%',
-            }"
-          ></div>
-        </div>
-        <span class="text-[10px] text-slate-400">{{ dayData.day }}</span>
-
-        <!-- Tooltip del día completo -->
-        <div
-          v-if="activeTooltip === index"
-          class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs rounded-lg py-2 px-3 z-50 shadow-xl min-w-[160px] border border-slate-700"
-        >
-          <div class="font-bold mb-1 text-center">{{ dayData.day }}</div>
-
-          <!-- Tiempo Dormido -->
-          <div class="flex justify-between items-center gap-3 mb-1">
-            <div class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-sm bg-state-asleep"></span>
-              <span class="text-slate-300">Dormido:</span>
-            </div>
-            <span class="font-bold text-state-asleep">
-              {{ formatDuration(getTimeByType(dayData.segments, 'asleep')) }}
-            </span>
-          </div>
-
-          <!-- Tiempo en Cama -->
-          <div class="flex justify-between items-center gap-3 mb-1">
-            <div class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-sm bg-state-inbed"></span>
-              <span class="text-slate-300">En Cama:</span>
-            </div>
-            <span class="font-bold text-state-inbed">
-              {{ formatDuration(getTimeByType(dayData.segments, 'inBed')) }}
-            </span>
-          </div>
-
-          <!-- Tiempo Despierto -->
-          <div class="flex justify-between items-center gap-3">
-            <div class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-sm bg-state-awake"></span>
-              <span class="text-slate-300">Despierto:</span>
-            </div>
-            <span class="font-bold text-state-awake">
-              {{ formatDuration(getTimeByType(dayData.segments, 'awake')) }}
-            </span>
-          </div>
-
-          <!-- Total -->
-          <div class="mt-2 pt-2 border-t border-slate-700">
-            <div class="flex justify-between">
-              <span class="text-slate-300">Total:</span>
-              <span class="font-bold">{{
-                formatDuration(getTotalTime(dayData))
-              }}</span>
-            </div>
-          </div>
-
-          <div
-            class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-900"
-          ></div>
-        </div>
+        {{ bar.label }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { getStateClass } from '@/views/UserEditReg/utils/css.util'
-  import { ref } from 'vue'
+  import { ref, type PropType } from 'vue'
 
-  // Tipos
-  type SegmentType = 'asleep' | 'inBed' | 'awake'
-
-  interface ChartSegment {
-    value: number // en minutos
-    type: SegmentType
+  interface ChartBar {
+    label: string
+    value: number
   }
 
-  interface ChartDayData {
-    day: string
-    segments: ChartSegment[]
-  }
-
-  // Props
-  defineProps({
+  const props = defineProps({
     title: {
       type: String,
-      default: 'Uso del Tiempo en Cama',
+      default: 'Tendencia de Descanso',
+    },
+    subtitle: {
+      type: String,
+      default: 'Horas totales registradas por noche',
     },
     chartData: {
-      type: Array<ChartDayData[]>,
+      type: Array as PropType<ChartBar[]>,
       required: true,
     },
-    showInfoButton: {
+    valueSuffix: {
+      type: String,
+      default: '',
+    },
+    gradientType: {
+      type: String,
+      default: 'blue',
+    },
+    highlightMax: {
       type: Boolean,
       default: true,
     },
   })
 
-  defineEmits(['info-click'])
-
-  // Estado reactivo para tooltips - SIMPLE
   const activeTooltip = ref<number | null>(null)
 
-  // Métodos
-  const getTotalHeight = (dayData: ChartDayData): number => {
-    const totalMinutes = getTotalTime(dayData)
-    // Normalizar a porcentaje entre 70-100% (basado en 12 horas máximo)
-    const maxHours = 12 * 60
-    return Math.min(100, 70 + (totalMinutes / maxHours) * 30)
+  // Calcular altura de la barra
+  const calculateBarHeight = (value: number): number => {
+    // Calcular automáticamente
+    const values = props.chartData.map(item => item.value)
+    if (values.length === 0) return 10
+
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const range = max - min
+
+    if (range <= 0) return 50
+
+    const normalized = (value - min) / range
+    return Math.max(10, normalized * 90)
   }
 
-  const getSegmentHeight = (
-    segment: ChartSegment,
-    dayData: ChartDayData
-  ): number => {
-    const totalMinutes = getTotalTime(dayData)
-    if (totalMinutes === 0) return 0
-    return (segment.value / totalMinutes) * 100
+  // Encontrar valor máximo
+  const getMaxDataValue = () => {
+    if (props.chartData.length === 0) return 0
+    return Math.max(...props.chartData.map(item => item.value))
   }
 
-  const getTimeByType = (
-    segments: ChartSegment[],
-    type: SegmentType
-  ): number => {
-    return segments
-      .filter(segment => segment.type === type)
-      .reduce((total, segment) => total + segment.value, 0)
-  }
-
-  const getTotalTime = (dayData: ChartDayData): number => {
-    return dayData.segments.reduce((total, segment) => total + segment.value, 0)
-  }
-
-  const formatDuration = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60)
-    const mins = minutes % 60
-
-    if (hours === 0) {
-      return `${mins}m`
-    } else if (mins === 0) {
-      return `${hours}h`
-    } else {
-      return `${hours}h ${mins}m`
+  // Determinar color de la barra
+  const getBarColor = (index: number, value: number): string => {
+    const colors = {
+      blue: '#3b82f6',
+      green: '#10b981',
+      purple: '#8b5cf6',
+      orange: '#f59e0b',
     }
+
+    const color =
+      colors[props.gradientType as keyof typeof colors] || colors.blue
+    const maxValue = getMaxDataValue()
+
+    // Si es el valor máximo
+    if (props.highlightMax && Math.abs(value - maxValue) < 0.001) {
+      return color
+    }
+
+    // Para otros valores, opacidad 20%
+    return color + '33'
   }
 
-  // Control de tooltips - SIMPLE: solo clic
-  const toggleTooltip = (index: number) => {
-    // Si ya está activo, lo cierra; si no, lo abre
-    activeTooltip.value = activeTooltip.value === index ? null : index
+  // Color del texto del tooltip
+  const getTooltipTextColor = (index: number, value: number): string => {
+    const maxValue = getMaxDataValue()
+
+    if (props.highlightMax && Math.abs(value - maxValue) < 0.001) {
+      return (
+        {
+          blue: 'text-blue-400',
+          green: 'text-green-400',
+          purple: 'text-purple-400',
+          orange: 'text-orange-400',
+        }[props.gradientType] || 'text-blue-400'
+      )
+    }
+    return 'text-slate-300'
+  }
+
+  // Gradiente de fondo
+  const gradientClass =
+    {
+      blue: 'chart-gradient-blue',
+      green: 'chart-gradient-green',
+      purple: 'chart-gradient-purple',
+      orange: 'chart-gradient-orange',
+    }[props.gradientType] || 'chart-gradient-blue'
+
+  // Formatear valor
+  const formatValue = (value: number): string => {
+    if (props.valueSuffix === '%') return `${value.toFixed(1)}%`
+    if (props.valueSuffix === 'h') return `${value.toFixed(1)}h`
+    if (props.valueSuffix) return `${value}${props.valueSuffix}`
+    return value.toString()
   }
 </script>
+
+<style scoped>
+  .chart-gradient-blue {
+    background: linear-gradient(
+      180deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(59, 130, 246, 0.02) 100%
+    );
+  }
+
+  .chart-gradient-green {
+    background: linear-gradient(
+      180deg,
+      rgba(16, 185, 129, 0.05) 0%,
+      rgba(16, 185, 129, 0.02) 100%
+    );
+  }
+
+  .chart-gradient-purple {
+    background: linear-gradient(
+      180deg,
+      rgba(139, 92, 246, 0.05) 0%,
+      rgba(139, 92, 246, 0.02) 100%
+    );
+  }
+
+  .chart-gradient-orange {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 158, 11, 0.05) 0%,
+      rgba(245, 158, 11, 0.02) 100%
+    );
+  }
+</style>

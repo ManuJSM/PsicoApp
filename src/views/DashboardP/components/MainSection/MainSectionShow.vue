@@ -1,29 +1,144 @@
 <script setup lang="ts">
   import BackButton from './components/BackButton.vue'
-  import { role, type Patient } from '@/types/types'
-  import RegTable from '../../../components/RegTable.vue'
-  import StatCard from './components/StatCard.vue'
-  import { getQualityEficiency } from './utils/utils'
-  import {
-    calculateDurationPercentage,
-    calculateDuration,
-  } from '@/views/components/utils/utils'
+  import { type Patient } from '@/types/types'
+  import { ref } from 'vue'
 
-  const targetHours = 8
+  import MetricCard from './components/MetricCard.vue'
+  import DateMenu from './components/DateMenu.vue'
+  import SleepBarChart from '@/views/MiCuenta/components/SleepBarChart.vue'
+  import WeeklyTable from './components/WeeklyTable.vue'
+  import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
+  const sleepData = [
+    { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
+    { day: 'Mar', value: 420 }, // 7 horas
+    { day: 'Mié', value: 540 }, // 9 horas
+    { day: 'Jue', value: 390 }, // 6.5 horas
+    { day: 'Vie', value: 510 }, // 8.5 horas
+    { day: 'Sáb', value: 600 }, // 10 horas
+    { day: 'Dom', value: 540 }, // 9 horas
+  ]
 
-  const rol = role.psico
+  const previousWeekData = [
+    { day: 'Lun', value: 450 },
+    { day: 'Mar', value: 430 },
+    { day: 'Mié', value: 460 },
+    { day: 'Jue', value: 420 },
+    { day: 'Vie', value: 480 },
+    { day: 'Sáb', value: 520 },
+    { day: 'Dom', value: 490 },
+  ]
+
+  const metrics = [
+    {
+      title: 'Tiempo en Cama',
+      value: '8h 50m',
+      icon: 'bed',
+      trend: {
+        value: '',
+        direction: 'stable' as const,
+        comparisonText: 'Estable',
+      },
+    },
+    {
+      title: 'Hora Media Sueño',
+      value: '7h 45m',
+      icon: 'schedule',
+      trend: {
+        value: '+15m',
+        direction: 'up' as const,
+        comparisonText: 'vs sem. ant.',
+      },
+    },
+    {
+      title: 'Eficiencia Media',
+      value: '88%',
+      icon: 'bolt',
+      trend: {
+        value: '+2%',
+        direction: 'up' as const,
+        comparisonText: 'vs sem. ant.',
+      },
+    },
+    {
+      title: 'Despertares',
+      value: '1.4',
+      icon: 'visibility',
+      trend: {
+        value: '-0.5',
+        direction: 'down' as const,
+        comparisonText: 'vs sem. ant.',
+      },
+    },
+  ]
 
   defineProps<{
     patient: Patient
   }>()
   defineEmits(['exit', 'edit'])
+  const periodText = ref('18 — 24 NOV, 2024')
+
+  const handleViewChange = (view: string) => {
+    console.log('Vista cambiada a:', view)
+    // Aquí puedes cambiar los datos según la vista
+  }
+
+  const openCalendar = () => {
+    console.log('Abrir calendario')
+  }
+  const sleepRecords = [
+    {
+      date: new Date(2024, 10, 18), // 18 Nov 2024 (Lunes)
+      efficiency: 88,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 19), // 19 Nov 2024 (Martes)
+      efficiency: 92,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 20), // 20 Nov 2024 (Miércoles)
+      efficiency: 85,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 21), // 21 Nov 2024 (Jueves)
+      efficiency: 78,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 22), // 22 Nov 2024 (Viernes)
+      efficiency: 95,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 23), // 23 Nov 2024 (Sábado)
+      efficiency: 82,
+      isLive: false,
+    },
+    {
+      date: new Date(2024, 10, 24), // 24 Nov 2024 (Domingo)
+      efficiency: 91,
+      isLive: true, // Registro en curso (hoy)
+    },
+  ]
+  // Datos de ejemplo para eficiencia
+  const latencyHour = [
+    { label: 'Lun', value: 6.2 },
+    { label: 'Mar', value: 7.5 },
+    { label: 'Mié', value: 5.1 },
+    { label: 'Jue', value: 8.4 },
+    { label: 'Vie', value: 6.8 },
+    { label: 'Sáb', value: 7.9 },
+    { label: 'Dom', value: 5.9 },
+  ]
 </script>
 <template>
   <section
     class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
-    <div class="p-6 space-y-6 overflow-y-auto md:px-20">
+    <div class="p-6 space-y-6 overflow-y-auto">
       <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div
@@ -58,33 +173,44 @@
           <a
             class="py-3 px-1 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
             href="#"
-            >Analytics</a
-          >
-          <a
-            class="py-3 px-1 border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors"
-            href="#"
             >Otras Apps</a
           >
         </nav>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <StatCard
-          title="Promedio de sueño (7d)"
-          :value="calculateDuration(patient.sleepAverage)"
-          :color="
-            getQualityEficiency(
-              calculateDurationPercentage(patient.sleepAverage, targetHours)
-            )
-          "
+      <DateMenu
+        :period-text="periodText"
+        @view-change="handleViewChange"
+        @calendar-click="openCalendar"
+      />
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard
+          v-for="metric in metrics"
+          :key="metric.title"
+          :title="metric.title"
+          :value="metric.value"
+          :icon="metric.icon"
+          :trend="metric.trend"
         />
-        <StatCard
-          title="Eficiencia (7d)"
-          :value="`${patient.Eficiency}%`"
-          :color="getQualityEficiency(patient.Eficiency)"
-        />
-        <StatCard title="Último registro" :value="patient.lastNote" />
       </div>
-      <RegTable :userRole="rol" />
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-4 justify-between">
+          <SleepBarChart
+            title="Latencia de Sueño"
+            subtitle="Tiempo que tarda en dormirse la primera vez"
+            :chart-data="latencyHour"
+            value-suffix="h"
+            gradient-type="blue"
+          />
+          <SleepChart
+            title="Tiempo Dormido"
+            :chart-data="sleepData"
+            :previous-period-data="previousWeekData"
+          ></SleepChart>
+        </div>
+
+        <WeeklyTable :rows="sleepRecords" />
+      </div>
     </div>
   </section>
 </template>
