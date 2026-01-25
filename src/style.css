@@ -26,7 +26,6 @@
 
   /* Modo oscuro - clase */
   --dark: initial;
-
 }
 
 /* Clase de utilidad para fuente */
@@ -48,7 +47,6 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
-
 
 :root {
   background-color: var(--color-background-light);

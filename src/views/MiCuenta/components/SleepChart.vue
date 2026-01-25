@@ -1,6 +1,6 @@
 <template>
   <div
-    class="dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-xl"
+    class="dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 shadow-xl flex flex-col"
   >
     <!-- Header -->
     <div class="mb-3">
@@ -29,24 +29,25 @@
     </div>
 
     <!-- Chart Container -->
-    <div class="relative flex-1 w-full mt-2">
+    <div class="relative grow w-full mt-2">
       <!-- Chart SVG -->
       <svg
         :viewBox="`0 0 ${viewBoxWidth} ${viewBoxHeight}`"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         width="100%"
         height="100%"
         class="relative z-0"
       >
+        <!-- Gradiente único -->
         <defs>
-          <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+          <linearGradient :id="gradientId" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" :stop-color="chartColor" stop-opacity="0.5" />
             <stop offset="100%" :stop-color="chartColor" stop-opacity="0" />
           </linearGradient>
         </defs>
 
         <!-- Chart area -->
-        <path :d="chartPath + areaPath" fill="url(#chartGradient)" />
+        <path :d="chartPath + areaPath" :fill="`url(#${gradientId})`" />
 
         <!-- Chart line -->
         <path
@@ -57,33 +58,41 @@
           stroke-linecap="round"
         />
 
-        <!-- Data points pequeños -->
+        <!-- Data points -->
         <circle
           v-for="(point, index) in dataPoints"
           :key="index"
           :cx="point.x"
           :cy="point.y"
           :fill="chartColor"
-          r="4"
+          r="3"
         />
       </svg>
+    </div>
 
-      <!-- Days labels -->
+    <!-- Days labels - MEJORADO -->
+    <div class="w-full mt-3 overflow-hidden">
       <div
-        class="flex justify-between px-1 pt-3 text-[#9dabb9] text-xs font-bold uppercase mt-1"
+        class="flex justify-between items-center text-[#9dabb9] text-xs font-bold uppercase gap-1"
       >
-        <span v-for="(day, index) in days" :key="index" class="truncate">
-          {{ day }}
-        </span>
+        <div
+          v-for="(day, index) in displayedDays"
+          :key="index"
+          class="flex-1 min-w-0"
+        >
+          <div class="text-center truncate" :title="originalDays[index]">
+            {{ day }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
 
-  // Interfaces simplificadas
+  // Interfaces
   interface ChartDayData {
     day: string
     value: number // minutos dormidos
@@ -111,9 +120,31 @@
     previousPeriodData: () => [],
   })
 
+  // Refs
+  const gradientId = ref('')
+
   // Constantes
   const viewBoxWidth: number = 800
   const viewBoxHeight: number = 250
+
+  // Inicializar ID único para el gradiente
+  onMounted(() => {
+    gradientId.value = `gradient-${Math.random().toString(36).substring(2, 9)}`
+  })
+
+  // Días originales para tooltip
+  const originalDays = computed(() => props.days)
+
+  // Días mostrados (abreviados si es necesario)
+  const displayedDays = computed(() => {
+    // Si hay muchos días o nombres largos, abreviar
+    return props.days.map(day => {
+      if (day.length > 3) {
+        return day.substring(0, 3)
+      }
+      return day
+    })
+  })
 
   // Extraer solo los valores
   const chartValues = computed(() => {
@@ -133,7 +164,7 @@
 
     return data.map((value, index) => {
       const normalizedY = ((value - minValue) / range) * 180
-      const y = viewBoxHeight - 30 - normalizedY
+      const y = viewBoxHeight - 60 - normalizedY // Más espacio para etiquetas
 
       return {
         x: index * spacing,
@@ -173,7 +204,7 @@
     const lastPoint = dataPoints.value[dataPoints.value.length - 1] as DataPoint
     const firstPoint = dataPoints.value[0] as DataPoint
 
-    return ` L${lastPoint.x},${viewBoxHeight} L${firstPoint.x},${viewBoxHeight} Z`
+    return ` L${lastPoint.x},${viewBoxHeight - 40} L${firstPoint.x},${viewBoxHeight - 40} Z`
   })
 
   // Calcular promedio de tiempo dormido
@@ -216,3 +247,18 @@
     }
   }
 </script>
+
+<style scoped>
+  /* Asegurar que los días no se salgan */
+  .day-cell {
+    flex: 1 1 0;
+    min-width: 0; /* IMPORTANTE: permite que el truncate funcione */
+  }
+
+  .day-label {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

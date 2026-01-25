@@ -22,6 +22,7 @@ export interface Reg {
   wakeup: Date | null
   intervals: Interval[]
   observaciones: string
+  comentarioP?: string
 }
 
 export type IntervalModel = Pick<Interval, 'state' | 'startTime' | 'endTime'>

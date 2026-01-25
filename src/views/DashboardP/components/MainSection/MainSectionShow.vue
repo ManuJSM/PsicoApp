@@ -8,6 +8,7 @@
   import SleepBarChart from '@/views/MiCuenta/components/SleepBarChart.vue'
   import WeeklyTable from './components/WeeklyTable.vue'
   import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
+  import DetailSleep from './components/DetailSleep.vue'
   const sleepData = [
     { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
     { day: 'Mar', value: 420 }, // 7 horas
@@ -27,6 +28,7 @@
     { day: 'Sáb', value: 520 },
     { day: 'Dom', value: 490 },
   ]
+  const showDetails = ref<boolean>(false)
 
   const metrics = [
     {
@@ -87,6 +89,7 @@
   }
   const handleShowReg = (index: number) => {
     console.log(`viewing ${index}`)
+    showDetails.value = true
   }
   const sleepRecords = [
     {
@@ -196,8 +199,8 @@
           :trend="metric.trend"
         />
       </div>
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <div class="flex flex-1 flex-col gap-4 justify-between">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-4">
           <SleepBarChart
             title="Latencia de Sueño"
             subtitle="Tiempo que tarda en dormirse la primera vez"
@@ -211,10 +214,16 @@
             :previous-period-data="previousWeekData"
           ></SleepChart>
         </div>
-        <div class="flex flex-1 flex-col">
-          <WeeklyTable :records="sleepRecords" @view="handleShowReg" />
-        </div>
+        <WeeklyTable
+          class="xl:col-span-2"
+          :records="sleepRecords"
+          @view="handleShowReg"
+        />
       </div>
     </div>
+    <DetailSleep
+      :is-open="showDetails"
+      @close="showDetails = false"
+    ></DetailSleep>
   </section>
 </template>
