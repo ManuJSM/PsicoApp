@@ -85,6 +85,9 @@
   const openCalendar = () => {
     console.log('Abrir calendario')
   }
+  const handleShowReg = (index: number) => {
+    console.log(`viewing ${index}`)
+  }
   const sleepRecords = [
     {
       date: new Date(2024, 10, 18), // 18 Nov 2024 (Lunes)
@@ -124,13 +127,13 @@
   ]
   // Datos de ejemplo para eficiencia
   const latencyHour = [
-    { label: 'Lun', value: 6.2 },
-    { label: 'Mar', value: 7.5 },
-    { label: 'Mié', value: 5.1 },
-    { label: 'Jue', value: 8.4 },
-    { label: 'Vie', value: 6.8 },
-    { label: 'Sáb', value: 7.9 },
-    { label: 'Dom', value: 5.9 },
+    { label: 'Lun', value: 2.2 },
+    { label: 'Mar', value: 1.5 },
+    { label: 'Mié', value: 1.1 },
+    { label: 'Jue', value: 2.4 },
+    { label: 'Vie', value: 1.8 },
+    { label: 'Sáb', value: 2.9 },
+    { label: 'Dom', value: 1.9 },
   ]
 </script>
 <template>
@@ -194,7 +197,7 @@
         />
       </div>
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <div class="flex flex-col gap-4 justify-between">
+        <div class="flex flex-1 flex-col gap-4 justify-between">
           <SleepBarChart
             title="Latencia de Sueño"
             subtitle="Tiempo que tarda en dormirse la primera vez"
@@ -208,8 +211,9 @@
             :previous-period-data="previousWeekData"
           ></SleepChart>
         </div>
-
-        <WeeklyTable :rows="sleepRecords" />
+        <div class="flex flex-1 flex-col">
+          <WeeklyTable :records="sleepRecords" @view="handleShowReg" />
+        </div>
       </div>
     </div>
   </section>

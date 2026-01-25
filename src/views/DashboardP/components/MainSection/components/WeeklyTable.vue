@@ -1,249 +1,177 @@
 <template>
-  <div class="bg-card-dark rounded-xl border border-white/10 p-6 shadow-2xl">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-lg font-bold text-white">{{ title }}</h3>
+  <div class="bg-card-dark rounded-xl border border-white/10 p-4 shadow-2xl">
+    <div class="flex items-center justify-between mb-6 px-2">
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-tight">
+          {{ title }}
+        </h3>
+      </div>
       <button
         v-if="showExportButton"
-        class="text-xs font-bold text-primary flex items-center gap-1 hover:underline hover:opacity-80 transition-all"
-        @click="$emit('export-csv')"
+        class="text-sm font-bold text-blue-400 flex items-center gap-1 hover:text-blue-300 transition-colors"
+        @click="$emit('export')"
       >
         <span class="material-symbols-outlined text-sm!">download</span>
-        {{ exportButtonText }}
+        EXPORTAR
       </button>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-left">
-        <thead>
-          <tr
-            class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-white/10"
+    <div class="flex flex-col gap-2 justify-around">
+      <!-- Header -->
+      <div
+        class="flex items-center px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-tight border-b border-white/10 mb-2"
+      >
+        <div class="w-24">Fecha</div>
+        <div class="flex-1 px-6"></div>
+        <div class="w-20 text-center">Eficiencia</div>
+        <div class="w-16 text-right">Acción</div>
+      </div>
+
+      <div
+        v-for="(record, index) in processedRecords"
+        :key="index"
+        @click="$emit('view', index)"
+        class="flex items-center border border-white/10 cursor-pointer px-4 py-3 hover:bg-white/5 transition-colors group relative"
+      >
+        <!-- Indicador lateral por eficiencia -->
+        <div
+          class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full"
+          :class="getEfficiencyColor(record.efficiency).border"
+        ></div>
+
+        <!-- Fecha -->
+        <div class="w-24 shrink-0 pl-1">
+          <div class="text-sm font-bold text-white">{{ record.day }}</div>
+          <div class="text-[10px] text-slate-400 font-medium">
+            {{ record.month }}
+          </div>
+        </div>
+
+        <!-- Espacio vacío -->
+        <div class="flex-1 px-6"></div>
+
+        <!-- Eficiencia -->
+        <div class="w-20 text-center">
+          <span
+            class="inline-flex items-center justify-center text-sm font-bold px-3 py-1.5 rounded-lg"
+            :class="getEfficiencyColor(record.efficiency).text"
           >
-            <th class="pb-3 px-3">Fecha</th>
-            <th class="pb-3 px-3">Estado</th>
-            <th class="pb-3 px-3 text-right">Eficiencia</th>
-            <th class="pb-3 px-3 text-right"></th>
-          </tr>
-        </thead>
+            {{ record.efficiency }}%
+          </span>
+        </div>
 
-        <tbody>
-          <tr
-            v-for="(row, index) in rows"
-            :key="index"
-            class="border-b border-white/5 hover:bg-white/3 transition-all duration-200 cursor-pointer group"
-            @click="$emit('row-click', row)"
+        <!-- Ojo + Puntito -->
+        <div class="w-16 flex items-center justify-end gap-2">
+          <!-- Puntito rojo pulsante si isLive -->
+          <div v-if="record.isLive" class="relative" title="Registro en vivo">
+            <div class="size-2 bg-red-500 rounded-full dot-pulse"></div>
+            <div
+              class="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-40"
+            ></div>
+          </div>
+          <button
+            class="flex items-center justify-center text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+            title="Ver detalles"
           >
-            <!-- Fecha -->
-            <td class="px-3 py-4">
-              <div class="flex flex-col">
-                <span
-                  class="text-sm font-semibold text-white group-hover:text-primary transition-colors"
-                >
-                  {{ formatDate(row.date) }}
-                </span>
-                <span class="text-[11px] text-slate-500 mt-0.5">
-                  {{ formatWeekday(row.date) }}
-                </span>
-              </div>
-            </td>
+            <span class="material-symbols-outlined text-xl"> visibility </span>
+          </button>
+        </div>
+      </div>
 
-            <!-- Estado -->
-            <td class="px-3 py-4">
-              <div class="flex items-center gap-2.5">
-                <div class="relative">
-                  <span
-                    class="size-3 rounded-full block"
-                    :class="getStatusColorClass(row.efficiency)"
-                  ></span>
-                  <span
-                    v-if="row.isLive"
-                    class="absolute -top-0.5 -right-0.5 size-1.5 bg-red-500 rounded-full border border-card-dark dot-pulse"
-                  ></span>
-                </div>
-                <div class="flex flex-col">
-                  <span
-                    class="text-sm font-medium"
-                    :class="getStatusTextColorClass(row.efficiency)"
-                  >
-                    {{ getStatusLabel(row.efficiency) }}
-                  </span>
-                  <span class="text-[11px] text-slate-500">
-                    {{ getStatusDescription(row.efficiency) }}
-                  </span>
-                </div>
-              </div>
-            </td>
-
-            <!-- Eficiencia -->
-            <td class="px-3 py-4 text-right">
-              <div class="flex flex-col items-end">
-                <span
-                  class="text-lg font-bold tracking-tight"
-                  :class="getEfficiencyColorClass(row.efficiency)"
-                >
-                  {{ row.efficiency }}%
-                </span>
-                <div
-                  class="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden mt-1.5"
-                >
-                  <div
-                    class="h-full rounded-full transition-all duration-500"
-                    :class="getStatusColorClass(row.efficiency)"
-                    :style="{ width: `${Math.min(row.efficiency, 100)}%` }"
-                  ></div>
-                </div>
-              </div>
-            </td>
-
-            <!-- Indicador Live/En curso -->
-            <td class="py-4">
-              <div class="flex items-center justify-end gap-2">
-                <div v-if="row.isLive" class="flex items-center gap-1.5">
-                  <div class="size-1.5 bg-red-500 rounded-full dot-pulse"></div>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Mensaje si no hay datos -->
-          <tr v-if="rows.length === 0">
-            <td colspan="4" class="px-3 py-12 text-center">
-              <div class="flex flex-col items-center justify-center">
-                <span
-                  class="material-symbols-outlined text-3xl text-slate-600 mb-3"
-                >
-                  sentiment_dissatisfied
-                </span>
-                <p class="text-slate-500 font-medium">{{ emptyMessage }}</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Empty state -->
+      <div
+        v-if="processedRecords.length === 0"
+        class="py-10 text-center text-slate-400 text-sm"
+      >
+        <span class="material-symbols-outlined mb-3 block opacity-50"
+          >sleep</span
+        >
+        <p class="text-slate-500">No hay registros disponibles</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  // Interfaces
-  interface SleepRecord {
-    date: Date
+  import { computed } from 'vue'
+
+  // Interface del registro - SOLO lo necesario
+  export interface DailyRecord {
+    date: Date | string
     efficiency: number
     isLive?: boolean
   }
 
-  interface SleepTableProps {
-    title?: string
-    rows?: SleepRecord[]
-    showExportButton?: boolean
-    exportButtonText?: string
-    emptyMessage?: string
-  }
-
   // Props
-  withDefaults(defineProps<SleepTableProps>(), {
-    title: 'Registros Diarios',
-    rows: () => [],
-    showExportButton: true,
-    exportButtonText: 'Exportar CSV',
-    emptyMessage: 'No hay registros para mostrar',
-  })
+  const props = withDefaults(
+    defineProps<{
+      title?: string
+      records: DailyRecord[]
+      showExportButton?: boolean
+    }>(),
+    {
+      title: 'Registros Diarios',
+      subtitle: 'Eficiencia del sueño',
+      showExportButton: true,
+      records: () => [],
+    }
+  )
 
   // Emits
   defineEmits<{
-    'export-csv': []
-    'row-click': [row: SleepRecord]
+    export: []
+    view: [index: number]
   }>()
 
-  // Métodos
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
+  // Procesar fechas
+  const processedRecords = computed(() => {
+    return props.records.map(record => {
+      const d =
+        typeof record.date === 'string' ? new Date(record.date) : record.date
+      const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+      const months = [
+        'Ene',
+        'Feb',
+        'Mar',
+        'Abr',
+        'May',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dic',
+      ]
+
+      return {
+        ...record,
+        day: `${days[d.getDay()]} ${d.getDate().toString().padStart(2, ' ')}`,
+        month: months[d.getMonth()],
+      }
     })
-  }
+  })
 
-  const formatWeekday = (date: Date): string => {
-    return date.toLocaleDateString('es-ES', {
-      weekday: 'short',
-    })
-  }
-
-  // Determinar estado basado en eficiencia
-  const getStatusLabel = (efficiency: number): string => {
-    if (efficiency >= 90) return 'Excelente'
-    if (efficiency >= 80) return 'Bueno'
-    if (efficiency >= 70) return 'Regular'
-    if (efficiency >= 60) return 'Deficiente'
-    return 'Malo'
-  }
-
-  const getStatusDescription = (efficiency: number): string => {
-    if (efficiency >= 90) return 'Sueño óptimo'
-    if (efficiency >= 80) return 'Descanso adecuado'
-    if (efficiency >= 70) return 'Sueño fragmentado'
-    if (efficiency >= 60) return 'Descanso insuficiente'
-    return 'Necesita atención'
-  }
-
-  const getStatusColorClass = (efficiency: number): string => {
+  // Color por eficiencia - MEJOR VISIBILIDAD
+  const getEfficiencyColor = (efficiency: number) => {
     if (efficiency >= 90)
-      return 'bg-gradient-to-r from-emerald-500 to-emerald-400'
-    if (efficiency >= 80) return 'bg-gradient-to-r from-green-500 to-green-400'
-    if (efficiency >= 70) return 'bg-gradient-to-r from-amber-500 to-amber-400'
-    if (efficiency >= 60)
-      return 'bg-gradient-to-r from-orange-500 to-orange-400'
-    return 'bg-gradient-to-r from-red-500 to-red-400'
-  }
-
-  const getStatusTextColorClass = (efficiency: number): string => {
-    if (efficiency >= 90) return 'text-emerald-400'
-    if (efficiency >= 80) return 'text-green-400'
-    if (efficiency >= 70) return 'text-amber-400'
-    if (efficiency >= 60) return 'text-orange-400'
-    return 'text-red-400'
-  }
-
-  const getEfficiencyColorClass = (efficiency: number): string => {
-    if (efficiency >= 90) return 'text-emerald-300'
-    if (efficiency >= 80) return 'text-green-300'
-    if (efficiency >= 70) return 'text-amber-300'
-    if (efficiency >= 60) return 'text-orange-300'
-    return 'text-red-300'
+      return {
+        text: 'text-emerald-400 bg-emerald-400/20',
+        border: 'bg-emerald-500',
+      }
+    if (efficiency >= 70)
+      return {
+        text: 'text-amber-400 bg-amber-400/20',
+        border: 'bg-amber-500',
+      }
+    return {
+      text: 'text-red-400 bg-red-400/20',
+      border: 'bg-red-500',
+    }
   }
 </script>
 
 <style scoped>
-  tr {
-    position: relative;
-  }
-
-  tr::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 100%
-    );
-  }
-
-  tr:last-child::after {
-    display: none;
-  }
-
-  tr:hover {
-    background: linear-gradient(
-      90deg,
-      rgba(59, 130, 246, 0.03) 0%,
-      rgba(59, 130, 246, 0.01) 100%
-    );
-  }
-
   .dot-pulse {
     animation: pulse 1.5s infinite;
   }
@@ -254,7 +182,7 @@
       opacity: 1;
     }
     50% {
-      opacity: 0.5;
+      opacity: 0.4;
     }
   }
 </style>
