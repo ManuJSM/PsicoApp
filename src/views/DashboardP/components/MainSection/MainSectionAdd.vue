@@ -12,11 +12,8 @@
     name: '',
     email: '',
     phone: '',
-    status: Status.Active,
+    status: Status.ACTIVE,
     avatar: nonAvatar,
-    sleepAverage: 0,
-    lastNote: '',
-    Eficiency: 0,
   })
 </script>
 <template>

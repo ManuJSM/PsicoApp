@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/auth.store.ts'
-import { AutenticationError, AuthorizationError } from '@/types/errors.types'
+import { AuthenticationError, AuthorizationError } from '@/types/errors.types'
 import type { HttpOptions } from '@/types/types'
 
 const apiUrl = 'http://192.168.1.24:80/api'
@@ -30,7 +30,7 @@ export async function http<T>(
       errorMessage = errData?.error || errorMessage
     } catch {}
     if (response.status == 401) {
-      throw new AutenticationError(errorMessage)
+      throw new AuthenticationError(errorMessage)
     }
 
     if (response.status == 403) {

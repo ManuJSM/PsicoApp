@@ -9,6 +9,10 @@
   import WeeklyTable from './components/WeeklyTable.vue'
   import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
+  import type { Reg } from '@/types/regEdit.types'
+
+  const regs: Reg[] = []
+
   const sleepData = [
     { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
     { day: 'Mar', value: 420 }, // 7 horas

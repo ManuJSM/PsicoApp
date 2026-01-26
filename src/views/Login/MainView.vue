@@ -2,7 +2,7 @@
   import { ref, onMounted } from 'vue'
   import { useToast } from '@/composables/useToast'
   import { ToastType } from '@/types/types'
-  import { AutenticationError } from '@/types/errors.types'
+  import { AuthenticationError } from '@/types/errors.types'
   import { useAuthStore } from '@/stores/auth.store'
   const { setToast } = useToast()
 
@@ -20,8 +20,8 @@
       // setToast(ToastType.Success, 'Login exitoso')
       window.location.assign('/Dashboard')
     } catch (err: unknown) {
-      if (err instanceof AutenticationError) {
-        setToast(ToastType.Error, err.message)
+      if (err instanceof AuthenticationError) {
+        setToast(ToastType.ERROR, err.message)
       } else {
         console.log(err)
       }

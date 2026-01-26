@@ -3,10 +3,10 @@
   import FilterButton from './components/FilterButton.vue'
   import CardList from './components/CardList.vue'
   import { type Patient } from '@/types/types'
-  type Filtro = 'All' | 'Active' | 'Inactive'
+  type Filtro = 'all' | 'active' | 'inactive'
   import { ref, computed } from 'vue'
   const searchQuery = ref<string>('')
-  const filterButton = ref<Filtro>('Active')
+  const filterButton = ref<Filtro>('active')
 
   const props = defineProps<{ patients: Patient[] }>()
   const emits = defineEmits(['add'])
@@ -14,7 +14,7 @@
   // Filtrar pacientes
   const filteredPatients = computed<Patient[]>(() => {
     const currentFilter =
-      filterButton.value === 'All'
+      filterButton.value === 'all'
         ? props.patients
         : props.patients.filter(
             (patient: Patient) => patient.status === filterButton.value
@@ -52,18 +52,18 @@
       <div class="flex gap-3 overflow-x-auto pb-1">
         <FilterButton
           label="Activos"
-          :active="filterButton === 'Active'"
-          @click="filterButton = 'Active'"
+          :active="filterButton === 'active'"
+          @click="filterButton = 'active'"
         />
         <FilterButton
           label="Inactivos"
-          :active="filterButton === 'Inactive'"
-          @click="filterButton = 'Inactive'"
+          :active="filterButton === 'inactive'"
+          @click="filterButton = 'inactive'"
         />
         <FilterButton
           label="Todos"
-          :active="filterButton === 'All'"
-          @click="filterButton = 'All'"
+          :active="filterButton === 'all'"
+          @click="filterButton = 'all'"
         />
       </div>
     </div>

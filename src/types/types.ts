@@ -1,6 +1,6 @@
 export enum Status {
-  Active = 'Active',
-  Inactive = 'Inactive',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 
 export interface MenuItems {
@@ -8,34 +8,19 @@ export interface MenuItems {
   icon: string
   routeName: string
 }
-/* =========================
-   MODELO (API?)
-========================= */
 
-export interface SleepRecord {
-  id: number
-  date: string
-  startTime: string
-  endTime: string
-  durationHours: number
-  targetHours: number
-  qualityRating: number
-  hasNotification: boolean
-  patientComment?: string
-  professionalNote?: string
-}
 export interface HttpOptions extends RequestInit {
   auth?: boolean // si true, añade Authorization header
 }
 
-export enum role{
-  user = 'USER',
-  psico = 'PSICO'
+export enum Role {
+  USER = 'USER',
+  PSICO = 'PSICO',
 }
 
 export enum ToastType {
-  Success = 'success',
-  Error = 'error',
+  SUCCESS = 'success',
+  ERROR = 'error',
 }
 export interface Notification {
   id: number
@@ -45,14 +30,13 @@ export interface Notification {
   timeAgo: string
   read: boolean
 }
+export type User = Patient
+
 export interface Patient {
   id: number
   name: string
   email: string
   phone: string
   avatar: string
-  sleepAverage: number
-  lastNote: string
-  Eficiency: number
   status: Status
 }

@@ -2,14 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { publicRoutes } from './public.route.ts'
 import { DASHBOARD_P, psicoRoutes } from './psico.route.ts'
 import { DASHBOARD_U, userRoutes } from './user.route.ts'
-import { role } from '@/types/types.ts'
+import { Role } from '@/types/types.ts'
 import { useAuthStore } from '@/stores/auth.store'
 
-export function createAppRouter(rol: role | null) {
+export function createAppRouter(rol: Role | null) {
   const routes = [...publicRoutes]
 
-  if (rol === role.psico) routes.push(...psicoRoutes)
-  if (rol === role.user) routes.push(...userRoutes)
+  if (rol === Role.PSICO) routes.push(...psicoRoutes)
+  if (rol === Role.USER) routes.push(...userRoutes)
 
   const router = createRouter({
     history: createWebHistory(),
@@ -27,9 +27,9 @@ export function createAppRouter(rol: role | null) {
     }
 
     if (to.name === 'login' && auth.isLoggedIn) {
-      if (auth.role === role.user) {
+      if (auth.role === Role.USER) {
         return { name: DASHBOARD_U }
-      } else if (auth.role === role.psico) {
+      } else if (auth.role === Role.PSICO) {
         return { name: DASHBOARD_P }
       }
     }

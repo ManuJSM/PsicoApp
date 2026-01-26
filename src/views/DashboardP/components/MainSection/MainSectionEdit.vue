@@ -17,10 +17,10 @@
   const editPatient = reactive<Patient>({
     ...props.patient,
   })
-  const isActive = computed<boolean>(() => editPatient.status === Status.Active)
+  const isActive = computed<boolean>(() => editPatient.status === Status.ACTIVE)
 
   const toggleStatus = () => {
-    editPatient.status = isActive.value ? Status.Inactive : Status.Active
+    editPatient.status = isActive.value ? Status.INACTIVE : Status.ACTIVE
   }
 
   const handleDelete = () => {
@@ -145,7 +145,7 @@
                 <div class="flex items-center gap-3">
                   <span
                     :class="[
-                      'text-sm font-medium',
+                      'text-sm font-medium uppercase',
                       isActive ? 'text-primary' : 'text-gray-500',
                     ]"
                     >{{ editPatient.status }}</span

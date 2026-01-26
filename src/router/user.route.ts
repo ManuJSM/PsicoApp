@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { lazyLoad } from './utils.ts'
 import Layout from '@/views/Layout/MainViewU.vue'
-import { role } from '@/types/types.ts'
+import { Role } from '@/types/types.ts'
 
 export const DASHBOARD_U = 'DashboardU'
 
@@ -39,7 +39,7 @@ export const userRoutes: Array<RouteRecordRaw> = [
     component: Layout,
     meta: {
       requiresAuth: true,
-      role: role.user,
+      role: Role.USER,
     },
     children: routes,
   },

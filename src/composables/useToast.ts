@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { ToastType } from '@/types/types'
 
 const showToast = ref(false)
-const toastType = ref<ToastType>(ToastType.Success)
+const toastType = ref<ToastType>(ToastType.SUCCESS)
 const toastMessage = ref('')
 const timeout = 2000
 

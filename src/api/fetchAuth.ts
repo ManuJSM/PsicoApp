@@ -1,6 +1,6 @@
 import { http } from './http'
 import { useRouter } from 'vue-router'
-import { AuthorizationError, AutenticationError } from '@/types/errors.types'
+import { AuthorizationError, AuthenticationError } from '@/types/errors.types'
 import { useAuthStore } from '@/stores/auth.store'
 
 export async function fetchWithAuth<T>(
@@ -13,7 +13,7 @@ export async function fetchWithAuth<T>(
   try {
     return await http<T>(endpoint, options)
   } catch (err: unknown) {
-    if (err instanceof AutenticationError) {
+    if (err instanceof AuthenticationError) {
       await authStore.bootstrapAuth()
       if (authStore.isLoggedIn) {
         return await http<T>(endpoint, options)

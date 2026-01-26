@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { loginAPI, refresh } from '@/api/http.auth'
-import { AutenticationError } from '@/types/errors.types'
-import { role } from '@/types/types'
+import { AuthenticationError } from '@/types/errors.types'
+import { ref } from 'vue'
+import { Role } from '@/types/types'
 interface jwtData {
-  role: role
+  role: Role
   id: number
 }
 
@@ -20,48 +21,57 @@ export function parseJwt(token: string) {
     return null
   }
 }
+export const useAuthStore = defineStore('auth', () => {
+  const accessToken = ref<string | null>(null)
+  const role = ref<Role | null>(null)
+  const isLoggedIn = ref(false)
+  const bootstrapped = ref(false)
 
-export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    accessToken: null as string | null,
-    role: null as role | null,
-    isLoggedIn: false,
-    bootstrapped: false,
-  }),
-  actions: {
-    setToken(token: string) {
-      this.accessToken = token
-      const data = parseJwt(token)
-      if (data === null) {
-        throw new AutenticationError('Invalid token')
+  function setToken(token: string) {
+    accessToken.value = token
+
+    const data = parseJwt(token)
+    if (data === null) {
+      throw new AuthenticationError('Invalid token')
+    }
+
+    role.value = data.role
+    isLoggedIn.value = true
+  }
+
+  async function login(email: string, password: string) {
+    const res = await loginAPI(email, password)
+    setToken(res.accessToken)
+  }
+
+  async function bootstrapAuth(): Promise<void> {
+    try {
+      const res = await refresh()
+      if (res.accessToken) {
+        setToken(res.accessToken)
       }
-      this.role = data.role
-      this.isLoggedIn = true
-    },
+    } catch {
+      logout()
+    } finally {
+      bootstrapped.value = true
+    }
+  }
 
-    async login(email: string, password: string) {
-      const res = await loginAPI(email, password)
-      this.setToken(res.accessToken)
-    },
+  function logout() {
+    accessToken.value = null
+    role.value = null
+    isLoggedIn.value = false
+    // TODO: deslogear en el backend
+  }
 
-    async bootstrapAuth(): Promise<void> {
-      try {
-        const res = await refresh()
-        if (res.accessToken) {
-          this.setToken(res.accessToken)
-        }
-      } catch {
-        this.logout()
-      } finally {
-        this.bootstrapped = true
-      }
-    },
-
-    logout() {
-      this.accessToken = null
-      this.role = null
-      this.isLoggedIn = false
-      //TODO: deslogear en el backend
-    },
-  },
+  return {
+    accessToken,
+    role,
+    isLoggedIn,
+    bootstrapped,
+    setToken,
+    login,
+    bootstrapAuth,
+    logout,
+  }
 })

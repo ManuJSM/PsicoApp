@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Patient } from '@/types/types'
-import { useRoute } from 'vue-router'
-import { DASHBOARD_P } from '@/router/psico.route'
-const route = useRoute()
+  import { computed } from 'vue'
+  import type { Patient } from '@/types/types'
+  import { useRoute } from 'vue-router'
+  import { DASHBOARD_P } from '@/router/psico.route'
+  const route = useRoute()
 
-const activePatientId = computed<number>(() => Number(route.params.id))
-defineProps<{
-  patients: Patient[]
-}>()
+  const activePatientId = computed<number>(() => Number(route.params.id))
+  defineProps<{
+    patients: Patient[]
+  }>()
 </script>
 
 <template>
@@ -40,13 +40,19 @@ defineProps<{
           <p
             class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal line-clamp-2"
           >
-            Promedio de sueño: {{ patient.sleepAverage }}
+            Alguna info chula
           </p>
         </div>
       </div>
       <div class="shrink-0">
-        <div class="text-slate-600 dark:text-white flex size-7 items-center justify-center">
-          <span class="material-symbols-outlined">chevron_right</span>
+        <div
+          class="text-slate-600 dark:text-white flex size-7 items-center justify-center"
+        >
+          <span
+            class="material-symbols-outlined"
+            :class="activePatientId === patient.id ? 'text-primary' : ''"
+            >chevron_right</span
+          >
         </div>
       </div>
     </router-link>
