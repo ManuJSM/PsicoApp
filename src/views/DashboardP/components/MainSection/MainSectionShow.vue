@@ -242,12 +242,151 @@
           :trend="metric.trend"
         />
       </div>
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <WeeklyTable
+      <div class="grid grid-cols-1 gap-4">
+        <!-- <WeeklyTable
           class="xl:col-span-2"
           :records="sleepRecords"
           @view="handleShowReg"
-        />
+        /> -->
+        <div
+          class="bg-card-dark rounded-2xl border border-white/10 p-6 shadow-2xl"
+          id="099b34705735495d868a30d495db75b3"
+        >
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h3 class="text-xl font-extrabold text-white tracking-tight">
+                Registros de Sueño
+              </h3>
+              <p class="text-xs text-slate-500 font-medium">
+                Historial dinámico de actividad semanal
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span
+                  class="size-2 rounded-full border border-github-border border-dashed opacity-50"
+                ></span>
+                <span
+                  class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+                  >Incompleto</span
+                >
+              </div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="size-2 bg-primary rounded-full shadow-[0_0_8px_rgba(19,127,236,0.6)]"
+                ></span>
+                <span
+                  class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+                  >Hoy</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
+                >Lun</span
+              >
+              <span class="text-xl font-extrabold text-white mt-0.5">18</span>
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
+                >Mar</span
+              >
+              <span class="text-xl font-extrabold text-white mt-0.5">19</span>
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-dashed border-github-border bg-white/[0.02] backdrop-blur-sm opacity-40 cursor-pointer hover:scale-105 hover:opacity-100 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-500 uppercase tracking-tighter group-hover:text-slate-300 transition-colors"
+                >Mié</span
+              >
+              <span class="text-xl font-extrabold text-slate-400 mt-0.5"
+                >20</span
+              >
+              <div
+                class="absolute top-3 right-4 size-1.5 bg-red-500 rounded-full dot-pulse"
+              ></div>
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
+                >Jue</span
+              >
+              <span class="text-xl font-extrabold text-white mt-0.5">21</span>
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-dashed border-github-border bg-white/[0.02] backdrop-blur-sm opacity-40 cursor-pointer hover:scale-105 hover:opacity-100 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-500 uppercase tracking-tighter group-hover:text-slate-300 transition-colors"
+                >Vie</span
+              >
+              <span class="text-xl font-extrabold text-slate-400 mt-0.5"
+                >22</span
+              >
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
+                >Sáb</span
+              >
+              <span class="text-xl font-extrabold text-white mt-0.5">23</span>
+            </label>
+            <label
+              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] bg-gradient-to-br from-primary to-[#0e5db3] border border-white/10 pill-glow cursor-pointer hover:scale-105 transition-all duration-300 group shadow-2xl"
+              for="date-drawer-toggle"
+            >
+              <span
+                class="text-[10px] font-bold text-white/80 uppercase tracking-tighter"
+                >Dom</span
+              >
+              <span class="text-xl font-extrabold text-white mt-0.5">24</span>
+              <div
+                class="absolute top-3 right-4 size-1.5 bg-white/80 rounded-full dot-pulse"
+              ></div>
+            </label>
+          </div>
+          <div
+            class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between"
+          >
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-slate-500 text-sm"
+                >event_note</span
+              >
+              <p
+                class="text-[10px] text-slate-500 font-bold uppercase tracking-widest"
+              >
+                Semana 47 · Noviembre 2024
+              </p>
+            </div>
+            <button
+              class="text-[10px] font-extrabold text-primary hover:text-blue-400 uppercase tracking-widest transition-colors flex items-center gap-1"
+            >
+              <span>Calendario Completo</span>
+              <span class="material-symbols-outlined !text-xs"
+                >arrow_forward</span
+              >
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <DetailSleep
