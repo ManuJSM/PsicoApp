@@ -1,24 +1,5 @@
 <template>
   <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-    <!-- View Selector -->
-    <div
-      class="flex items-center bg-slate-200 dark:bg-card-dark p-0.5 rounded-lg border border-slate-300 dark:border-border-dark overflow-hidden"
-    >
-      <button
-        v-for="view in views"
-        :key="view"
-        :class="[
-          'px-4 py-2 text-sm font-medium cursor-pointer tracking-wide ',
-          activeView === view
-            ? 'text-white bg-primary/10 border-b-2 border-primary rounded-md'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-        @click="selectView(view)"
-      >
-        {{ view }}
-      </button>
-    </div>
-
     <!-- Date Navigation -->
     <label
       @click="$emit('calendar-click')"
@@ -40,6 +21,24 @@
         >calendar_month</span
       >
     </label>
+    <!-- View Selector -->
+    <div
+      class="flex items-center bg-slate-200 dark:bg-card-dark p-0.5 rounded-lg border border-slate-300 dark:border-border-dark overflow-hidden"
+    >
+      <button
+        v-for="view in views"
+        :key="view"
+        :class="[
+          'px-4 py-2 text-sm font-medium cursor-pointer tracking-wide ',
+          activeView === view
+            ? 'text-white bg-primary/10 border-b-2 border-primary rounded-md'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+        @click="selectView(view)"
+      >
+        {{ view }}
+      </button>
+    </div>
   </div>
 </template>
 

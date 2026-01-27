@@ -10,6 +10,7 @@
   import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
   import type { Reg } from '@/types/regEdit.types'
+  import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
 
   const regs: Reg[] = []
 
@@ -76,6 +77,21 @@
       },
     },
   ]
+  const sleepSegments = [
+    { value: 130, color: '#059669', label: 'Awake' }, // 5h 30m
+    { value: 180, color: '#d97706', label: 'inBed' }, // 3h
+    { value: 400, color: '#4f46e5', label: 'asleep' }, // h
+  ]
+
+  const handleAnalyticsClick = () => {
+    console.log('Analytics clicked')
+    // Navegar a vista de análisis detallado
+  }
+
+  const handleSegmentClick = segment => {
+    console.log('Segment clicked:', segment)
+    // Mostrar detalles del segmento
+  }
 
   defineProps<{
     patient: Patient
@@ -192,6 +208,29 @@
         @view-change="handleViewChange"
         @calendar-click="openCalendar"
       />
+      <div class="grid md:grid-cols-2 gap-4">
+        <!-- <SleepBarChart
+          title="Latencia de Sueño"
+          subtitle="Tiempo que tarda en dormirse la primera vez"
+          :chart-data="latencyHour"
+          value-suffix="h"
+          gradient-type="blue"
+        /> -->
+
+        <DonutChart
+          title="Distribución del Sueño"
+          subtitle="Análisis semanal promedio"
+          :segments="sleepSegments"
+          center-subtitle="Total Sueño"
+          @analytics-click="handleAnalyticsClick"
+          @segment-click="handleSegmentClick"
+        />
+        <SleepChart
+          title="Tiempo Dormido"
+          :chart-data="sleepData"
+          :previous-period-data="previousWeekData"
+        ></SleepChart>
+      </div>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
@@ -204,20 +243,6 @@
         />
       </div>
       <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div class="flex flex-col gap-4">
-          <SleepBarChart
-            title="Latencia de Sueño"
-            subtitle="Tiempo que tarda en dormirse la primera vez"
-            :chart-data="latencyHour"
-            value-suffix="h"
-            gradient-type="blue"
-          />
-          <SleepChart
-            title="Tiempo Dormido"
-            :chart-data="sleepData"
-            :previous-period-data="previousWeekData"
-          ></SleepChart>
-        </div>
         <WeeklyTable
           class="xl:col-span-2"
           :records="sleepRecords"

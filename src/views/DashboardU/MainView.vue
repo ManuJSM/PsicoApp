@@ -87,10 +87,10 @@
             </div>
           </div>
           <div
-            class="bg-gray-50 dark:bg-[#15202b] rounded-xl p-4 lg:p-6 shadow-none border border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 lg:gap-3 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition-colors h-full min-h-[140px] lg:min-h-auto"
+            class="bg-gray-50 dark:bg-[#15202b] rounded-xl p-4 lg:p-6 shadow-none border border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 lg:gap-3 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition-colors h-full lg:min-h-auto"
           >
             <div
-              class="size-8 lg:size-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center"
+              class="size-12 lg:size-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center"
             >
               <span class="material-symbols-outlined text-xl lg:text-2xl"
                 >add</span
