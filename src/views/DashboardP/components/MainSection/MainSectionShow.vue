@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import BackButton from './components/BackButton.vue'
   import { type Patient } from '@/types/types'
-  import { ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
 
   import MetricCard from './components/MetricCard.vue'
   import DateMenu from './components/DateMenu.vue'
@@ -10,6 +10,7 @@
   import { SleepState, type Reg } from '@/types/regEdit.types'
   import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
   import { DashboardViews } from '@/types/dashboardP.types'
+  import { mockReg } from './utils/mocks'
 
   const regs: Reg[] = []
 
@@ -63,11 +64,11 @@
       },
     },
     {
-      title: 'Despertares',
-      value: '1.4',
+      title: 'Latencia al Sueño',
+      value: '45m',
       icon: 'visibility',
       trend: {
-        value: '-0.5',
+        value: '+5m',
         direction: 'down' as const,
         comparisonText: 'vs sem. ant.',
       },
@@ -83,104 +84,62 @@
     patient: Patient
   }>()
   defineEmits(['exit', 'edit'])
-  const periodText = ref('18 — 24 NOV, 2024')
+  const selectedDate = ref<Date>(new Date())
+  const periodText = computed<string>(() => {
+    const date = selectedDate.value
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+    const year = date.getFullYear()
+    //TODO dependiendo de la vista mostrar diferente formato
+    return `${day}/${month}/${year}`
+  })
   const selectedView = ref<DashboardViews>(DashboardViews.DIARIA)
 
   const handleViewChange = (view: DashboardViews) => {
     console.log('Vista cambiada a:', view)
     selectedView.value = view
-    // Aquí puedes cambiar los datos según la vista
   }
 
   const openCalendar = () => {
     console.log('Abrir calendario')
   }
+  const dayReg = ref<Reg>(mockReg)
+  const weekReg = ref<Reg[]>([])
+  const monthReg = ref<Reg[]>([])
+  const loading = ref(false)
 
-  const mockReg: Reg = {
-    fecha: new Date('2024-01-20'),
-    bedtime: new Date('2024-01-19T23:00:00'),
-    wakeup: new Date('2024-01-20T07:15:00'),
-    intervals: [
-      {
-        state: SleepState.INBED,
-        hours: 0,
-        minutes: 15,
-        startTime: new Date('2024-01-19T23:00:00'),
-        endTime: new Date('2024-01-19T23:15:00'),
-      },
-      {
-        state: SleepState.ASLEEP,
-        hours: 3,
-        minutes: 45,
-        startTime: new Date('2024-01-19T23:15:00'),
-        endTime: new Date('2024-01-20T03:00:00'),
-      },
-      {
-        state: SleepState.AWAKE,
-        hours: 0,
-        minutes: 20,
-        startTime: new Date('2024-01-20T03:00:00'),
-        endTime: new Date('2024-01-20T03:20:00'),
-      },
-      {
-        state: SleepState.ASLEEP,
-        hours: 3,
-        minutes: 55,
-        startTime: new Date('2024-01-20T03:20:00'),
-        endTime: new Date('2024-01-20T07:15:00'),
-      },
-    ],
-    observaciones:
-      'Me costó un poco conciliar el sueño por el ruido de los vecinos, pero una vez dormida descansé bien hasta que me despertó una pesadilla a las 3 de la mañana. Después volví a dormirme rápido y me desperté sintiéndome bastante renovada.',
-  }
-  const sleepRecords = ref([
-    {
-      date: new Date(2024, 10, 18), // 18 Nov 2024 (Lunes)
-      isLive: false,
-      isComplete: true, // Completado (sin punto)
-    },
-    {
-      date: new Date(2024, 10, 19), // 19 Nov 2024 (Martes)
-      isLive: false,
-      isComplete: true, // Completado
-    },
-    {
-      date: new Date(2024, 10, 20), // 20 Nov 2024 (Miércoles)
-      isLive: false,
-      isComplete: false, // INCOMPLETO (estilo diferente)
-    },
-    {
-      date: new Date(2024, 10, 21), // 21 Nov 2024 (Jueves)
-      isLive: false,
-      isComplete: true,
-    },
-    {
-      date: new Date(2024, 10, 22), // 22 Nov 2024 (Viernes)
-      isLive: false,
-      isComplete: false, // INCOMPLETO
-    },
-    {
-      date: new Date(2024, 10, 23), // 23 Nov 2024 (Sábado)
-      isLive: false,
-      isComplete: true,
-    },
-    {
-      date: new Date(2024, 10, 24), // 24 Nov 2024 (Domingo)
-      isLive: true, // Registro en curso (punto pulsante)
-      isComplete: false, // INCOMPLETO (pero hoy es especial)
-    },
-  ])
+  watch(
+    [selectedView, selectedDate],
+    async ([v, selectedDate]: [DashboardViews, Date]) => {
+      if (v === DashboardViews.DIARIA && !dayReg.value) {
+        loading.value = true
+        try {
+          // dayReg.value = await fetchDay()
+        } finally {
+          loading.value = false
+        }
+      }
 
-  // Datos de ejemplo para eficiencia
-  const latencyHour = [
-    { label: 'Lun', value: 2.2 },
-    { label: 'Mar', value: 1.5 },
-    { label: 'Mié', value: 1.1 },
-    { label: 'Jue', value: 2.4 },
-    { label: 'Vie', value: 1.8 },
-    { label: 'Sáb', value: 2.9 },
-    { label: 'Dom', value: 1.9 },
-  ]
+      if (v === DashboardViews.SEMANAL && weekReg.value.length === 0) {
+        loading.value = true
+        try {
+          // weekReg.value = await fetchWeek()
+        } finally {
+          loading.value = false
+        }
+      }
+
+      if (v === DashboardViews.MENSUAL && monthReg.value.length === 0) {
+        loading.value = true
+        try {
+          // monthReg.value = await fetchMonth()
+        } finally {
+          loading.value = false
+        }
+      }
+    },
+    { immediate: true }
+  )
 </script>
 <template>
   <section
@@ -257,7 +216,7 @@
           />
         </div>
       </div>
-      <DetailSleep v-else :reg="mockReg" />
+      <DetailSleep v-else :reg="dayReg" />
     </div>
   </section>
 </template>
