@@ -3,17 +3,11 @@
     class="dark:bg-card-dark border dark:border-border-dark rounded-xl p-4 flex flex-col"
   >
     <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-center items-center mb-4">
       <div>
         <h3 class="font-bold text-slate-300 text-base mb-0.5">{{ title }}</h3>
-        <p class="text-xs text-slate-500">{{ subtitle }}</p>
+        <p class="text-xs text-center text-slate-500">{{ subtitle }}</p>
       </div>
-      <button
-        class="text-slate-500 hover:text-primary transition-colors p-2 rounded-lg hover:bg-white/5"
-        @click="$emit('analytics-click')"
-      >
-        <span class="material-symbols-outlined">analytics</span>
-      </button>
     </div>
 
     <!-- Content -->
@@ -68,14 +62,14 @@
       <!-- Legend lateral -->
       <div
         v-if="showLegend && preparedSegments.length"
-        class="flex-1 flex md:flex-col justify-center items-start gap-4"
+        class="flex-1 flex md:flex-col justify-center gap-4"
       >
         <div
           v-for="(segment, index) in preparedSegments"
           :key="index"
-          class="flex items-center justify-center gap-2"
+          class="flex gap-1 md:gap-0 md:grid md:grid-cols-2"
         >
-          <div class="flex justify-center items-baseline gap-1">
+          <div class="flex gap-1 justify-start items-baseline">
             <div
               class="w-2 h-2 rounded-full"
               :style="{ backgroundColor: segment.color }"
@@ -125,7 +119,7 @@
 
   const animatedProgress = ref(0)
 
-  const radius = 36
+  const radius = 40
   const circumference = 2 * Math.PI * radius
 
   const totalValue = computed(() => {
@@ -173,15 +167,19 @@
   const startAnimation = () => {
     if (!props.animate) {
       animatedProgress.value = 1
+
       return
     }
 
     const start = performance.now()
+
     const d = props.animationDuration
 
     const step = (t: number) => {
       const p = Math.min((t - start) / d, 1)
+
       animatedProgress.value = 1 - Math.pow(1 - p, 3)
+
       if (p < 1) requestAnimationFrame(step)
     }
 

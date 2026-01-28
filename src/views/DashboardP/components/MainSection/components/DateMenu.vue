@@ -26,7 +26,7 @@
       class="flex items-center bg-slate-200 dark:bg-card-dark p-0.5 rounded-lg border border-slate-300 dark:border-border-dark overflow-hidden"
     >
       <button
-        v-for="view in views"
+        v-for="view in DashboardViews"
         :key="view"
         :class="[
           'px-4 py-2 text-sm font-medium cursor-pointer tracking-wide ',
@@ -44,21 +44,20 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { DashboardViews } from '@/types/dashboardP.types'
 
   interface DateNavigationProps {
-    views?: string[]
     activeView?: string
     periodText?: string
   }
 
   interface DateNavigationEmits {
-    (e: 'view-change', view: string): void
+    (e: 'view-change', view: DashboardViews): void
     (e: 'calendar-click'): void
   }
 
   const props = withDefaults(defineProps<DateNavigationProps>(), {
-    views: () => ['Vista Semanal', 'Vista Mensual', 'Vista Anual'],
-    activeView: 'Vista Semanal',
+    activeView: DashboardViews.DIARIA,
     periodText: '18 — 24 NOV, 2024',
   })
 
@@ -66,7 +65,7 @@
 
   const activeView = ref(props.activeView)
 
-  const selectView = (view: string) => {
+  const selectView = (view: DashboardViews) => {
     activeView.value = view
     emit('view-change', view)
   }

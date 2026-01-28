@@ -219,7 +219,7 @@
   }
 
   const guardarRegistro = () => {
-    registro.observaciones = observaciones.value
+    registro.psicoComment = observaciones.value
     emits('save')
   }
 </script>

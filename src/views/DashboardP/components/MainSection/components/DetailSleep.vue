@@ -1,277 +1,317 @@
 <template>
-  <!-- Transition para overlay -->
-  <Transition name="fade">
-    <div
-      v-if="isOpen"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-      id="drawer-overlay-detail"
-      @click="$emit('close')"
-    ></div>
-  </Transition>
-
-  <!-- Transition para drawer -->
-  <Transition name="slide">
-    <div
-      v-if="isOpen"
-      class="fixed top-0 right-0 h-full w-full lg:w-1/3 bg-background-dark/95 backdrop-blur-xl border-l border-white/10 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] z-60 flex flex-col"
-    >
+  <!-- Cronología de la Noche -->
+  <div
+    class="technical-card bg-card-dark border border-white/10 rounded-xl overflow-hidden"
+  >
+    <!-- Header con leyenda -->
+    <div class="px-4 md:px-6 py-4 border-b border-white/10 bg-[#0d1117]/50">
       <div
-        class="p-6 border-b border-github-border flex items-center justify-between sticky top-0 bg-background-dark/90 backdrop-blur-md z-10"
+        class="flex flex-col md:flex-row md:items-center justify-between gap-2"
       >
-        <div class="flex flex-col">
-          <h2 class="text-white font-extrabold text-xl tracking-tight">
-            Detalle del Registro
-          </h2>
-          <p
-            class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1"
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+          Cronología de la Noche
+        </h3>
+        <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+          <div
+            class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
           >
-            Domingo, 24 de Noviembre, 2024
+            <span class="size-1.5 rounded-full bg-state-asleep"></span>
+            Sueño
+          </div>
+          <div
+            class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
+          >
+            <span class="size-1.5 rounded-full bg-state-inbed"></span>
+            Cama
+          </div>
+          <div
+            class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
+          >
+            <span class="size-1.5 rounded-full bg-state-awake"></span>
+            Fuera
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-4 md:p-6 space-y-4">
+      <!-- Timeline visual -->
+      <div
+        class="relative w-full h-8 md:h-10 bg-[#0d1117] rounded-xl border border-white/10 overflow-hidden flex shadow-inner"
+      >
+        <div
+          v-for="(interval, index) in timelineIntervals"
+          :key="index"
+          class="h-full transition-all duration-300 hover:opacity-90"
+          :class="getStateClass(interval.state)"
+          :style="{ width: getIntervalPercentage(interval) + '%' }"
+          :title="getIntervalTooltip(interval)"
+        ></div>
+      </div>
+
+      <!-- Intervalos detallados -->
+      <div
+        class="bg-[#0d1117]/50 rounded-lg border border-white/10 overflow-hidden"
+      >
+        <div class="grid grid-cols-1">
+          <div
+            v-for="(interval, index) in reg.intervals"
+            :key="index"
+            class="flex items-center justify-between p-3"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="size-2 rounded-full shrink-0"
+                :class="getStateClass(interval.state)"
+              ></span>
+              <span class="text-xs font-bold text-white w-24 md:w-auto">
+                {{ formatTime(interval.startTime) }} -
+                {{ formatTime(interval.endTime) }}
+              </span>
+              <span
+                class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter"
+              >
+                {{ getStateLabel(interval.state) }}
+              </span>
+            </div>
+            <span class="text-xs font-bold text-slate-400 shrink-0">
+              {{ formatDuration(interval.hours, interval.minutes) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="technical-card bg-card-dark border border-white/10 rounded-xl overflow-hidden"
+  >
+    <div class="px-4 md:px-6 py-4 border-b border-white/10 bg-[#0d1117]/50">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        Observaciones sobre la noche
+      </h3>
+    </div>
+
+    <div class="p-4 md:p-6 space-y-6">
+      <!-- Observaciones del paciente -->
+      <div v-if="reg.observaciones" class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-indigo-400 uppercase">
+            Paciente (Autorregistro)
+          </span>
+          <span class="text-[10px] text-slate-600">
+            {{ formatDateTime(reg.fecha) }}
+          </span>
+        </div>
+        <div
+          class="bg-[#0d1117]/50 border border-white/10 p-3 md:p-4 rounded-lg"
+        >
+          <p class="text-slate-300 text-sm leading-relaxed italic">
+            "{{ reg.observaciones }}"
           </p>
         </div>
-        <button
-          class="cursor-pointer size-10 flex items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/10"
-          @click="$emit('close')"
-        >
-          <span class="material-symbols-outlined">close</span>
-        </button>
       </div>
-      <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
-        <section class="space-y-6">
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-sm font-bold text-slate-400 uppercase tracking-widest"
-            >
-              Resumen de Noche
-            </h3>
-            <div
-              class="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-xs font-bold"
-            >
-              <span class="material-symbols-outlined text-sm!">verified</span>
-              Calidad Óptima
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white/5 rounded-xl p-4 border border-white/5">
-              <p
-                class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1"
-              >
-                Eficiencia
-              </p>
-              <p class="text-xl font-extrabold text-white">94%</p>
-            </div>
-            <div class="bg-white/5 rounded-xl p-4 border border-white/5">
-              <p
-                class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1"
-              >
-                Duración Total
-              </p>
-              <p class="text-xl font-extrabold text-white">8h 12m</p>
-            </div>
-          </div>
-          <div class="space-y-3">
-            <div
-              class="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider"
-            >
-              <span>22:15 PM (Inicio)</span>
-              <span>06:27 AM (Fin)</span>
-            </div>
-            <div class="w-full flex gap-1 items-stretch h-2">
-              <div
-                class="timeline-segment bg-primary w-[70%]"
-                title="Durmiendo (5h 45m)"
-              ></div>
-              <div
-                class="timeline-segment bg-amber-500 w-[10%]"
-                title="Despierto en cama (45m)"
-              ></div>
-              <div
-                class="timeline-segment bg-primary w-[15%]"
-                title="Durmiendo (1h 27m)"
-              ></div>
-              <div
-                class="timeline-segment bg-slate-700 w-[5%]"
-                title="Fuera de cama (15m)"
-              ></div>
-            </div>
-            <div class="flex flex-wrap gap-4 pt-1">
-              <div class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-primary"></span>
-                <span class="text-[10px] text-slate-400 font-medium"
-                  >Durmiendo</span
-                >
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-amber-500"></span>
-                <span class="text-[10px] text-slate-400 font-medium"
-                  >En cama (Despierto)</span
-                >
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="size-2 rounded-full bg-slate-700"></span>
-                <span class="text-[10px] text-slate-400 font-medium"
-                  >Fuera de cama</span
-                >
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="space-y-4">
-          <h3
-            class="text-sm font-bold text-slate-400 uppercase tracking-widest"
+
+      <!-- Observaciones técnicas existentes -->
+      <div v-if="reg.psicoComment" class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-primary uppercase"
+            >Psicologo (Feedback)</span
           >
-            Observaciones y Notas
-          </h3>
-          <div class="space-y-4">
-            <div class="flex gap-4">
-              <div
-                class="size-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5 overflow-hidden"
-              >
-                <img
-                  alt="Paciente"
-                  class="size-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcCASojTkYrVjh8XHvuZu_GDY2AztCPtku67lfoY4ehBbQ-NqhTa9dhp5R0aspG1zj4PLBNyMDHSqhm5dwY0p-RcVBE2fiCUgXN_L5iWx7nnt9mVaDVrju3G4yFx4JL7DbjVdm3v9IVu7yVi71DabvAg6tiImMD7cTjvyY82ODHkG0qYoDjnflaF7JoPAFKaafgZy1vVDBM_J546SG68VQ-26JX_Lw5b7q9ydRJorAaHoKA4KbObADC-4BEnTI8tpgW3mipt043CM"
-                />
-              </div>
-              <div class="flex-1 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-white"
-                    >Ana García
-                    <span class="text-[10px] text-slate-500 ml-1 font-normal"
-                      >(Paciente)</span
-                    ></span
-                  >
-                </div>
-                <div
-                  class="bg-github-dark border border-white/10 p-3 rounded-2xl rounded-tl-none text-sm text-slate-300 leading-relaxed"
-                >
-                  He dormido muy bien, pero me he despertado una vez por un
-                  ruido en la calle. Me costó volver a conciliar el sueño unos
-                  20 minutos.
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div
-                class="size-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20"
-              >
-                <span class="material-symbols-outlined text-primary text-lg!"
-                  >psychology</span
-                >
-              </div>
-              <div class="flex-1 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-primary"
-                    >Dr. Analista
-                    <span class="text-[10px] text-slate-500 ml-1 font-normal"
-                      >(Psicólogo)</span
-                    ></span
-                  >
-                </div>
-                <div
-                  class="bg-primary/5 border border-primary/20 p-3 rounded-2xl rounded-tl-none text-sm text-slate-300 leading-relaxed"
-                >
-                  Se observa una fragmentación mínima. La eficiencia del 94% es
-                  excelente. Mantendremos las pautas de higiene de sueño
-                  actuales. No se requiere ajuste en la medicación por ahora.
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4">
-            <div class="relative">
-              <textarea
-                class="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 text-sm text-white placeholder:text-slate-600 resize-none min-h-24"
-                placeholder="Añadir una observación clínica..."
-              ></textarea>
+          <span class="text-[10px] text-slate-600">
+            {{ formatDateTime(reg.fecha) }}
+          </span>
+        </div>
+        <div
+          class="bg-[#0d1117]/50 border border-[#58a6ff]/20 p-3 md:p-4 rounded-lg"
+        >
+          <p class="text-slate-300 text-sm leading-relaxed">
+            {{ reg.psicoComment }}
+          </p>
+        </div>
+        <div class="pt-2 border-t border-white/10">
+          <button
+            @click="editObservation"
+            class="text-xs text-primary hover:text-primary font-medium flex items-center gap-1 transition-colors duration-200"
+          >
+            <span class="material-symbols-outlined text-sm!">edit</span>
+            Editar comentario
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulario para añadir/editar observaciones -->
+      <div v-if="showObservationForm" class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-primary uppercase">
+            {{ reg.psicoComment ? 'Editar Nota' : 'Añadir Nota Técnica' }}
+          </span>
+          <span class="text-[10px] text-slate-600">Ahora</span>
+        </div>
+        <div
+          class="bg-[#0d1117]/50 border border-[#58a6ff]/20 p-3 md:p-4 rounded-lg"
+        >
+          <textarea
+            v-model="newObservation"
+            class="w-full bg-transparent border-none text-white text-sm focus:ring-0 min-h-[100px] md:min-h-[120px] resize-none placeholder:text-slate-600 focus:outline-none focus:shadow-[0_0_0_2px_rgba(88,166,255,0.1)]"
+            :placeholder="
+              reg.psicoComment
+                ? 'Editar observaciones técnicas...'
+                : 'Añadir observaciones técnicas sobre la arquitectura del sueño...'
+            "
+            @keydown.ctrl.enter="saveObservation"
+          ></textarea>
+          <div
+            class="flex flex-col md:flex-row justify-between items-center gap-2 pt-3 border-t border-white/10 mt-3"
+          >
+            <div class="flex items-center gap-2">
               <button
-                class="absolute cursor-pointer bottom-3 right-3 flex justify-center items-ceter bg-primary hover:bg-primary/90 text-white p-1 rounded-lg transition-all"
+                @click="cancelObservation"
+                class="px-3 py-1.5 text-xs text-slate-400 hover:text-white font-medium hover:bg-white/5 rounded-lg transition-colors duration-200"
               >
-                <span class="material-symbols-outlined">send</span>
+                Cancelar
+              </button>
+              <button
+                @click="saveObservation"
+                :disabled="!newObservation.trim()"
+                class="bg-[#238636] hover:bg-primary disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold px-4 py-2 rounded-lg text-xs transition-all duration-200 flex items-center gap-2 shadow-lg shadow-[#58a6ff]/10"
+              >
+                <span class="material-symbols-outlined text-sm!">save</span>
+                {{ reg.psicoComment ? 'Actualizar' : 'Guardar' }}
               </button>
             </div>
           </div>
-        </section>
+        </div>
+      </div>
+
+      <!-- Botón para mostrar formulario si no hay nota o está oculto -->
+      <div
+        v-if="!reg.psicoComment && !showObservationForm"
+        class="pt-4 border-t border-white/10"
+      >
+        <button
+          @click="addObservation"
+          class="w-full md:w-auto bg-[#58a6ff]/10 hover:bg-[#58a6ff]/20 border border-[#58a6ff]/30 text-[#58a6ff] hover:text-blue-300 font-bold px-4 py-3 rounded-lg text-xs transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <span class="material-symbols-outlined text-sm!">add_comment</span>
+          Añadir comentario
+        </button>
       </div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
+  import { computed, ref } from 'vue'
+  import { SleepState, type Interval, type Reg } from '@/types/regEdit.types'
+  import { getStateClass } from '@/views/UserEditReg/utils/css.util'
+
   // Props
-  withDefaults(
-    defineProps<{
-      isOpen?: boolean
-    }>(),
-    {
-      isOpen: false,
-    }
-  )
+  interface Props {
+    reg: Reg
+  }
+
+  const props = defineProps<Props>()
 
   // Emits
-  defineEmits<{
-    close: []
+  const emit = defineEmits<{
+    'update:observations': [observations: string]
   }>()
+
+  // Estado local
+  const newObservation = ref(props.reg.psicoComment || '')
+  const showObservationForm = ref(props.reg.psicoComment !== undefined)
+
+  // Computed: Calcular duración total para porcentajes
+  const totalDuration = computed(() => {
+    return props.reg.intervals.reduce((total, interval) => {
+      return total + (interval.hours * 60 + interval.minutes)
+    }, 0)
+  })
+
+  // Computed: Preparar intervalos para la timeline
+  const timelineIntervals = computed(() => {
+    return props.reg.intervals.map(interval => ({
+      ...interval,
+      totalMinutes: interval.hours * 60 + interval.minutes,
+    }))
+  })
+
+  // Métodos
+  const getIntervalPercentage = (
+    interval: Interval & { totalMinutes?: number }
+  ) => {
+    const minutes =
+      interval.totalMinutes || interval.hours * 60 + interval.minutes
+    return totalDuration.value > 0 ? (minutes / totalDuration.value) * 100 : 0
+  }
+
+  const getStateLabel = (state: SleepState) => {
+    switch (state) {
+      case SleepState.ASLEEP:
+        return 'Dormido'
+      case SleepState.INBED:
+        return 'En Cama'
+      case SleepState.AWAKE:
+        return 'Fuera de cama'
+      default:
+        return 'Desconocido'
+    }
+  }
+
+  const getIntervalTooltip = (interval: Interval) => {
+    const state = getStateLabel(interval.state)
+    const duration = formatDuration(interval.hours, interval.minutes)
+    const timeRange = `${formatTime(interval.startTime)} - ${formatTime(interval.endTime)}`
+    return `${state}: ${duration} (${timeRange})`
+  }
+
+  const formatTime = (date: Date) => {
+    return new Date(date).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+  }
+
+  const formatDateTime = (date: Date) => {
+    return new Date(date).toLocaleString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+  }
+
+  const formatDuration = (hours: number, minutes: number) => {
+    if (hours === 0) {
+      return `${minutes}m`
+    } else if (minutes === 0) {
+      return `${hours}h`
+    } else {
+      return `${hours}h ${minutes}m`
+    }
+  }
+
+  const addObservation = () => {
+    showObservationForm.value = true
+    newObservation.value = props.reg.psicoComment || ''
+  }
+
+  const editObservation = () => {
+    showObservationForm.value = true
+    newObservation.value = props.reg.psicoComment || ''
+  }
+
+  const cancelObservation = () => {
+    showObservationForm.value = false
+    newObservation.value = props.reg.psicoComment || ''
+  }
+
+  const saveObservation = () => {
+    if (newObservation.value.trim()) {
+      emit('update:observations', newObservation.value)
+      showObservationForm.value = false
+    }
+  }
 </script>
-
-<style scoped>
-  /* Animación fade para overlay */
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.3s ease;
-  }
-
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
-
-  .fade-enter-to,
-  .fade-leave-from {
-    opacity: 1;
-  }
-
-  /* Animación slide para drawer */
-  .slide-enter-active,
-  .slide-leave-active {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .slide-enter-from,
-  .slide-leave-to {
-    transform: translateX(100%);
-  }
-
-  .slide-enter-to,
-  .slide-leave-from {
-    transform: translateX(0);
-  }
-
-  /* Estilos del drawer */
-  .timeline-segment {
-    height: 8px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-  }
-
-  .timeline-segment:hover {
-    transform: scaleY(1.3);
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-</style>

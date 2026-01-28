@@ -5,21 +5,17 @@
 
   import MetricCard from './components/MetricCard.vue'
   import DateMenu from './components/DateMenu.vue'
-  import SleepBarChart from '@/views/MiCuenta/components/SleepBarChart.vue'
-  import WeeklyTable from './components/WeeklyTable.vue'
   import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
-  import type { Reg } from '@/types/regEdit.types'
+  import { SleepState, type Reg } from '@/types/regEdit.types'
   import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
+  import { DashboardViews } from '@/types/dashboardP.types'
 
   const regs: Reg[] = []
 
   const sleepData = [
     { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
     { day: 'Mar', value: 420 }, // 7 horas
-    { day: 'Mié', value: 540 }, // 9 horas
-    { day: 'Jue', value: 390 }, // 6.5 horas
-    { day: 'Vie', value: 510 }, // 8.5 horas
     { day: 'Sáb', value: 600 }, // 10 horas
     { day: 'Dom', value: 540 }, // 9 horas
   ]
@@ -78,76 +74,103 @@
     },
   ]
   const sleepSegments = [
-    { value: 130, color: '#059669', label: 'Awake' }, // 5h 30m
-    { value: 180, color: '#d97706', label: 'inBed' }, // 3h
-    { value: 400, color: '#4f46e5', label: 'asleep' }, // h
+    { value: 100, color: '#059669', label: 'Awake' }, // 5h 30m
+    { value: 100, color: '#d97706', label: 'InBed' }, // 3h
+    { value: 132, color: '#4f46e5', label: 'Asleep' }, // h
   ]
-
-  const handleAnalyticsClick = () => {
-    console.log('Analytics clicked')
-    // Navegar a vista de análisis detallado
-  }
-
-  const handleSegmentClick = segment => {
-    console.log('Segment clicked:', segment)
-    // Mostrar detalles del segmento
-  }
 
   defineProps<{
     patient: Patient
   }>()
   defineEmits(['exit', 'edit'])
   const periodText = ref('18 — 24 NOV, 2024')
+  const selectedView = ref<DashboardViews>(DashboardViews.DIARIA)
 
-  const handleViewChange = (view: string) => {
+  const handleViewChange = (view: DashboardViews) => {
     console.log('Vista cambiada a:', view)
+    selectedView.value = view
     // Aquí puedes cambiar los datos según la vista
   }
 
   const openCalendar = () => {
     console.log('Abrir calendario')
   }
-  const handleShowReg = (index: number) => {
-    console.log(`viewing ${index}`)
-    showDetails.value = true
+
+  const mockReg: Reg = {
+    fecha: new Date('2024-01-20'),
+    bedtime: new Date('2024-01-19T23:00:00'),
+    wakeup: new Date('2024-01-20T07:15:00'),
+    intervals: [
+      {
+        state: SleepState.INBED,
+        hours: 0,
+        minutes: 15,
+        startTime: new Date('2024-01-19T23:00:00'),
+        endTime: new Date('2024-01-19T23:15:00'),
+      },
+      {
+        state: SleepState.ASLEEP,
+        hours: 3,
+        minutes: 45,
+        startTime: new Date('2024-01-19T23:15:00'),
+        endTime: new Date('2024-01-20T03:00:00'),
+      },
+      {
+        state: SleepState.AWAKE,
+        hours: 0,
+        minutes: 20,
+        startTime: new Date('2024-01-20T03:00:00'),
+        endTime: new Date('2024-01-20T03:20:00'),
+      },
+      {
+        state: SleepState.ASLEEP,
+        hours: 3,
+        minutes: 55,
+        startTime: new Date('2024-01-20T03:20:00'),
+        endTime: new Date('2024-01-20T07:15:00'),
+      },
+    ],
+    observaciones:
+      'Me costó un poco conciliar el sueño por el ruido de los vecinos, pero una vez dormida descansé bien hasta que me despertó una pesadilla a las 3 de la mañana. Después volví a dormirme rápido y me desperté sintiéndome bastante renovada.',
   }
-  const sleepRecords = [
+  const sleepRecords = ref([
     {
       date: new Date(2024, 10, 18), // 18 Nov 2024 (Lunes)
-      efficiency: 88,
       isLive: false,
+      isComplete: true, // Completado (sin punto)
     },
     {
       date: new Date(2024, 10, 19), // 19 Nov 2024 (Martes)
-      efficiency: 92,
       isLive: false,
+      isComplete: true, // Completado
     },
     {
       date: new Date(2024, 10, 20), // 20 Nov 2024 (Miércoles)
-      efficiency: 85,
       isLive: false,
+      isComplete: false, // INCOMPLETO (estilo diferente)
     },
     {
       date: new Date(2024, 10, 21), // 21 Nov 2024 (Jueves)
-      efficiency: 78,
       isLive: false,
+      isComplete: true,
     },
     {
       date: new Date(2024, 10, 22), // 22 Nov 2024 (Viernes)
-      efficiency: 95,
       isLive: false,
+      isComplete: false, // INCOMPLETO
     },
     {
       date: new Date(2024, 10, 23), // 23 Nov 2024 (Sábado)
-      efficiency: 82,
       isLive: false,
+      isComplete: true,
     },
     {
       date: new Date(2024, 10, 24), // 24 Nov 2024 (Domingo)
-      efficiency: 91,
-      isLive: true, // Registro en curso (hoy)
+      isLive: true, // Registro en curso (punto pulsante)
+      isComplete: false, // INCOMPLETO (pero hoy es especial)
     },
-  ]
+  ])
+
   // Datos de ejemplo para eficiencia
   const latencyHour = [
     { label: 'Lun', value: 2.2 },
@@ -208,190 +231,33 @@
         @view-change="handleViewChange"
         @calendar-click="openCalendar"
       />
-      <div class="grid md:grid-cols-2 gap-4">
-        <!-- <SleepBarChart
-          title="Latencia de Sueño"
-          subtitle="Tiempo que tarda en dormirse la primera vez"
-          :chart-data="latencyHour"
-          value-suffix="h"
-          gradient-type="blue"
-        /> -->
-
+      <div
+        v-if="selectedView != DashboardViews.DIARIA"
+        class="grid lg:grid-cols-2 gap-4"
+      >
         <DonutChart
           title="Distribución del Sueño"
           subtitle="Análisis semanal promedio"
           :segments="sleepSegments"
-          center-subtitle="Total Sueño"
-          @analytics-click="handleAnalyticsClick"
-          @segment-click="handleSegmentClick"
+          center-subtitle="Total Noche"
         />
         <SleepChart
           title="Tiempo Dormido"
           :chart-data="sleepData"
           :previous-period-data="previousWeekData"
-        ></SleepChart>
-      </div>
-
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          v-for="metric in metrics"
-          :key="metric.title"
-          :title="metric.title"
-          :value="metric.value"
-          :icon="metric.icon"
-          :trend="metric.trend"
         />
-      </div>
-      <div class="grid grid-cols-1 gap-4">
-        <!-- <WeeklyTable
-          class="xl:col-span-2"
-          :records="sleepRecords"
-          @view="handleShowReg"
-        /> -->
-        <div
-          class="bg-card-dark rounded-2xl border border-white/10 p-6 shadow-2xl"
-          id="099b34705735495d868a30d495db75b3"
-        >
-          <div class="flex items-center justify-between mb-8">
-            <div>
-              <h3 class="text-xl font-extrabold text-white tracking-tight">
-                Registros de Sueño
-              </h3>
-              <p class="text-xs text-slate-500 font-medium">
-                Historial dinámico de actividad semanal
-              </p>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2">
-                <span
-                  class="size-2 rounded-full border border-github-border border-dashed opacity-50"
-                ></span>
-                <span
-                  class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
-                  >Incompleto</span
-                >
-              </div>
-              <div class="flex items-center gap-2">
-                <span
-                  class="size-2 bg-primary rounded-full shadow-[0_0_8px_rgba(19,127,236,0.6)]"
-                ></span>
-                <span
-                  class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
-                  >Hoy</span
-                >
-              </div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
-                >Lun</span
-              >
-              <span class="text-xl font-extrabold text-white mt-0.5">18</span>
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
-                >Mar</span
-              >
-              <span class="text-xl font-extrabold text-white mt-0.5">19</span>
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-dashed border-github-border bg-white/[0.02] backdrop-blur-sm opacity-40 cursor-pointer hover:scale-105 hover:opacity-100 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-500 uppercase tracking-tighter group-hover:text-slate-300 transition-colors"
-                >Mié</span
-              >
-              <span class="text-xl font-extrabold text-slate-400 mt-0.5"
-                >20</span
-              >
-              <div
-                class="absolute top-3 right-4 size-1.5 bg-red-500 rounded-full dot-pulse"
-              ></div>
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
-                >Jue</span
-              >
-              <span class="text-xl font-extrabold text-white mt-0.5">21</span>
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-dashed border-github-border bg-white/[0.02] backdrop-blur-sm opacity-40 cursor-pointer hover:scale-105 hover:opacity-100 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-500 uppercase tracking-tighter group-hover:text-slate-300 transition-colors"
-                >Vie</span
-              >
-              <span class="text-xl font-extrabold text-slate-400 mt-0.5"
-                >22</span
-              >
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] border border-github-border bg-white/5 backdrop-blur-sm cursor-pointer hover:scale-105 hover:border-slate-400 transition-all duration-300 group shadow-sm"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-medium text-slate-400 uppercase tracking-tighter group-hover:text-slate-200 transition-colors"
-                >Sáb</span
-              >
-              <span class="text-xl font-extrabold text-white mt-0.5">23</span>
-            </label>
-            <label
-              class="relative flex flex-col items-center justify-center py-4 px-2 rounded-[24px] bg-gradient-to-br from-primary to-[#0e5db3] border border-white/10 pill-glow cursor-pointer hover:scale-105 transition-all duration-300 group shadow-2xl"
-              for="date-drawer-toggle"
-            >
-              <span
-                class="text-[10px] font-bold text-white/80 uppercase tracking-tighter"
-                >Dom</span
-              >
-              <span class="text-xl font-extrabold text-white mt-0.5">24</span>
-              <div
-                class="absolute top-3 right-4 size-1.5 bg-white/80 rounded-full dot-pulse"
-              ></div>
-            </label>
-          </div>
-          <div
-            class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between"
-          >
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-slate-500 text-sm"
-                >event_note</span
-              >
-              <p
-                class="text-[10px] text-slate-500 font-bold uppercase tracking-widest"
-              >
-                Semana 47 · Noviembre 2024
-              </p>
-            </div>
-            <button
-              class="text-[10px] font-extrabold text-primary hover:text-blue-400 uppercase tracking-widest transition-colors flex items-center gap-1"
-            >
-              <span>Calendario Completo</span>
-              <span class="material-symbols-outlined !text-xs"
-                >arrow_forward</span
-              >
-            </button>
-          </div>
+        <div class="grid grid-cols-2 lg:col-span-2 lg:grid-cols-4 gap-4">
+          <MetricCard
+            v-for="metric in metrics"
+            :key="metric.title"
+            :title="metric.title"
+            :value="metric.value"
+            :icon="metric.icon"
+            :trend="metric.trend"
+          />
         </div>
       </div>
+      <DetailSleep v-else :reg="mockReg" />
     </div>
-    <DetailSleep
-      :is-open="showDetails"
-      @close="showDetails = false"
-    ></DetailSleep>
   </section>
 </template>

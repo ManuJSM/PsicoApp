@@ -30,7 +30,7 @@
     bedtime: null,
     wakeup: null,
     intervals: [],
-    observaciones: '',
+    psicoComment: '',
   }
   provide<Reg>('registro', registro)
 
