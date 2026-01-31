@@ -7,12 +7,18 @@
   import DateMenu from './components/DateMenu.vue'
   import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
-  import { SleepState, type Reg } from '@/types/regEdit.types'
-  import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
+  import { type Reg } from '@/types/regEdit.types'
   import { DashboardViews } from '@/types/dashboardP.types'
+  import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
   import { mockReg } from './utils/mocks'
-
-  const regs: Reg[] = []
+  import DatePicker from './components/DatePicker.vue'
+  import {
+    formatDateRange,
+    formatDay,
+    getMonthRange,
+    getWeekRange,
+    type DateRange,
+  } from './utils/date.utils'
 
   const sleepData = [
     { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
@@ -30,7 +36,6 @@
     { day: 'Sáb', value: 520 },
     { day: 'Dom', value: 490 },
   ]
-  const showDetails = ref<boolean>(false)
 
   const metrics = [
     {
@@ -84,62 +89,85 @@
     patient: Patient
   }>()
   defineEmits(['exit', 'edit'])
+
   const selectedDate = ref<Date>(new Date())
   const periodText = computed<string>(() => {
-    const date = selectedDate.value
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
-    //TODO dependiendo de la vista mostrar diferente formato
-    return `${day}/${month}/${year}`
+    switch (selectedView.value) {
+      case DashboardViews.DIARIA:
+        return formatDay(selectedDate.value)
+      case DashboardViews.SEMANAL:
+        return formatDateRange(weekRange.value)
+      case DashboardViews.MENSUAL:
+        return formatDateRange(monthRange.value)
+    }
+    return formatDay(selectedDate.value)
   })
+
   const selectedView = ref<DashboardViews>(DashboardViews.DIARIA)
 
   const handleViewChange = (view: DashboardViews) => {
-    console.log('Vista cambiada a:', view)
     selectedView.value = view
   }
 
-  const openCalendar = () => {
-    console.log('Abrir calendario')
-  }
-  const dayReg = ref<Reg>(mockReg)
-  const weekReg = ref<Reg[]>([])
-  const monthReg = ref<Reg[]>([])
-  const loading = ref(false)
-
-  watch(
-    [selectedView, selectedDate],
-    async ([v, selectedDate]: [DashboardViews, Date]) => {
-      if (v === DashboardViews.DIARIA && !dayReg.value) {
-        loading.value = true
-        try {
-          // dayReg.value = await fetchDay()
-        } finally {
-          loading.value = false
-        }
-      }
-
-      if (v === DashboardViews.SEMANAL && weekReg.value.length === 0) {
-        loading.value = true
-        try {
-          // weekReg.value = await fetchWeek()
-        } finally {
-          loading.value = false
-        }
-      }
-
-      if (v === DashboardViews.MENSUAL && monthReg.value.length === 0) {
-        loading.value = true
-        try {
-          // monthReg.value = await fetchMonth()
-        } finally {
-          loading.value = false
-        }
-      }
-    },
-    { immediate: true }
+  const isOpenCalendar = ref(false)
+  const dayReg = ref<Reg | null>(mockReg)
+  // const weekReg = ref<Reg[]>([])
+  // const monthReg = ref<Reg[]>([])
+  // const loading = ref(false)
+  const weekRange = computed<DateRange>(() => getWeekRange(selectedDate.value))
+  const monthRange = computed<DateRange>(() =>
+    getMonthRange(selectedDate.value)
   )
+
+  // watch(
+  //   selectedView,
+  //   async v => {
+  //     loading.value = true
+  //     try {
+  //       if (v === DashboardViews.DIARIA && dayReg.value === null) {
+  //         // dayReg.value = await fetchDay(selectedDate.value)
+  //       }
+  //       if (v === DashboardViews.SEMANAL && weekReg.value.length === 0) {
+  //         // statRegs.value = await fetchWeek(selectedDate.value)
+  //       }
+  //       if (v === DashboardViews.MENSUAL && monthReg.value.length === 0) {
+  //         // statRegs.value = await fetchMonth(selectedDate.value)
+  //       }
+  //     } finally {
+  //       loading.value = false
+  //     }
+  //   },
+  //   { immediate: true }
+  // )
+
+  // watch(selectedDate, async () => {
+  //   dayReg.value = null
+  //   weekReg.value = []
+  //   monthReg.value = []
+
+  //   loading.value = true
+  //   try {
+  //     switch (selectedView.value) {
+  //       case DashboardViews.DIARIA:
+  //         // dayReg.value = await fetchDay(selectedDate.value)
+  //         break
+  //       case DashboardViews.SEMANAL:
+  //         // statRegs.value = await fetchWeek(selectedDate.value)
+  //         break
+  //       case DashboardViews.MENSUAL:
+  //         // statRegs.value = await fetchMonth(selectedDate.value)
+  //         break
+  //     }
+  //   } finally {
+  //     loading.value = false
+  //   }
+  // })
+
+  const maxDate = new Date(2023, 11, 11)
+
+  const handleRangeSelected = (day: Date) => {
+    selectedDate.value = day
+  }
 </script>
 <template>
   <section
@@ -147,7 +175,7 @@
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
     <div class="p-6 space-y-6 overflow-y-auto">
-      <div class="flex flex-wrap items-center gap-4 justify-between">
+      <div class="md:hidden flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0"
@@ -188,7 +216,7 @@
       <DateMenu
         :period-text="periodText"
         @view-change="handleViewChange"
-        @calendar-click="openCalendar"
+        @calendar-click="isOpenCalendar = true"
       />
       <div
         v-if="selectedView != DashboardViews.DIARIA"
@@ -216,7 +244,18 @@
           />
         </div>
       </div>
-      <DetailSleep v-else :reg="dayReg" />
+      <DetailSleep
+        v-if="dayReg !== null && selectedView === DashboardViews.DIARIA"
+        :reg="dayReg"
+      />
+      <DatePicker
+        :is-open="isOpenCalendar"
+        :view-type="selectedView"
+        :min-date="maxDate"
+        :selected-date="selectedDate"
+        @close="isOpenCalendar = false"
+        @date-selected="handleRangeSelected"
+      />
     </div>
   </section>
 </template>

@@ -12,7 +12,7 @@
           >Periodo Seleccionado</span
         >
         <span
-          class="text-sm font-bold text-white group-hover:text-primary transition-colors"
+          class="text-sm self-center font-bold text-white group-hover:text-primary transition-colors"
           >{{ periodText }}</span
         >
       </div>

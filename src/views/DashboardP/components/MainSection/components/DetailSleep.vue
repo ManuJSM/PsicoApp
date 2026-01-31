@@ -11,7 +11,7 @@
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">
           Cronología de la Noche
         </h3>
-        <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+        <div class="flex items-baseline gap-3 md:gap-5">
           <div
             class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
           >
