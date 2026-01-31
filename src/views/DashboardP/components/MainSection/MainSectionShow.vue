@@ -163,7 +163,7 @@
   //   }
   // })
 
-  const maxDate = new Date(2023, 11, 11)
+  const maxDate = new Date(2021, 11, 11)
 
   const handleRangeSelected = (day: Date) => {
     selectedDate.value = day

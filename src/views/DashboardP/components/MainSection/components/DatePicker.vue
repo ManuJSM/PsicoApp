@@ -47,7 +47,7 @@
         class="px-6 py-4 bg-github-dark/50 flex items-center gap-2 overflow-x-auto"
       >
         <button
-          v-for="year in allYears"
+          v-for="year in loadedYears"
           :key="year"
           :class="[
             'px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
@@ -68,9 +68,19 @@
         ref="scrollContainerRef"
         @scroll="handleScroll"
       >
-        <div class="flex flex-col-reverse">
+        <!-- Spinner de carga inicial -->
+        <div
+          v-if="loadingInitial"
+          class="flex items-center justify-center h-full"
+        >
           <div
-            v-for="month in allMonths"
+            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+          ></div>
+        </div>
+
+        <div v-else class="flex flex-col">
+          <div
+            v-for="month in loadedMonths"
             :key="`${month.year}-${month.month}`"
             class="p-6 space-y-4"
             :ref="el => addMonthRef(el as HTMLElement, month)"
@@ -185,6 +195,13 @@
               </div>
             </div>
           </div>
+
+          <!-- Spinner al final cuando está cargando más -->
+          <div v-if="loadingMore" class="p-6 flex justify-center">
+            <div
+              class="animate-spin rounded-full h-6 w-6 border-t-2 border-primary"
+            ></div>
+          </div>
         </div>
       </div>
 
@@ -204,15 +221,8 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch, nextTick } from 'vue'
-
-  // Enums
-  enum DashboardViews {
-    DIARIA = 'Vista Diaria',
-    SEMANAL = 'Vista Semanal',
-    MENSUAL = 'Vista Mensual',
-    ANUAL = 'Vista Anual',
-  }
+  import { ref, watch, nextTick } from 'vue'
+  import { DashboardViews } from '@/types/dashboardP.types'
 
   // Interfaces
   interface DayInfo {
@@ -265,40 +275,20 @@
   const scrollContainerRef = ref<HTMLElement | null>(null)
   const monthRefs = ref<Map<string, HTMLElement>>(new Map())
   const selectedYear = ref<number>(today.getFullYear())
+  const loadingInitial = ref(false)
+  const loadingMore = ref(false)
 
-  // Computed
-  const allYears = computed<number[]>(() => {
-    const maxYear = today.getFullYear()
-    const minYear = props.minDate.getFullYear()
-    const years: number[] = []
-    for (let year = maxYear; year >= minYear; year--) {
-      years.push(year)
-    }
-    return years
-  })
-
-  const allMonths = computed<MonthData[]>(() => {
-    const months: MonthData[] = []
-    const startYear = props.minDate.getFullYear()
-    const endYear = today.getFullYear()
-
-    for (let year = endYear; year >= startYear; year--) {
-      const startMonth = year === startYear ? props.minDate.getMonth() : 0
-      const endMonth = year === endYear ? today.getMonth() : 11
-
-      for (let month = endMonth; month >= startMonth; month--) {
-        const monthData = generateMonthData(year, month)
-        if (monthData) {
-          months.push(monthData)
-        }
-      }
-    }
-
-    return months
-  })
+  // Datos cargados
+  const loadedMonths = ref<MonthData[]>([])
+  const loadedYears = ref<number[]>([])
+  const allYears = ref<number[]>([])
 
   // Métodos principales
   const closeDrawer = () => {
+    // Limpiar todo al cerrar
+    loadedMonths.value = []
+    loadedYears.value = []
+    monthRefs.value.clear()
     emit('close')
   }
 
@@ -309,29 +299,54 @@
     }
   }
 
-  const scrollToYear = (year: number) => {
+  const scrollToYear = async (year: number) => {
     selectedYear.value = year
-    const monthIndex = allMonths.value.findIndex(m => m.year === year)
-    if (monthIndex !== -1) {
-      const month = allMonths.value[monthIndex] as MonthData
-      const element = monthRefs.value.get(`${month.year}-${month.month}`)
-      if (element && scrollContainerRef.value) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+    // Si el año ya está cargado, scrolleamos
+    if (loadedYears.value.includes(year)) {
+      const monthIndex = loadedMonths.value.findIndex(m => m.year === year)
+      if (monthIndex !== -1) {
+        const month = loadedMonths.value[monthIndex] as MonthData
+        const element = monthRefs.value.get(`${month.year}-${month.month}`)
+        if (element && scrollContainerRef.value) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
       }
+      return
     }
+
+    // Si no está cargado, lo cargamos
+    loadingMore.value = true
+    await loadYearMonths(year)
+    loadingMore.value = false
+
+    // Scroll al año
+    nextTick(() => {
+      const monthIndex = loadedMonths.value.findIndex(m => m.year === year)
+      if (monthIndex !== -1) {
+        const month = loadedMonths.value[monthIndex] as MonthData
+        const element = monthRefs.value.get(`${month.year}-${month.month}`)
+        if (element && scrollContainerRef.value) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+    })
   }
 
-  const handleScroll = () => {
-    if (!scrollContainerRef.value) return
+  const handleScroll = async () => {
+    if (!scrollContainerRef.value || loadingMore.value || loadingInitial.value)
+      return
 
     const container = scrollContainerRef.value
     const scrollTop = container.scrollTop
-    const containerHeight = container.clientHeight
+    const scrollHeight = container.scrollHeight
+    const clientHeight = container.clientHeight
 
+    // Detectar año actualmente visible
     let mostVisibleMonth: MonthData | null = null
     let maxVisibility = 0
 
-    for (const month of allMonths.value) {
+    for (const month of loadedMonths.value) {
       const element = monthRefs.value.get(`${month.year}-${month.month}`)
       if (element) {
         const rect = element.getBoundingClientRect()
@@ -341,10 +356,7 @@
         const elementBottom = elementTop + rect.height
 
         const visibleTop = Math.max(scrollTop, elementTop)
-        const visibleBottom = Math.min(
-          scrollTop + containerHeight,
-          elementBottom
-        )
+        const visibleBottom = Math.min(scrollTop + clientHeight, elementBottom)
         const visibleHeight = Math.max(0, visibleBottom - visibleTop)
         const visibility = visibleHeight / rect.height
 
@@ -357,6 +369,101 @@
 
     if (mostVisibleMonth && mostVisibleMonth.year !== selectedYear.value) {
       selectedYear.value = mostVisibleMonth.year
+    }
+
+    // VERIFICACIÓN MEJORADA: Cargar más meses cuando estamos cerca del final
+    const scrollBottom = scrollTop + clientHeight
+    const distanceFromBottom = scrollHeight - scrollBottom
+
+    // Si estamos en el último 20% del contenido, cargar más
+    if (distanceFromBottom < clientHeight * 0.2) {
+      await loadMoreMonths()
+    }
+  }
+
+  // Cargar todos los años disponibles (solo para el selector)
+  async function loadAllYears() {
+    const maxYear = today.getFullYear()
+    const minYear = props.minDate.getFullYear()
+    const years: number[] = []
+
+    // Orden descendente
+    for (let year = maxYear; year >= minYear; year--) {
+      years.push(year)
+    }
+
+    allYears.value = years
+  }
+
+  // Cargar meses de un año específico
+  async function loadYearMonths(year: number) {
+    // Si ya está cargado, salir
+    if (loadedYears.value.includes(year)) return
+
+    const months: MonthData[] = []
+    const startMonth =
+      year === props.minDate.getFullYear() ? props.minDate.getMonth() : 0
+    const endMonth = year === today.getFullYear() ? today.getMonth() : 11
+
+    // Orden descendente dentro del año
+    for (let month = endMonth; month >= startMonth; month--) {
+      const monthData = await generateMonthData(year, month)
+      if (monthData) {
+        months.push(monthData)
+      }
+    }
+
+    // Insertar en la posición correcta (orden descendente)
+    const insertIndex = loadedMonths.value.findIndex(m => m.year < year)
+
+    if (insertIndex === -1) {
+      // Añadir al final
+      loadedMonths.value.push(...months)
+    } else {
+      // Insertar antes del primer año menor
+      loadedMonths.value.splice(insertIndex, 0, ...months)
+    }
+
+    // Añadir año a la lista de años cargados
+    if (!loadedYears.value.includes(year)) {
+      loadedYears.value.push(year)
+      loadedYears.value.sort((a, b) => b - a) // Orden descendente
+    }
+  }
+
+  // Cargar más meses (años anteriores) - VERSIÓN MEJORADA
+  async function loadMoreMonths() {
+    if (loadingMore.value) return
+
+    // Encontrar el año más antiguo cargado
+    if (loadedYears.value.length === 0) return
+
+    const oldestLoadedYear = Math.min(...loadedYears.value)
+    const minYear = props.minDate.getFullYear()
+
+    // Si aún quedan años por cargar
+    if (oldestLoadedYear > minYear) {
+      loadingMore.value = true
+
+      // Cargar el año anterior
+      await loadYearMonths(oldestLoadedYear - 1)
+
+      // Si todavía tenemos poco contenido, cargar otro año más
+      if (scrollContainerRef.value) {
+        const container = scrollContainerRef.value
+        const scrollHeight = container.scrollHeight
+        const clientHeight = container.clientHeight
+
+        // Si el contenido es menos de 2 veces la altura del viewport, cargar otro año
+        if (scrollHeight < clientHeight * 2) {
+          const newOldestYear = Math.min(...loadedYears.value)
+          if (newOldestYear > minYear) {
+            await loadYearMonths(newOldestYear - 1)
+          }
+        }
+      }
+
+      loadingMore.value = false
     }
   }
 
@@ -406,7 +513,10 @@
     return week[2] || week[0] || (week[week.length - 1] as DayInfo)
   }
 
-  const generateMonthData = (year: number, month: number): MonthData | null => {
+  const generateMonthData = async (
+    year: number,
+    month: number
+  ): Promise<MonthData | null> => {
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
 
@@ -416,7 +526,7 @@
 
     if (!isInRange) return null
 
-    const weeks = generateCalendarWeeks(year, month)
+    const weeks = await generateCalendarWeeks(year, month)
     return {
       year,
       month,
@@ -424,7 +534,10 @@
     }
   }
 
-  const generateCalendarWeeks = (year: number, month: number): Week[] => {
+  const generateCalendarWeeks = async (
+    year: number,
+    month: number
+  ): Promise<Week[]> => {
     const weeks: Week[] = []
     const firstDay = new Date(year, month, 1)
     let lastDay = new Date(year, month + 1, 0)
@@ -608,18 +721,36 @@
 
     if (element && scrollContainerRef.value) {
       nextTick(() => {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 100)
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
       })
     }
   }
 
-  // Inicialización
-  const initialize = () => {
-    const targetDate = new Date(props.selectedDate)
-    selectedYear.value = targetDate.getFullYear()
+  // Inicialización - Carga el año del selectedDate y uno más para tener contenido
+  const initialize = async () => {
+    loadingInitial.value = true
 
+    // Limpiar todo
+    loadedMonths.value = []
+    loadedYears.value = []
+    monthRefs.value.clear()
+
+    // Cargar lista de años para el selector
+    await loadAllYears()
+
+    // Cargar el año del selectedDate
+    selectedYear.value = props.selectedDate.getFullYear()
+    await loadYearMonths(selectedYear.value)
+
+    // Cargar también el año anterior para tener más contenido inicial
+    const minYear = props.minDate.getFullYear()
+    if (selectedYear.value > minYear) {
+      await loadYearMonths(selectedYear.value - 1)
+    }
+
+    loadingInitial.value = false
+
+    // Scroll al mes seleccionado
     nextTick(() => {
       scrollToSelectedMonth()
     })
@@ -628,9 +759,14 @@
   // Watchers
   watch(
     () => props.isOpen,
-    newVal => {
+    async newVal => {
       if (newVal) {
-        initialize()
+        await initialize()
+      } else {
+        // Limpiar al cerrar
+        loadedMonths.value = []
+        loadedYears.value = []
+        monthRefs.value.clear()
       }
     }
   )
@@ -639,7 +775,7 @@
     () => props.selectedDate,
     () => {
       if (props.isOpen) {
-        initialize()
+        scrollToSelectedMonth()
       }
     }
   )
