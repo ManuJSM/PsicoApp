@@ -38,12 +38,12 @@
     <div class="p-4 md:p-6 space-y-4">
       <!-- Timeline visual -->
       <div
-        class="relative w-full h-8 md:h-10 bg-[#0d1117] rounded-xl border border-white/10 overflow-hidden flex shadow-inner"
+        class="relative w-full h-5 md:h-5 rounded-xl border border-white/10 overflow-hidden flex"
       >
         <div
           v-for="(interval, index) in timelineIntervals"
           :key="index"
-          class="h-full transition-all duration-300 hover:opacity-90"
+          class="h-full"
           :class="getStateClass(interval.state)"
           :style="{ width: getIntervalPercentage(interval) + '%' }"
           :title="getIntervalTooltip(interval)"

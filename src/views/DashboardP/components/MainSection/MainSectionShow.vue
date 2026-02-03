@@ -175,7 +175,7 @@
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
     <div class="p-6 space-y-6 overflow-y-auto">
-      <div class="md:hidden flex flex-wrap items-center gap-4 justify-between">
+      <div class="flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0"
@@ -250,7 +250,6 @@
       />
       <DatePicker
         :is-open="isOpenCalendar"
-        :view-type="selectedView"
         :min-date="maxDate"
         :selected-date="selectedDate"
         @close="isOpenCalendar = false"

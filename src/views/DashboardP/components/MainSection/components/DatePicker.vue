@@ -30,7 +30,7 @@
           <p
             class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1"
           >
-            {{ getViewTypeLabel() }}
+            {{ viewType }}
           </p>
         </div>
         <button
@@ -44,14 +44,14 @@
 
       <!-- Year Selector -->
       <div
-        class="px-6 py-4 bg-github-dark/50 flex items-center gap-2 overflow-x-auto"
+        class="px-6 py-4 bg-github-dark/50 flex items-center gap-2 overflow-x-auto sticky top-[96px] z-10"
       >
         <button
-          v-for="year in loadedYears"
+          v-for="year in availableYears"
           :key="year"
           :class="[
             'px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
-            selectedYear === year
+            currentYear === year
               ? 'bg-primary text-white shadow-lg shadow-primary/20'
               : 'text-slate-500 border border-github-border hover:border-slate-500 hover:text-white',
           ]"
@@ -65,49 +65,44 @@
       <!-- Calendar Content -->
       <div
         class="flex-1 overflow-y-auto custom-scrollbar"
-        ref="scrollContainerRef"
-        @scroll="handleScroll"
+        ref="scrollContainer"
       >
-        <!-- Spinner de carga inicial -->
-        <div
-          v-if="loadingInitial"
-          class="flex items-center justify-center h-full"
-        >
+        <!-- Todos los años -->
+        <div v-for="year in availableYears" :key="year" class="p-6">
+          <!-- Header del año -->
           <div
-            class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
-          ></div>
-        </div>
+            class="flex items-center justify-between border-b border-slate-400 pb-2 mb-4"
+            :id="`year-${year}`"
+          >
+            <h3 class="text-white font-bold text-lg">{{ year }}</h3>
+            <span
+              class="text-xs text-slate-500 font-bold uppercase tracking-widest"
+            >
+              {{ getMonthsCount(year) }} meses
+            </span>
+          </div>
 
-        <div v-else class="flex flex-col">
+          <!-- Todos los meses del año (en orden descendente: diciembre a enero) -->
           <div
-            v-for="month in loadedMonths"
-            :key="`${month.year}-${month.month}`"
-            class="p-6 space-y-4"
-            :ref="el => addMonthRef(el as HTMLElement, month)"
+            v-for="month in getMonthsForYear(year)"
+            :key="`${year}-${month.index}`"
+            class="mb-8"
           >
             <!-- Header del mes -->
             <div
-              class="flex items-center justify-between border-b border-slate-400 pb-2"
+              class="flex items-center justify-between border-b border-slate-400/50 pb-2 mb-3"
             >
-              <div class="flex items-center gap-3">
-                <h3 class="text-white font-bold text-base">
-                  {{ getMonthName(month.month) }}
-                </h3>
-                <!-- Indicador de mes actual -->
-                <span
-                  v-if="isCurrentMonth(month)"
-                  class="text-sm border border-primary/50 shadow-[inset_0_0_15px_rgba(19,127,236,0.1)] px-2 bg-primary/10 rounded-lg text-primary font-bold"
-                  >ACTUAL</span
-                >
-              </div>
+              <h4 class="text-white font-bold text-sm">
+                {{ getMonthName(month.index) }}
+              </h4>
               <span
                 class="text-xs text-slate-500 font-bold uppercase tracking-widest"
               >
-                {{ month.year }}
+                {{ month.daysCount }} días
               </span>
             </div>
 
-            <!-- Days of week header -->
+            <!-- Días de la semana -->
             <div
               class="mini-calendar-grid text-[9px] text-slate-600 font-extrabold uppercase text-center mb-1"
             >
@@ -115,92 +110,57 @@
               ><span>V</span><span>S</span><span>D</span>
             </div>
 
-            <!-- Calendar weeks - ESTILOS SEPARADOS POR VISTA -->
-            <div
-              :class="[
-                'space-y-1',
-                // VISTA MENSUAL: Todo el contenedor del mes con fondo cuando está seleccionado
-                viewType === DashboardViews.MENSUAL && isMonthSelected(month)
-                  ? 'bg-primary/10 border border-primary/50 rounded-lg p-2'
-                  : '',
-                // VISTA MENSUAL: Hover en TODO el contenedor del mes cuando NO está seleccionado
-                viewType === DashboardViews.MENSUAL && !isMonthSelected(month)
-                  ? 'cursor-pointer hover:bg-white/5 rounded-lg p-2'
-                  : '',
-              ]"
-              @click="
-                viewType === DashboardViews.MENSUAL
-                  ? handleWeekOrMonthClick(month.weeks[0] as Week)
-                  : null
-              "
-            >
+            <!-- CALENDARIO DEL MES -->
+            <div class="space-y-1">
               <div
                 v-for="(week, weekIndex) in month.weeks"
                 :key="weekIndex"
-                :class="[
-                  'mini-calendar-grid',
-                  // VISTA DIARIA: Solo días individuales
-                  viewType === DashboardViews.DIARIA ? 'p-1' : '',
-                  // VISTA SEMANAL: Click en semanas completas
-                  viewType === DashboardViews.SEMANAL
-                    ? 'p-2 cursor-pointer hover:bg-white/5 rounded-lg'
-                    : '',
-                  // VISTA MENSUAL: NO hover en semanas individuales - todo el mes es un solo elemento clickable
-                  viewType === DashboardViews.MENSUAL ? 'p-1' : '',
-                  // Semana seleccionada en vista semanal
-                  viewType === DashboardViews.SEMANAL && isWeekSelected(week)
-                    ? 'bg-primary/10 border border-primary/50 shadow-[inset_0_0_15px_rgba(19,127,236,0.1)]'
-                    : '',
-                ]"
-                @click="
-                  viewType === DashboardViews.SEMANAL
-                    ? handleWeekOrMonthClick(week)
-                    : null
-                "
+                class="mini-calendar-grid"
               >
-                <!-- Días de la semana -->
                 <div
                   v-for="day in week"
-                  :key="`${day.year}-${day.month}-${day.day}`"
+                  :key="`${day.year}-${day.month}-${day.date}`"
                   :class="[
                     'flex items-center justify-center min-h-8 transition-all relative',
-                    day.month !== month.month
-                      ? 'text-slate-500 opacity-60'
+                    day.month !== month.index
+                      ? 'text-slate-500 opacity-40'
                       : 'text-slate-200',
-                    // VISTA DIARIA
-                    viewType === DashboardViews.DIARIA && isDaySelected(day)
-                      ? 'bg-primary/10 border border-primary/50 shadow-[inset_0_0_15px_rgba(19,127,236,0.1)] text-primary font-bold rounded-lg'
-                      : viewType === DashboardViews.DIARIA
-                        ? 'cursor-pointer hover:bg-white/10 rounded-lg'
-                        : '',
-                    // VISTA SEMANAL
-                    viewType === DashboardViews.SEMANAL &&
-                    isDayInSelectedWeek(day)
-                      ? 'text-primary font-bold'
-                      : '',
-                    // VISTA MENSUAL - texto azul para todos los días del mes seleccionado
-                    viewType === DashboardViews.MENSUAL &&
-                    isDayInSelectedMonth(day)
-                      ? 'text-primary'
-                      : '',
-                    // Día actual (todas las vistas)
-                    isToday(day) ? 'text-white bg-primary/30 rounded-full' : '',
+                    isToday(day)
+                      ? 'bg-blue-500/20 border border-blue-500 text-white font-bold'
+                      : isDaySelected(day)
+                        ? 'bg-primary/20 border border-primary/70 text-white font-bold'
+                        : hasRegistro(day)
+                          ? 'cursor-pointer hover:bg-white/10'
+                          : isDayClickable(day)
+                            ? 'cursor-pointer hover:bg-white/5 opacity-60'
+                            : 'opacity-30',
+                    hasRegistro(day) && !isToday(day) && !isDaySelected(day)
+                      ? 'rounded-full bg-state-asleep'
+                      : 'rounded-lg',
                   ]"
-                  @click.stop="handleDayClick(day)"
+                  @click="isDayClickable(day) ? handleDayClick(day) : null"
                 >
                   <span class="font-medium z-10 relative">
-                    {{ day.day }}
+                    {{ day.date }}
                   </span>
+
+                  <!-- NOTIFICACIÓN ROJA -->
+                  <div
+                    v-if="hasNotification(day)"
+                    class="absolute top-0 right-0"
+                  >
+                    <div
+                      class="size-2 rounded-full bg-red-500 animate-pulse"
+                    ></div>
+                  </div>
+
+                  <!-- INDICADOR DE HOY -->
+                  <div v-if="isToday(day)" class="absolute -top-1 -right-1">
+                    <div class="size-3 rounded-full bg-blue-500"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Spinner al final cuando está cargando más -->
-          <div v-if="loadingMore" class="p-6 flex justify-center">
-            <div
-              class="animate-spin rounded-full h-6 w-6 border-t-2 border-primary"
-            ></div>
           </div>
         </div>
       </div>
@@ -209,11 +169,11 @@
       <div class="p-6 border-t border-github-border bg-github-dark/50">
         <button
           class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-3.5 rounded-xl border border-github-border transition-all flex items-center justify-center gap-2"
-          @click="selectCurrentPeriod"
+          @click="selectToday"
           type="button"
         >
           <span class="material-symbols-outlined text-sm!">history</span>
-          {{ getCurrentPeriodButtonText() }}
+          Seleccionar Hoy
         </button>
       </div>
     </div>
@@ -221,253 +181,267 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, nextTick } from 'vue'
-  import { DashboardViews } from '@/types/dashboardP.types'
+  import { ref, computed, onMounted, nextTick, watch } from 'vue'
+  import { mockRegCalendar } from '../utils/mocks'
 
-  // Interfaces
-  interface DayInfo {
-    year: number
-    month: number
-    day: number
-    date: Date
-  }
-
-  type Week = DayInfo[]
-  type ViewType = DashboardViews
-
-  interface MonthData {
-    year: number
-    month: number
-    weeks: Week[]
-  }
-
-  // Props
-  interface Props {
+  const props = defineProps<{
     isOpen: boolean
-    viewType?: ViewType
-    minDate?: Date
+    viewType?: string
     selectedDate?: Date
-  }
+  }>()
 
-  // Fecha de hoy
-  const today = new Date()
-  today.setHours(23, 59, 59, 999)
-
-  const props = withDefaults(defineProps<Props>(), {
-    isOpen: false,
-    viewType: DashboardViews.DIARIA,
-    minDate: () => {
-      const date = new Date()
-      date.setFullYear(date.getFullYear() - 1)
-      date.setHours(0, 0, 0, 0)
-      return date
-    },
-    selectedDate: () => new Date(),
-  })
-
-  // Emits
   const emit = defineEmits<{
     close: []
     'date-selected': [date: Date]
   }>()
 
-  // Refs
-  const scrollContainerRef = ref<HTMLElement | null>(null)
-  const monthRefs = ref<Map<string, HTMLElement>>(new Map())
-  const selectedYear = ref<number>(today.getFullYear())
-  const loadingInitial = ref(false)
-  const loadingMore = ref(false)
+  // Estado
+  const currentYear = ref(new Date().getFullYear())
+  const today = new Date()
+  const todayYear = today.getFullYear()
+  const todayMonth = today.getMonth()
+  const todayDate = today.getDate()
+  const scrollContainer = ref<HTMLElement>()
 
-  // Datos cargados
-  const loadedMonths = ref<MonthData[]>([])
-  const loadedYears = ref<number[]>([])
-  const allYears = ref<number[]>([])
+  // Usar los datos reales del mock
+  const registros = computed(() => {
+    return mockRegCalendar || []
+  })
 
-  // Métodos principales
-  const closeDrawer = () => {
-    // Limpiar todo al cerrar
-    loadedMonths.value = []
-    loadedYears.value = []
-    monthRefs.value.clear()
-    emit('close')
-  }
+  // Años disponibles en los datos
+  const availableYears = computed(() => {
+    const yearsSet = new Set<number>()
 
-  // Métodos de referencia y scroll
-  const addMonthRef = (el: HTMLElement | null, month: MonthData) => {
-    if (el) {
-      monthRefs.value.set(`${month.year}-${month.month}`, el)
+    // Añadir años de los registros
+    registros.value.forEach(reg => {
+      const year = parseInt(reg.fecha.split('-')[0])
+      yearsSet.add(year)
+    })
+
+    // Asegurarnos que el año actual esté incluido
+    yearsSet.add(todayYear)
+
+    // Si hay una fecha seleccionada, asegurarnos que su año está incluido
+    if (props.selectedDate) {
+      const selectedYear = props.selectedDate.getFullYear()
+      yearsSet.add(selectedYear)
     }
-  }
 
-  const scrollToYear = async (year: number) => {
-    selectedYear.value = year
+    // Ordenar de más reciente a más antiguo
+    return Array.from(yearsSet).sort((a, b) => b - a)
+  })
 
-    // Si el año ya está cargado, scrolleamos
-    if (loadedYears.value.includes(year)) {
-      const monthIndex = loadedMonths.value.findIndex(m => m.year === year)
-      if (monthIndex !== -1) {
-        const month = loadedMonths.value[monthIndex] as MonthData
-        const element = monthRefs.value.get(`${month.year}-${month.month}`)
-        if (element && scrollContainerRef.value) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
+  // Obtener meses de un año que tienen registros
+  const getMonthsForYear = (year: number) => {
+    const monthsMap = new Map<number, any>()
+
+    // Obtener todos los registros del año
+    const yearRegistros = registros.value.filter(reg => {
+      const regYear = parseInt(reg.fecha.split('-')[0])
+      return regYear === year
+    })
+
+    // Agrupar por mes
+    yearRegistros.forEach(reg => {
+      const [regYear, regMonth, regDate] = reg.fecha.split('-').map(Number)
+      const monthIndex = regMonth - 1 // Convertir a índice 0-based
+
+      if (!monthsMap.has(monthIndex)) {
+        monthsMap.set(monthIndex, {
+          index: monthIndex,
+          days: new Set<number>(),
+          weeks: [],
+        })
       }
-      return
+
+      const monthData = monthsMap.get(monthIndex)
+      monthData.days.add(regDate)
+    })
+
+    // SI ES EL AÑO ACTUAL, AÑADIR EL MES ACTUAL AUNQUE NO TENGA REGISTROS
+    if (year === todayYear) {
+      if (!monthsMap.has(todayMonth)) {
+        monthsMap.set(todayMonth, {
+          index: todayMonth,
+          days: new Set<number>(),
+          weeks: [],
+        })
+      }
     }
 
-    // Si no está cargado, lo cargamos
-    loadingMore.value = true
-    await loadYearMonths(year)
-    loadingMore.value = false
+    // Convertir a array y ordenar de más reciente a más antiguo
+    const monthsArray = Array.from(monthsMap.values()).sort(
+      (a, b) => b.index - a.index
+    )
 
-    // Scroll al año
+    // Para cada mes, generar el calendario y contar días
+    monthsArray.forEach(month => {
+      // Determinar hasta qué día mostrar
+      let lastDay = new Date(year, month.index + 1, 0).getDate()
+
+      // Si es el año y mes actual, limitar al día de hoy
+      if (year === todayYear && month.index === todayMonth) {
+        lastDay = todayDate
+      }
+
+      // Generar semanas del mes
+      month.weeks = generateWeeksForMonth(year, month.index, lastDay)
+      month.daysCount = month.days.size
+
+      // Si es el mes actual pero sin registros, daysCount será 0
+      if (
+        month.daysCount === 0 &&
+        year === todayYear &&
+        month.index === todayMonth
+      ) {
+        month.daysCount = 1 // Al menos el día de hoy es clicable
+      }
+    })
+
+    return monthsArray
+  }
+
+  // Contar meses con registros en un año
+  const getMonthsCount = (year: number) => {
+    const monthsSet = new Set<number>()
+    registros.value.forEach(reg => {
+      const [regYear, regMonth] = reg.fecha.split('-').map(Number)
+      if (regYear === year) {
+        monthsSet.add(regMonth)
+      }
+    })
+
+    // Si es el año actual, contar el mes actual aunque no tenga registros
+    if (year === todayYear) {
+      monthsSet.add(todayMonth + 1) // +1 porque en el mock es 1-based
+    }
+
+    return monthsSet.size
+  }
+
+  // Generar semanas de un mes
+  const generateWeeksForMonth = (
+    year: number,
+    month: number,
+    lastDay: number
+  ) => {
+    const weeks = []
+
+    // Primer día del mes
+    const firstDay = new Date(year, month, 1)
+
+    // Último día a mostrar
+    const effectiveLastDay = Math.min(
+      lastDay,
+      new Date(year, month + 1, 0).getDate()
+    )
+
+    // Ir al primer lunes antes del primer día del mes
+    let currentDate = new Date(firstDay)
+    while (currentDate.getDay() !== 1) {
+      // 1 = Lunes
+      currentDate.setDate(currentDate.getDate() - 1)
+    }
+
+    const lastDate = new Date(year, month, effectiveLastDay)
+
+    // Generar semanas
+    while (currentDate <= lastDate) {
+      const week = []
+
+      for (let i = 0; i < 7; i++) {
+        const dateObj = new Date(currentDate)
+        week.push({
+          year: dateObj.getFullYear(),
+          month: dateObj.getMonth(),
+          date: dateObj.getDate(),
+          dateObj: dateObj,
+        })
+        currentDate.setDate(currentDate.getDate() + 1)
+      }
+
+      // Solo añadir semanas que tengan días del mes actual
+      const hasDaysInMonth = week.some(
+        day => day.year === year && day.month === month
+      )
+      if (hasDaysInMonth) {
+        weeks.push(week)
+      }
+    }
+
+    return weeks
+  }
+
+  // Verificar si un día tiene registro
+  const hasRegistro = (day: { year: number; month: number; date: number }) => {
+    const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+    return registros.value.some(reg => reg.fecha === dateStr)
+  }
+
+  // Verificar si es hoy
+  const isToday = (day: { year: number; month: number; date: number }) => {
+    return (
+      day.year === todayYear &&
+      day.month === todayMonth &&
+      day.date === todayDate
+    )
+  }
+
+  // Verificar si un día es clicable
+  const isDayClickable = (day: {
+    year: number
+    month: number
+    date: number
+  }) => {
+    // Es clicable si tiene registro o si es hoy
+    return hasRegistro(day) || isToday(day)
+  }
+
+  // Verificar si tiene notificación
+  const hasNotification = (day: {
+    year: number
+    month: number
+    date: number
+  }) => {
+    const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+    const registro = registros.value.find(reg => reg.fecha === dateStr)
+    return registro?.notification || false
+  }
+
+  // Scroll a un año específico
+  const scrollToYear = (year: number) => {
+    currentYear.value = year
+
     nextTick(() => {
-      const monthIndex = loadedMonths.value.findIndex(m => m.year === year)
-      if (monthIndex !== -1) {
-        const month = loadedMonths.value[monthIndex] as MonthData
-        const element = monthRefs.value.get(`${month.year}-${month.month}`)
-        if (element && scrollContainerRef.value) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
+      const element = document.getElementById(`year-${year}`)
+      if (element && scrollContainer.value) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
     })
   }
 
-  const handleScroll = async () => {
-    if (!scrollContainerRef.value || loadingMore.value || loadingInitial.value)
+  // Scroll a la fecha seleccionada
+  const scrollToSelectedDate = () => {
+    if (!props.selectedDate) {
+      // Si no hay fecha seleccionada, scrollear al año actual
+      scrollToYear(todayYear)
       return
+    }
 
-    const container = scrollContainerRef.value
-    const scrollTop = container.scrollTop
-    const scrollHeight = container.scrollHeight
-    const clientHeight = container.clientHeight
+    const selectedYear = props.selectedDate.getFullYear()
+    const selectedMonth = props.selectedDate.getMonth()
 
-    // Detectar año actualmente visible
-    let mostVisibleMonth: MonthData | null = null
-    let maxVisibility = 0
+    currentYear.value = selectedYear
 
-    for (const month of loadedMonths.value) {
-      const element = monthRefs.value.get(`${month.year}-${month.month}`)
-      if (element) {
-        const rect = element.getBoundingClientRect()
-        const containerRect = container.getBoundingClientRect()
-
-        const elementTop = rect.top - containerRect.top + scrollTop
-        const elementBottom = elementTop + rect.height
-
-        const visibleTop = Math.max(scrollTop, elementTop)
-        const visibleBottom = Math.min(scrollTop + clientHeight, elementBottom)
-        const visibleHeight = Math.max(0, visibleBottom - visibleTop)
-        const visibility = visibleHeight / rect.height
-
-        if (visibility > maxVisibility) {
-          maxVisibility = visibility
-          mostVisibleMonth = month
-        }
+    nextTick(() => {
+      const yearElement = document.getElementById(`year-${selectedYear}`)
+      if (yearElement && scrollContainer.value) {
+        yearElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
-    }
-
-    if (mostVisibleMonth && mostVisibleMonth.year !== selectedYear.value) {
-      selectedYear.value = mostVisibleMonth.year
-    }
-
-    // VERIFICACIÓN MEJORADA: Cargar más meses cuando estamos cerca del final
-    const scrollBottom = scrollTop + clientHeight
-    const distanceFromBottom = scrollHeight - scrollBottom
-
-    // Si estamos en el último 20% del contenido, cargar más
-    if (distanceFromBottom < clientHeight * 0.2) {
-      await loadMoreMonths()
-    }
+    })
   }
 
-  // Cargar todos los años disponibles (solo para el selector)
-  async function loadAllYears() {
-    const maxYear = today.getFullYear()
-    const minYear = props.minDate.getFullYear()
-    const years: number[] = []
-
-    // Orden descendente
-    for (let year = maxYear; year >= minYear; year--) {
-      years.push(year)
-    }
-
-    allYears.value = years
-  }
-
-  // Cargar meses de un año específico
-  async function loadYearMonths(year: number) {
-    // Si ya está cargado, salir
-    if (loadedYears.value.includes(year)) return
-
-    const months: MonthData[] = []
-    const startMonth =
-      year === props.minDate.getFullYear() ? props.minDate.getMonth() : 0
-    const endMonth = year === today.getFullYear() ? today.getMonth() : 11
-
-    // Orden descendente dentro del año
-    for (let month = endMonth; month >= startMonth; month--) {
-      const monthData = await generateMonthData(year, month)
-      if (monthData) {
-        months.push(monthData)
-      }
-    }
-
-    // Insertar en la posición correcta (orden descendente)
-    const insertIndex = loadedMonths.value.findIndex(m => m.year < year)
-
-    if (insertIndex === -1) {
-      // Añadir al final
-      loadedMonths.value.push(...months)
-    } else {
-      // Insertar antes del primer año menor
-      loadedMonths.value.splice(insertIndex, 0, ...months)
-    }
-
-    // Añadir año a la lista de años cargados
-    if (!loadedYears.value.includes(year)) {
-      loadedYears.value.push(year)
-      loadedYears.value.sort((a, b) => b - a) // Orden descendente
-    }
-  }
-
-  // Cargar más meses (años anteriores) - VERSIÓN MEJORADA
-  async function loadMoreMonths() {
-    if (loadingMore.value) return
-
-    // Encontrar el año más antiguo cargado
-    if (loadedYears.value.length === 0) return
-
-    const oldestLoadedYear = Math.min(...loadedYears.value)
-    const minYear = props.minDate.getFullYear()
-
-    // Si aún quedan años por cargar
-    if (oldestLoadedYear > minYear) {
-      loadingMore.value = true
-
-      // Cargar el año anterior
-      await loadYearMonths(oldestLoadedYear - 1)
-
-      // Si todavía tenemos poco contenido, cargar otro año más
-      if (scrollContainerRef.value) {
-        const container = scrollContainerRef.value
-        const scrollHeight = container.scrollHeight
-        const clientHeight = container.clientHeight
-
-        // Si el contenido es menos de 2 veces la altura del viewport, cargar otro año
-        if (scrollHeight < clientHeight * 2) {
-          const newOldestYear = Math.min(...loadedYears.value)
-          if (newOldestYear > minYear) {
-            await loadYearMonths(newOldestYear - 1)
-          }
-        }
-      }
-
-      loadingMore.value = false
-    }
-  }
-
-  // Métodos de utilidad
+  // Métodos auxiliares
   const getMonthName = (monthIndex: number): string => {
     const months = [
       'Enero',
@@ -483,299 +457,53 @@
       'Noviembre',
       'Diciembre',
     ]
-    return months[monthIndex] as string
+    return months[monthIndex]
   }
 
-  const getWeekFromDate = (date: Date): Week => {
-    const week: DayInfo[] = []
-    const dayOfWeek = date.getDay()
-
-    const monday = new Date(date)
-    const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)
-    monday.setDate(diff)
-
-    for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(monday)
-      currentDate.setDate(monday.getDate() + i)
-
-      week.push({
-        year: currentDate.getFullYear(),
-        month: currentDate.getMonth(),
-        day: currentDate.getDate(),
-        date: currentDate,
-      })
-    }
-
-    return week
-  }
-
-  const getWeekMiddleDay = (week: Week): DayInfo => {
-    return week[2] || week[0] || (week[week.length - 1] as DayInfo)
-  }
-
-  const generateMonthData = async (
-    year: number,
+  const isDaySelected = (day: {
+    year: number
     month: number
-  ): Promise<MonthData | null> => {
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-
-    const monthEnd = lastDay > today ? new Date(today) : lastDay
-
-    const isInRange = firstDay <= today && monthEnd >= props.minDate
-
-    if (!isInRange) return null
-
-    const weeks = await generateCalendarWeeks(year, month)
-    return {
-      year,
-      month,
-      weeks,
-    }
-  }
-
-  const generateCalendarWeeks = async (
-    year: number,
-    month: number
-  ): Promise<Week[]> => {
-    const weeks: Week[] = []
-    const firstDay = new Date(year, month, 1)
-    let lastDay = new Date(year, month + 1, 0)
-
-    if (lastDay > today) {
-      lastDay = new Date(today)
-    }
-
-    const adjustedFirstDay =
-      firstDay < props.minDate ? new Date(props.minDate) : firstDay
-
-    if (adjustedFirstDay > lastDay) return weeks
-
-    let currentDate = new Date(adjustedFirstDay)
-    while (currentDate.getDay() !== 1 && currentDate <= lastDay) {
-      currentDate.setDate(currentDate.getDate() + 1)
-    }
-
-    if (currentDate > lastDay) {
-      currentDate = new Date(adjustedFirstDay)
-    }
-
-    while (currentDate.getDay() !== 1 && currentDate >= adjustedFirstDay) {
-      currentDate.setDate(currentDate.getDate() - 1)
-    }
-
-    while (currentDate <= lastDay) {
-      const weekDays: DayInfo[] = []
-
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(currentDate)
-
-        weekDays.push({
-          year: date.getFullYear(),
-          month: date.getMonth(),
-          day: date.getDate(),
-          date: date,
-        })
-
-        currentDate.setDate(currentDate.getDate() + 1)
-      }
-
-      const hasCurrentMonthInRange = weekDays.some(
-        day =>
-          day.year === year &&
-          day.month === month &&
-          day.date >= adjustedFirstDay &&
-          day.date <= lastDay
-      )
-
-      if (hasCurrentMonthInRange) {
-        weeks.push(weekDays)
-      }
-    }
-
-    return weeks
-  }
-
-  // Métodos de selección y verificación
-  const isDaySelected = (day: DayInfo): boolean => {
+    date: number
+  }) => {
     if (!props.selectedDate) return false
-
-    const date = new Date(day.year, day.month, day.day)
-    date.setHours(0, 0, 0, 0)
-
-    const selectedDate = new Date(props.selectedDate)
-    selectedDate.setHours(0, 0, 0, 0)
-
-    return date.getTime() === selectedDate.getTime()
-  }
-
-  const isDayInSelectedWeek = (day: DayInfo): boolean => {
-    if (!props.selectedDate) return false
-
-    const selectedWeek = getWeekFromDate(new Date(props.selectedDate))
-    return selectedWeek.some(
-      d => d.year === day.year && d.month === day.month && d.day === day.day
-    )
-  }
-
-  const isDayInSelectedMonth = (day: DayInfo): boolean => {
-    if (!props.selectedDate) return false
-
-    const selectedDate = new Date(props.selectedDate)
+    const selected = new Date(props.selectedDate)
     return (
-      day.year === selectedDate.getFullYear() &&
-      day.month === selectedDate.getMonth()
+      day.year === selected.getFullYear() &&
+      day.month === selected.getMonth() &&
+      day.date === selected.getDate()
     )
   }
 
-  const isWeekSelected = (week: Week): boolean => {
-    if (!props.selectedDate) return false
-
-    const selectedDate = new Date(props.selectedDate)
-    selectedDate.setHours(0, 0, 0, 0)
-
-    const selectedWeek = getWeekFromDate(selectedDate)
-    const selectedWeekStart = selectedWeek[0]?.date
-    if (!selectedWeekStart) return false
-
-    const weekStart = week[0]?.date
-    if (!weekStart) return false
-
-    const selectedStart = new Date(selectedWeekStart)
-    selectedStart.setHours(0, 0, 0, 0)
-
-    const thisStart = new Date(weekStart)
-    thisStart.setHours(0, 0, 0, 0)
-
-    return selectedStart.getTime() === thisStart.getTime()
-  }
-
-  const isMonthSelected = (month: MonthData): boolean => {
-    if (!props.selectedDate) return false
-
-    const selectedDate = new Date(props.selectedDate)
-    selectedDate.setHours(0, 0, 0, 0)
-
-    return (
-      selectedDate.getMonth() === month.month &&
-      selectedDate.getFullYear() === month.year
-    )
-  }
-
-  const isCurrentMonth = (month: MonthData): boolean => {
-    return (
-      month.year === today.getFullYear() && month.month === today.getMonth()
-    )
-  }
-
-  const isToday = (day: DayInfo): boolean => {
-    return (
-      day.year === today.getFullYear() &&
-      day.month === today.getMonth() &&
-      day.day === today.getDate()
-    )
-  }
-
-  // Handlers de click
-  const handleDayClick = (day: DayInfo): void => {
-    emit('date-selected', new Date(day.date))
+  const handleDayClick = (day: { dateObj: Date }) => {
+    emit('date-selected', new Date(day.dateObj))
     closeDrawer()
   }
 
-  const handleWeekOrMonthClick = (week: Week): void => {
-    const day = getWeekMiddleDay(week)
-    emit('date-selected', new Date(day.date))
+  const selectToday = () => {
+    emit('date-selected', new Date())
     closeDrawer()
   }
 
-  const selectCurrentPeriod = (): void => {
-    const todayDate = new Date(today)
-    todayDate.setHours(0, 0, 0, 0)
-    emit('date-selected', todayDate)
-    closeDrawer()
+  const closeDrawer = () => {
+    currentYear.value = todayYear
+    emit('close')
   }
 
-  const getViewTypeLabel = (): string => {
-    return props.viewType || DashboardViews.DIARIA
-  }
-
-  const getCurrentPeriodButtonText = (): string => {
-    switch (props.viewType) {
-      case DashboardViews.DIARIA:
-        return 'Seleccionar Hoy'
-      case DashboardViews.SEMANAL:
-        return 'Seleccionar Esta Semana'
-      case DashboardViews.MENSUAL:
-        return 'Seleccionar Este Mes'
-      default:
-        return 'Seleccionar Periodo Actual'
+  // Inicializar
+  onMounted(() => {
+    if (props.selectedDate) {
+      currentYear.value = props.selectedDate.getFullYear()
     }
-  }
+  })
 
-  const scrollToSelectedMonth = () => {
-    const targetDate = new Date(props.selectedDate)
-    const targetYear = targetDate.getFullYear()
-    const targetMonth = targetDate.getMonth()
-
-    const element = monthRefs.value.get(`${targetYear}-${targetMonth}`)
-
-    if (element && scrollContainerRef.value) {
-      nextTick(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      })
-    }
-  }
-
-  // Inicialización - Carga el año del selectedDate y uno más para tener contenido
-  const initialize = async () => {
-    loadingInitial.value = true
-
-    // Limpiar todo
-    loadedMonths.value = []
-    loadedYears.value = []
-    monthRefs.value.clear()
-
-    // Cargar lista de años para el selector
-    await loadAllYears()
-
-    // Cargar el año del selectedDate
-    selectedYear.value = props.selectedDate.getFullYear()
-    await loadYearMonths(selectedYear.value)
-
-    // Cargar también el año anterior para tener más contenido inicial
-    const minYear = props.minDate.getFullYear()
-    if (selectedYear.value > minYear) {
-      await loadYearMonths(selectedYear.value - 1)
-    }
-
-    loadingInitial.value = false
-
-    // Scroll al mes seleccionado
-    nextTick(() => {
-      scrollToSelectedMonth()
-    })
-  }
-
-  // Watchers
+  // Cuando se abre el drawer, scrollear a la fecha seleccionada
   watch(
     () => props.isOpen,
-    async newVal => {
-      if (newVal) {
-        await initialize()
-      } else {
-        // Limpiar al cerrar
-        loadedMonths.value = []
-        loadedYears.value = []
-        monthRefs.value.clear()
-      }
-    }
-  )
-
-  watch(
-    () => props.selectedDate,
-    () => {
-      if (props.isOpen) {
-        scrollToSelectedMonth()
+    isOpen => {
+      if (isOpen) {
+        nextTick(() => {
+          setTimeout(scrollToSelectedDate, 100)
+        })
       }
     }
   )
@@ -804,5 +532,49 @@
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
+  }
+
+  /* Color para registros */
+  .bg-state-asleep {
+    background-color: #10b981 !important;
+    color: white !important;
+  }
+
+  /* Animación de notificación */
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse {
+    animation: pulse 1s infinite;
+  }
+
+  /* Estilo para día seleccionado */
+  .bg-primary\/20 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+  }
+
+  .border-primary\/70 {
+    border-color: rgba(59, 130, 246, 0.7) !important;
+  }
+
+  /* Estilo para hoy */
+  .bg-blue-500\/20 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+  }
+
+  .border-blue-500 {
+    border-color: rgb(59, 130, 246) !important;
+  }
+
+  /* Estilo para header sticky */
+  .sticky {
+    position: sticky;
   }
 </style>
