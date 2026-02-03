@@ -42,26 +42,6 @@
         </button>
       </div>
 
-      <!-- Year Selector -->
-      <div
-        class="px-6 py-4 bg-github-dark/50 flex items-center gap-2 overflow-x-auto sticky top-[96px] z-10"
-      >
-        <button
-          v-for="year in availableYears"
-          :key="year"
-          :class="[
-            'px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap',
-            currentYear === year
-              ? 'bg-primary text-white shadow-lg shadow-primary/20'
-              : 'text-slate-500 border border-github-border hover:border-slate-500 hover:text-white',
-          ]"
-          @click="scrollToYear(year)"
-          type="button"
-        >
-          {{ year }}
-        </button>
-      </div>
-
       <!-- Calendar Content -->
       <div
         class="flex-1 overflow-y-auto custom-scrollbar"
@@ -121,10 +101,8 @@
                   v-for="day in week"
                   :key="`${day.year}-${day.month}-${day.date}`"
                   :class="[
-                    'flex items-center justify-center min-h-8 transition-all relative',
-                    day.month !== month.index
-                      ? 'text-slate-500 opacity-40'
-                      : 'text-slate-200',
+                    'flex text-slate-200 items-center justify-center min-h-8 transition-all relative',
+
                     isToday(day)
                       ? 'bg-blue-500/20 border border-blue-500 text-white font-bold'
                       : isDaySelected(day)
@@ -181,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, nextTick, watch } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { mockRegCalendar } from '../utils/mocks'
 
   const props = defineProps<{
@@ -408,37 +386,17 @@
     return registro?.notification || false
   }
 
-  // Scroll a un año específico
+  // Scroll a un año específico - SIMPLE Y FUNCIONAL
   const scrollToYear = (year: number) => {
     currentYear.value = year
 
-    nextTick(() => {
-      const element = document.getElementById(`year-${year}`)
-      if (element && scrollContainer.value) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    })
-  }
-
-  // Scroll a la fecha seleccionada
-  const scrollToSelectedDate = () => {
-    if (!props.selectedDate) {
-      // Si no hay fecha seleccionada, scrollear al año actual
-      scrollToYear(todayYear)
-      return
+    const element = document.getElementById(`year-${year}`)
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
     }
-
-    const selectedYear = props.selectedDate.getFullYear()
-    const selectedMonth = props.selectedDate.getMonth()
-
-    currentYear.value = selectedYear
-
-    nextTick(() => {
-      const yearElement = document.getElementById(`year-${selectedYear}`)
-      if (yearElement && scrollContainer.value) {
-        yearElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    })
   }
 
   // Métodos auxiliares
@@ -457,7 +415,7 @@
       'Noviembre',
       'Diciembre',
     ]
-    return months[monthIndex]
+    return months[monthIndex] as string
   }
 
   const isDaySelected = (day: {
@@ -495,18 +453,6 @@
       currentYear.value = props.selectedDate.getFullYear()
     }
   })
-
-  // Cuando se abre el drawer, scrollear a la fecha seleccionada
-  watch(
-    () => props.isOpen,
-    isOpen => {
-      if (isOpen) {
-        nextTick(() => {
-          setTimeout(scrollToSelectedDate, 100)
-        })
-      }
-    }
-  )
 </script>
 
 <style scoped>
@@ -534,12 +480,6 @@
     border-radius: 3px;
   }
 
-  /* Color para registros */
-  .bg-state-asleep {
-    background-color: #10b981 !important;
-    color: white !important;
-  }
-
   /* Animación de notificación */
   @keyframes pulse {
     0%,
@@ -553,28 +493,5 @@
 
   .animate-pulse {
     animation: pulse 1s infinite;
-  }
-
-  /* Estilo para día seleccionado */
-  .bg-primary\/20 {
-    background-color: rgba(59, 130, 246, 0.2) !important;
-  }
-
-  .border-primary\/70 {
-    border-color: rgba(59, 130, 246, 0.7) !important;
-  }
-
-  /* Estilo para hoy */
-  .bg-blue-500\/20 {
-    background-color: rgba(59, 130, 246, 0.2) !important;
-  }
-
-  .border-blue-500 {
-    border-color: rgb(59, 130, 246) !important;
-  }
-
-  /* Estilo para header sticky */
-  .sticky {
-    position: sticky;
   }
 </style>
