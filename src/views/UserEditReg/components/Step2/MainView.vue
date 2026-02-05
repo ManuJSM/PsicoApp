@@ -401,12 +401,16 @@
   import { ref, computed, inject } from 'vue'
   import { getStateClass, getStateIcon } from '../../utils/css.util'
   import InstructionsPanel from '../InstructionsPanel.vue'
-  import { SleepState, type Interval, type Reg } from '@/types/regEdit.types'
+  import {
+    SleepState,
+    type Interval,
+    type SleepReg,
+  } from '@/types/sleepReg.types'
   import {
     formatDuration,
     formatTime,
   } from '@/views/UserEditReg/utils/time.util'
-  const registro = inject('registro') as Reg
+  const registro = inject('registro') as SleepReg
 
   const emits = defineEmits(['back', 'next'])
 

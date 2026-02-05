@@ -1,4 +1,4 @@
-import type { SleepState } from '@/types/regEdit.types'
+import type { SleepState } from '@/types/sleepReg.types'
 const sleepStateConfig = {
   asleep: {
     class: 'bg-state-asleep',

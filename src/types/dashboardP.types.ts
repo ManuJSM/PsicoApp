@@ -4,3 +4,8 @@ export enum DashboardViews {
   MENSUAL = 'Vista Mensual',
   ANUAL = 'Vista Anual',
 }
+
+export type RegCalendar = {
+  fecha: string
+  notification: boolean
+}

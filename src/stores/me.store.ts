@@ -1,4 +1,4 @@
-import { fetchWithAuth } from '@/api/fetchAuth'
+import { httpAuth } from '@/api/http/httpAuth'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { type User } from '@/types/types'
@@ -9,7 +9,7 @@ export const useMeStore = defineStore('me', () => {
 
   async function fetchMe() {
     if (loaded.value) return
-    me.value = await fetchWithAuth<User>('/me')
+    me.value = await httpAuth<User>('/me')
     loaded.value = true
   }
 

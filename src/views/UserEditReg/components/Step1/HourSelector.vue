@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import type { TimeValue } from '@/types/regEdit.types'
+  import type { TimeValue } from '@/types/sleepReg.types'
 
   const ITEM_HEIGHT = 48
   const HOURS: number[] = Array.from({ length: 12 }, (_, i) => i + 1) // 1-12

@@ -9,7 +9,7 @@
       <div class="flex flex-col items-start leading-none">
         <span
           class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest mb-0.5"
-          >Periodo Seleccionado</span
+          >Fecha Seleccionada</span
         >
         <span
           class="text-sm self-center font-bold text-white group-hover:text-primary transition-colors"

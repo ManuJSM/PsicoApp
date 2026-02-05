@@ -2,10 +2,10 @@
   import { ref, computed } from 'vue'
   import InstructionsPanel from '../InstructionsPanel.vue'
   import HourSelector from './HourSelector.vue'
-  import type { TimeValue } from '@/types/regEdit.types'
-  import type { Reg } from '@/types/regEdit.types'
+  import type { TimeValue } from '@/types/sleepReg.types'
+  import type { SleepReg } from '@/types/sleepReg.types'
   import { inject } from 'vue'
-  const registro = inject('registro') as Reg
+  const registro = inject('registro') as SleepReg
 
   const emits = defineEmits(['next'])
   const instruccionesTimePicker = [

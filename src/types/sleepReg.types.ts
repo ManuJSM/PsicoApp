@@ -16,11 +16,28 @@ export type Interval = {
   startTime: Date
   endTime: Date
 }
-export interface Reg {
+
+export interface SleepReg {
   fecha: Date
   bedtime: Date | null
   wakeup: Date | null
   intervals: Interval[]
+  observaciones: string
+  psicoComment?: string
+}
+
+export type IntervalDto = {
+  state: string
+  hours: string
+  minutes: string
+  startTime: string
+  endTime: string
+}
+export interface SleepRegDto {
+  fecha: string
+  bedtime: string
+  wakeup: string
+  intervals: IntervalDto[]
   observaciones: string
   psicoComment?: string
 }

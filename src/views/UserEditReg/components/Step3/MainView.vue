@@ -154,7 +154,11 @@
 
 <script setup lang="ts">
   import { ref, computed, inject } from 'vue'
-  import { SleepState, type Interval, type Reg } from '@/types/regEdit.types'
+  import {
+    SleepState,
+    type Interval,
+    type SleepReg,
+  } from '@/types/sleepReg.types'
   import { getIntervalWidth } from '@/views/UserEditReg/utils/bar.util'
   import { getStateClass } from '@/views/UserEditReg/utils/css.util'
   import {
@@ -166,7 +170,7 @@
     formatDuration,
   } from '@/views/UserEditReg/utils/time.util'
 
-  const registro = inject('registro') as Reg
+  const registro = inject('registro') as SleepReg
   const emits = defineEmits(['back', 'save'])
 
   const intervals = ref<Interval[]>(registro.intervals)

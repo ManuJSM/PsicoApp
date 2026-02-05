@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { Reg } from '@/types/regEdit.types'
+  import type { SleepReg } from '@/types/sleepReg.types'
   import Step1 from './components/Step1/MainView.vue'
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
@@ -25,14 +25,14 @@
   //FIXME se pasara por prop
   const fecha = new Date()
 
-  const registro: Reg = {
+  const registro: SleepReg = {
     fecha: fecha,
     bedtime: null,
     wakeup: null,
     intervals: [],
     psicoComment: '',
   }
-  provide<Reg>('registro', registro)
+  provide<SleepReg>('registro', registro)
 
   const saveReg = () => {
     router.back()

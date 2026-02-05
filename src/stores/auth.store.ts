@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { loginAPI, refresh } from '@/api/http.auth'
+import { loginAPI, refresh } from '@/api/auth/auth.api'
 import { AuthenticationError } from '@/types/errors.types'
 import { ref } from 'vue'
 import { Role } from '@/types/types'

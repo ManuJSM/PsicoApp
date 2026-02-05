@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import { AuthorizationError, AuthenticationError } from '@/types/errors.types'
 import { useAuthStore } from '@/stores/auth.store'
 
-export async function fetchWithAuth<T>(
+export async function httpAuth<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {

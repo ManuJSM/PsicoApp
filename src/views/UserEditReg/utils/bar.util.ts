@@ -1,5 +1,5 @@
 // Calcular ancho del intervalo para la barra
-import type { Interval } from '@/types/regEdit.types'
+import type { Interval } from '@/types/sleepReg.types'
 export const getIntervalWidth = (
   interval: Interval,
   totalTimeInBedMinutes: number

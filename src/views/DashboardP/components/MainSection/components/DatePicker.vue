@@ -25,7 +25,7 @@
       >
         <div class="flex flex-col">
           <h2 class="text-white font-extrabold text-xl tracking-tight">
-            Seleccionar Periodo
+            Seleccionar Fecha
           </h2>
           <p
             class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1"
@@ -159,8 +159,27 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, nextTick } from 'vue'
   import { mockRegCalendar } from '../utils/mocks'
+
+  interface Day {
+    year: number
+    month: number
+    date: number
+    dateObj: Date
+  }
+
+  interface MonthData {
+    index: number
+    days: Set<number>
+    weeks: Day[][]
+    daysCount: number
+  }
+
+  interface Registro {
+    fecha: string
+    notification: boolean
+  }
 
   const props = defineProps<{
     isOpen: boolean
@@ -173,16 +192,14 @@
     'date-selected': [date: Date]
   }>()
 
-  // Estado
   const currentYear = ref(new Date().getFullYear())
   const today = new Date()
   const todayYear = today.getFullYear()
   const todayMonth = today.getMonth()
   const todayDate = today.getDate()
-  const scrollContainer = ref<HTMLElement>()
 
   // Usar los datos reales del mock
-  const registros = computed(() => {
+  const registros = computed<Registro[]>(() => {
     return mockRegCalendar || []
   })
 
@@ -192,7 +209,7 @@
 
     // Añadir años de los registros
     registros.value.forEach(reg => {
-      const year = parseInt(reg.fecha.split('-')[0])
+      const year = parseInt(reg.fecha.split('-')[0] as string)
       yearsSet.add(year)
     })
 
@@ -210,19 +227,19 @@
   })
 
   // Obtener meses de un año que tienen registros
-  const getMonthsForYear = (year: number) => {
-    const monthsMap = new Map<number, any>()
+  const getMonthsForYear = (year: number): MonthData[] => {
+    const monthsMap = new Map<number, Omit<MonthData, 'daysCount'>>()
 
     // Obtener todos los registros del año
     const yearRegistros = registros.value.filter(reg => {
-      const regYear = parseInt(reg.fecha.split('-')[0])
+      const regYear = parseInt(reg.fecha.split('-')[0] as string)
       return regYear === year
     })
 
     // Agrupar por mes
     yearRegistros.forEach(reg => {
-      const [regYear, regMonth, regDate] = reg.fecha.split('-').map(Number)
-      const monthIndex = regMonth - 1 // Convertir a índice 0-based
+      const [, regMonth, regDate] = reg.fecha.split('-').map(Number)
+      const monthIndex = (regMonth as number) - 1
 
       if (!monthsMap.has(monthIndex)) {
         monthsMap.set(monthIndex, {
@@ -232,8 +249,8 @@
         })
       }
 
-      const monthData = monthsMap.get(monthIndex)
-      monthData.days.add(regDate)
+      const monthData = monthsMap.get(monthIndex)!
+      monthData.days.add(regDate as number)
     })
 
     // SI ES EL AÑO ACTUAL, AÑADIR EL MES ACTUAL AUNQUE NO TENGA REGISTROS
@@ -248,50 +265,39 @@
     }
 
     // Convertir a array y ordenar de más reciente a más antiguo
-    const monthsArray = Array.from(monthsMap.values()).sort(
-      (a, b) => b.index - a.index
-    )
-
-    // Para cada mes, generar el calendario y contar días
-    monthsArray.forEach(month => {
-      // Determinar hasta qué día mostrar
-      let lastDay = new Date(year, month.index + 1, 0).getDate()
-
-      // Si es el año y mes actual, limitar al día de hoy
-      if (year === todayYear && month.index === todayMonth) {
-        lastDay = todayDate
-      }
-
-      // Generar semanas del mes
-      month.weeks = generateWeeksForMonth(year, month.index, lastDay)
-      month.daysCount = month.days.size
-
-      // Si es el mes actual pero sin registros, daysCount será 0
-      if (
-        month.daysCount === 0 &&
-        year === todayYear &&
-        month.index === todayMonth
-      ) {
-        month.daysCount = 1 // Al menos el día de hoy es clicable
-      }
-    })
+    const monthsArray = Array.from(monthsMap.values())
+      .sort((a, b) => b.index - a.index)
+      .map(
+        month =>
+          ({
+            ...month,
+            daysCount: month.days.size,
+            weeks: generateWeeksForMonth(
+              year,
+              month.index,
+              year === todayYear && month.index === todayMonth
+                ? todayDate
+                : new Date(year, month.index + 1, 0).getDate()
+            ),
+          }) as MonthData
+      )
 
     return monthsArray
   }
 
   // Contar meses con registros en un año
-  const getMonthsCount = (year: number) => {
+  const getMonthsCount = (year: number): number => {
     const monthsSet = new Set<number>()
     registros.value.forEach(reg => {
       const [regYear, regMonth] = reg.fecha.split('-').map(Number)
       if (regYear === year) {
-        monthsSet.add(regMonth)
+        monthsSet.add(regMonth as number)
       }
     })
 
     // Si es el año actual, contar el mes actual aunque no tenga registros
     if (year === todayYear) {
-      monthsSet.add(todayMonth + 1) // +1 porque en el mock es 1-based
+      monthsSet.add(todayMonth + 1)
     }
 
     return monthsSet.size
@@ -302,8 +308,8 @@
     year: number,
     month: number,
     lastDay: number
-  ) => {
-    const weeks = []
+  ): Day[][] => {
+    const weeks: Day[][] = []
 
     // Primer día del mes
     const firstDay = new Date(year, month, 1)
@@ -315,9 +321,8 @@
     )
 
     // Ir al primer lunes antes del primer día del mes
-    let currentDate = new Date(firstDay)
+    const currentDate = new Date(firstDay)
     while (currentDate.getDay() !== 1) {
-      // 1 = Lunes
       currentDate.setDate(currentDate.getDate() - 1)
     }
 
@@ -325,7 +330,7 @@
 
     // Generar semanas
     while (currentDate <= lastDate) {
-      const week = []
+      const week: Day[] = []
 
       for (let i = 0; i < 7; i++) {
         const dateObj = new Date(currentDate)
@@ -351,13 +356,13 @@
   }
 
   // Verificar si un día tiene registro
-  const hasRegistro = (day: { year: number; month: number; date: number }) => {
+  const hasRegistro = (day: Day): boolean => {
     const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
     return registros.value.some(reg => reg.fecha === dateStr)
   }
 
   // Verificar si es hoy
-  const isToday = (day: { year: number; month: number; date: number }) => {
+  const isToday = (day: Day): boolean => {
     return (
       day.year === todayYear &&
       day.month === todayMonth &&
@@ -366,37 +371,15 @@
   }
 
   // Verificar si un día es clicable
-  const isDayClickable = (day: {
-    year: number
-    month: number
-    date: number
-  }) => {
-    // Es clicable si tiene registro o si es hoy
+  const isDayClickable = (day: Day): boolean => {
     return hasRegistro(day) || isToday(day)
   }
 
   // Verificar si tiene notificación
-  const hasNotification = (day: {
-    year: number
-    month: number
-    date: number
-  }) => {
+  const hasNotification = (day: Day): boolean => {
     const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
     const registro = registros.value.find(reg => reg.fecha === dateStr)
     return registro?.notification || false
-  }
-
-  // Scroll a un año específico - SIMPLE Y FUNCIONAL
-  const scrollToYear = (year: number) => {
-    currentYear.value = year
-
-    const element = document.getElementById(`year-${year}`)
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-    }
   }
 
   // Métodos auxiliares
@@ -418,11 +401,7 @@
     return months[monthIndex] as string
   }
 
-  const isDaySelected = (day: {
-    year: number
-    month: number
-    date: number
-  }) => {
+  const isDaySelected = (day: Day): boolean => {
     if (!props.selectedDate) return false
     const selected = new Date(props.selectedDate)
     return (
@@ -432,7 +411,7 @@
     )
   }
 
-  const handleDayClick = (day: { dateObj: Date }) => {
+  const handleDayClick = (day: Day) => {
     emit('date-selected', new Date(day.dateObj))
     closeDrawer()
   }
@@ -447,10 +426,35 @@
     emit('close')
   }
 
+  // Scroll automático a la fecha seleccionada
+  const scrollToSelectedDate = () => {
+    if (!props.selectedDate) {
+      // Si no hay fecha seleccionada, scrollear al año actual
+      const element = document.getElementById(`year-${todayYear}`)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      return
+    }
+
+    const selectedYear = props.selectedDate.getFullYear()
+    const element = document.getElementById(`year-${selectedYear}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   // Inicializar
   onMounted(() => {
     if (props.selectedDate) {
       currentYear.value = props.selectedDate.getFullYear()
+    }
+
+    // Hacer scroll automático cuando se monta (si está abierto)
+    if (props.isOpen) {
+      nextTick(() => {
+        setTimeout(scrollToSelectedDate, 100)
+      })
     }
   })
 </script>

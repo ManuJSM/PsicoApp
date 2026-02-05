@@ -1,6 +1,7 @@
-import { type Reg, SleepState } from '@/types/regEdit.types'
+import { type SleepReg, SleepState } from '@/types/sleepReg.types'
+import { type RegCalendar } from '@/types/dashboardP.types'
 
-export const mockReg: Reg = {
+export const mockReg: SleepReg = {
   fecha: new Date('2024-01-20'),
   bedtime: new Date('2024-01-19T23:00:00'),
   wakeup: new Date('2024-01-20T07:15:00'),
@@ -38,7 +39,7 @@ export const mockReg: Reg = {
     'Me costó un poco conciliar el sueño por el ruido de los vecinos, pero una vez dormida descansé bien hasta que me despertó una pesadilla a las 3 de la mañana. Después volví a dormirme rápido y me desperté sintiéndome bastante renovada.',
 }
 // mockRegistros.ts
-export const mockRegCalendar = [
+export const mockRegCalendar: RegCalendar[] = [
   // 2024 - Enero
   { fecha: '2024-01-05', notification: true },
   { fecha: '2024-01-07', notification: false },

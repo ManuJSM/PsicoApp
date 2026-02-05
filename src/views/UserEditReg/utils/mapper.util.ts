@@ -1,4 +1,4 @@
-import type { IntervalModel, Interval } from '@/types/regEdit.types'
+import type { IntervalModel, Interval } from '@/types/sleepReg.types'
 
 const intervalToModel = (interval: Interval): IntervalModel => {
   return {
