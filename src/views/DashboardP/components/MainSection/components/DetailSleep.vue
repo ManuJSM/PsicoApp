@@ -66,19 +66,12 @@
       <!-- Contenido -->
       <div class="p-4 md:p-6 space-y-4">
         <!-- Timeline visual -->
-        <div
-          class="relative w-full h-5 md:h-5 rounded-xl border border-white/10 overflow-hidden flex"
-        >
-          <div
-            v-for="(interval, index) in timelineIntervals"
-            :key="index"
-            class="h-full"
-            :class="getStateClass(interval.state)"
-            :style="{ width: getIntervalPercentage(interval) + '%' }"
-            :title="getIntervalTooltip(interval)"
-          ></div>
-        </div>
 
+        <SleepTimeline
+          :intervals="dayReg.intervals"
+          :bedtime-date="dayReg.bedtime as Date"
+          :wakeup-date="dayReg.wakeup as Date"
+        />
         <!-- Intervalos detallados -->
         <div
           class="bg-[#0d1117]/50 rounded-lg border border-white/10 overflow-hidden"
@@ -227,13 +220,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
-  import {
-    SleepState,
-    type Interval,
-    type SleepReg,
-  } from '@/types/sleepReg.types'
+  import { ref } from 'vue'
+  import { SleepState, type SleepReg } from '@/types/sleepReg.types'
   import { getStateClass } from '@/views/UserEditReg/utils/css.util'
+  import SleepTimeline from '@/views/UserEditReg/components/Step3/components/SleepTimeline.vue'
 
   interface Props {
     dayReg: SleepReg | null
@@ -254,29 +244,6 @@
   const newObservation = ref(props.dayReg?.psicoComment || '')
   const showObservationForm = ref(props.dayReg?.psicoComment !== undefined)
 
-  const totalDuration = computed(() => {
-    if (!props.dayReg) return 0
-    return props.dayReg.intervals.reduce((total, interval) => {
-      return total + (interval.hours * 60 + interval.minutes)
-    }, 0)
-  })
-
-  const timelineIntervals = computed(() => {
-    if (!props.dayReg) return []
-    return props.dayReg.intervals.map(interval => ({
-      ...interval,
-      totalMinutes: interval.hours * 60 + interval.minutes,
-    }))
-  })
-
-  const getIntervalPercentage = (
-    interval: Interval & { totalMinutes?: number }
-  ) => {
-    const minutes =
-      interval.totalMinutes || interval.hours * 60 + interval.minutes
-    return totalDuration.value > 0 ? (minutes / totalDuration.value) * 100 : 0
-  }
-
   const getStateLabel = (state: SleepState) => {
     switch (state) {
       case SleepState.ASLEEP:
@@ -288,13 +255,6 @@
       default:
         return 'Desconocido'
     }
-  }
-
-  const getIntervalTooltip = (interval: Interval) => {
-    const state = getStateLabel(interval.state)
-    const duration = formatDuration(interval.hours, interval.minutes)
-    const timeRange = `${formatTime(interval.startTime)} - ${formatTime(interval.endTime)}`
-    return `${state}: ${duration} (${timeRange})`
   }
 
   const formatTime = (date: Date) => {

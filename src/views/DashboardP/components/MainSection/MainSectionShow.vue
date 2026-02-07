@@ -19,6 +19,7 @@
     type DateRange,
   } from './utils/date.utils'
   import { fetchDailyReg } from '@/api/SleepRegs/sleepReg.api'
+  import { useRoute } from 'vue-router'
 
   const sleepData = [
     { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
@@ -139,6 +140,7 @@
   //   },
   //   { immediate: true }
   // )
+  const route = useRoute()
 
   watch(selectedDate, async () => {
     dayReg.value = null
@@ -150,6 +152,7 @@
       switch (selectedView.value) {
         case DashboardViews.DIARIA:
           const regValue: SleepReg | null = await fetchDailyReg({
+            userId: Number(route.params.id),
             day: selectedDate.value,
           })
           dayReg.value = regValue

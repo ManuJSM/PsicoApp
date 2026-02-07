@@ -13,10 +13,10 @@ const queryDate = (day: Date) => {
 }
 
 export async function fetchDailyReg({
-  userId = 2,
+  userId,
   day,
 }: {
-  userId?: number
+  userId: number
   day: Date
 }): Promise<SleepReg | null> {
   const regValues = await httpAuth<SleepRegDto[]>(

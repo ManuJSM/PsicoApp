@@ -32,32 +32,11 @@
           >
           Resumen de la Noche
         </h3>
-        <div class="relative pt-2 pb-2">
-          <!-- Línea de tiempo dinámica -->
-          <div
-            class="h-8 w-full rounded-full custom-inner-shadow flex p-1.5 gap-0.5 mb-2"
-          >
-            <div
-              v-for="(interval, index) in intervals"
-              :key="index"
-              :class="[
-                'h-full timeline-pill',
-                getStateClass(interval.state),
-                index === 0 ? 'rounded-l-full' : '',
-                index === intervals.length - 1 ? 'rounded-r-full' : '',
-              ]"
-              :style="{
-                width: getIntervalWidth(interval, totalTiempoEnCama) + '%',
-              }"
-            ></div>
-          </div>
-          <div
-            class="flex justify-between text-[10px] font-bold text-slate-500 uppercase px-1"
-          >
-            <span>{{ formatTime(bedtimeDate) }}</span>
-            <span>{{ formatTime(wakeupDate) }}</span>
-          </div>
-        </div>
+        <SleepTimeline
+          :intervals="intervals"
+          :bedtime-date="bedtimeDate"
+          :wakeup-date="wakeupDate"
+        />
 
         <div class="grid grid-cols-2 gap-4 mt-8">
           <div
@@ -159,16 +138,12 @@
     type Interval,
     type SleepReg,
   } from '@/types/sleepReg.types'
-  import { getIntervalWidth } from '@/views/UserEditReg/utils/bar.util'
-  import { getStateClass } from '@/views/UserEditReg/utils/css.util'
   import {
     getQualityIcon,
     getQualityColor,
   } from '@/views/components/utils/utils'
-  import {
-    formatTime,
-    formatDuration,
-  } from '@/views/UserEditReg/utils/time.util'
+  import { formatDuration } from '@/views/UserEditReg/utils/time.util'
+  import SleepTimeline from './components/SleepTimeline.vue'
 
   const registro = inject('registro') as SleepReg
   const emits = defineEmits(['back', 'save'])

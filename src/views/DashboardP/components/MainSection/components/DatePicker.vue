@@ -159,8 +159,11 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, nextTick } from 'vue'
-  import { mockRegCalendar } from '../utils/mocks'
+  import { ref, computed, onMounted, watch } from 'vue'
+  import { fetchCalendar } from '@/api/calendar/calendar.api'
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
 
   interface Day {
     year: number
@@ -199,9 +202,7 @@
   const todayDate = today.getDate()
 
   // Usar los datos reales del mock
-  const registros = computed<Registro[]>(() => {
-    return mockRegCalendar || []
-  })
+  const registros = ref<Registro[]>([])
 
   // Años disponibles en los datos
   const availableYears = computed(() => {
@@ -425,36 +426,20 @@
     currentYear.value = todayYear
     emit('close')
   }
-
-  // Scroll automático a la fecha seleccionada
-  const scrollToSelectedDate = () => {
-    if (!props.selectedDate) {
-      // Si no hay fecha seleccionada, scrollear al año actual
-      const element = document.getElementById(`year-${todayYear}`)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-      return
-    }
-
-    const selectedYear = props.selectedDate.getFullYear()
-    const element = document.getElementById(`year-${selectedYear}`)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
+  watch(
+    () => Number(route.params.id),
+    async id => {
+      selectToday()
+      if (!Number.isInteger(id)) return
+      registros.value = await fetchCalendar({ userId: id })
+    },
+    { immediate: true }
+  )
 
   // Inicializar
   onMounted(() => {
     if (props.selectedDate) {
       currentYear.value = props.selectedDate.getFullYear()
-    }
-
-    // Hacer scroll automático cuando se monta (si está abierto)
-    if (props.isOpen) {
-      nextTick(() => {
-        setTimeout(scrollToSelectedDate, 100)
-      })
     }
   })
 </script>
