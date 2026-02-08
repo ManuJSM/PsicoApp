@@ -90,8 +90,9 @@
         return formatDateRange(monthRange.value)
       case DashboardViews.ANUAL:
         return selectedDate.value.getFullYear().toString()
+      default:
+        return formatDay(selectedDate.value)
     }
-    return formatDay(selectedDate.value)
   })
 
   const selectedView = ref<DashboardViews>(DashboardViews.DIARIA)

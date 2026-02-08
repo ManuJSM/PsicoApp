@@ -107,55 +107,42 @@
 </script>
 
 <template>
-  <!-- Mobile: Show either sidebar or main section -->
-  <div class="md:hidden pb-safe-sm overflow-y-auto flex-1">
-    <SideBar
-      @add="showAdd"
-      v-if="!selectedPatient && currentView !== 'add'"
-      :patients="patients"
-    />
-    <MainSectionShow
-      v-else-if="currentView === 'show' && selectedPatient"
-      :patient="selectedPatient"
-      @exit="handleExit"
-      @edit="showEdit"
-    />
-    <MainSectionAdd
-      v-else-if="currentView === 'add'"
-      @back="handleBack"
-      @save="handleAdd"
-    />
-    <MainSectionEdit
-      v-else-if="currentView === 'edit' && selectedPatient"
-      :patient="selectedPatient"
-      @back="handleBack"
-      @save="handleSave"
-      @delete="handleDelete"
-    />
-  </div>
-
-  <!-- Desktop: Show both side by side -->
-  <div class="hidden md:flex overflow-y-auto flex-1">
-    <div class="w-1/3 lg:w-1/4">
-      <SideBar @add="showAdd" :patients="patients" />
+  <div class="flex flex-1 overflow-y-auto">
+    <!-- Sidebar -->
+    <div
+      class="w-full md:w-1/3 lg:w-1/4"
+      :class="{
+        'hidden md:block': selectedPatient || currentView === 'add',
+      }"
+    >
+      <SideBar :patients="patients" @add="showAdd" />
     </div>
-    <div class="flex-1">
+
+    <!-- Main section -->
+    <div
+      class="flex-1"
+      :class="{
+        'hidden md:block': !selectedPatient && currentView !== 'add',
+      }"
+    >
       <MainSectionShow
-        v-if="selectedPatient && currentView === 'show'"
+        v-if="currentView === 'show' && selectedPatient"
         :patient="selectedPatient"
         @exit="handleExit"
         @edit="showEdit"
       />
+
       <MainSectionAdd
         v-else-if="currentView === 'add'"
+        @back="handleBack"
         @save="handleAdd"
-        @back="handleBack"
       />
+
       <MainSectionEdit
-        v-else-if="selectedPatient && currentView === 'edit'"
+        v-else-if="currentView === 'edit' && selectedPatient"
         :patient="selectedPatient"
-        @save="handleSave"
         @back="handleBack"
+        @save="handleSave"
         @delete="handleDelete"
       />
     </div>

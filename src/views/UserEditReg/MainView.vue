@@ -29,6 +29,7 @@
     fecha: fecha,
     bedtime: null,
     wakeup: null,
+    observaciones: '',
     intervals: [],
     psicoComment: '',
   }

@@ -16,7 +16,7 @@
     <router-link
       v-for="patient in patients"
       :key="patient.id"
-      class="flex items-center gap-4 px-4 min-h-[72px] py-2 justify-between cursor-pointer transition-colors duration-200"
+      class="flex items-center gap-4 px-4 py-2 justify-between cursor-pointer transition-colors duration-200"
       :class="{
         'bg-primary/20 dark:bg-primary/20 border-l-4 border-primary':
           activePatientId === patient.id,
@@ -40,7 +40,7 @@
           <p
             class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal line-clamp-2"
           >
-            Alguna info chula
+            {{ patient.email }}
           </p>
         </div>
       </div>

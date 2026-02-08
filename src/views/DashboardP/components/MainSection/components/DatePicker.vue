@@ -2,11 +2,9 @@
   <div>
     <!-- Overlay -->
     <label
+      v-show="isOpen"
       :class="[
         'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300',
-        isOpen
-          ? 'opacity-100 pointer-events-auto'
-          : 'opacity-0 pointer-events-none',
       ]"
       @click="closeDrawer"
     ></label>
@@ -14,7 +12,7 @@
     <!-- Drawer -->
     <div
       :class="[
-        'fixed top-0 left-0 h-full w-full md:w-1/4 bg-background-dark/95 backdrop-blur-xl border-r border-white/10 shadow-[20px_0_50px_rgba(0,0,0,0.5)] z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
+        'fixed top-0 left-0 h-full w-full md:w-1/4 bg-background-dark/95 backdrop-blur-xl border-r border-white/10 z-50 transform transition-transform duration-300 ease-in-out flex flex-col',
         isOpen ? 'translate-x-0' : '-translate-x-full',
       ]"
       id="date-side-drawer"
