@@ -28,7 +28,10 @@
     </p>
 
     <!-- Trend -->
-    <div class="flex items-center gap-1" :class="trendColorClass">
+    <div
+      class="flex justify-center items-center gap-1"
+      :class="trendColorClass"
+    >
       <span class="material-symbols-outlined text-xs">
         {{ trendIcon }}
       </span>
@@ -42,7 +45,7 @@
 <script setup lang="ts">
   import { computed } from 'vue'
 
-  interface MetricCardProps {
+  export interface MetricCardProps {
     title: string
     value: string
     icon: string
@@ -53,7 +56,14 @@
     }
   }
 
-  const props = defineProps<MetricCardProps>()
+  const props = withDefaults(defineProps<MetricCardProps>(), {
+    value: '',
+    trend: () => ({
+      value: '',
+      direction: 'stable',
+      comparisonText: '',
+    }),
+  })
 
   // Computed
   const trendIcon = computed(() => {

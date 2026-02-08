@@ -86,14 +86,14 @@
 <script setup lang="ts">
   import { computed, ref, onMounted, watch } from 'vue'
 
-  interface DonutSegment {
+  export interface DonutSegment {
     value: number
     color: string
     label: string
     percentage?: number
   }
 
-  interface DonutChartProps {
+  export interface DonutChartProps {
     title?: string
     subtitle?: string
     segments: DonutSegment[]

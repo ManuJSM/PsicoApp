@@ -160,7 +160,7 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted, watch } from 'vue'
-  import { fetchCalendar } from '@/api/calendar/calendar.api'
+  import { fetchCalendar } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()

@@ -3,14 +3,19 @@
   import { type Patient } from '@/types/types'
   import { computed, ref, watch } from 'vue'
 
-  import MetricCard from './components/MetricCard.vue'
+  import MetricCard, { type MetricCardProps } from './components/MetricCard.vue'
   import DateMenu from './components/DateMenu.vue'
-  import SleepChart from '@/views/MiCuenta/components/SleepChart.vue'
+  import SleepChart, {
+    type SleepLineChartProps,
+  } from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
   import { type SleepReg } from '@/types/sleepReg.types'
   import { DashboardViews } from '@/types/dashboardP.types'
-  import DonutChart from '@/views/MiCuenta/components/DonutChart.vue'
+  import DonutChart, {
+    type DonutSegment,
+  } from '@/views/MiCuenta/components/DonutChart.vue'
   import DatePicker from './components/DatePicker.vue'
+  import { dailySleepData, monthlyData, weeklyData } from './utils/mocks'
   import {
     formatDateRange,
     formatDay,
@@ -18,73 +23,52 @@
     getWeekRange,
     type DateRange,
   } from './utils/date.utils'
-  import { fetchDailyReg } from '@/api/SleepRegs/sleepReg.api'
+  import { fetchDailyReg } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
 
-  const sleepData = [
-    { day: 'Lun', value: 480 }, // 8 horas = 480 minutos
-    { day: 'Mar', value: 420 }, // 7 horas
-    { day: 'Sáb', value: 600 }, // 10 horas
-    { day: 'Dom', value: 540 }, // 9 horas
-  ]
+  const sleepChartData = ref<SleepLineChartProps>({
+    chartData: [],
+    averageTimeAsleep: '0h ',
+    chartColor: '#935fe0',
+  })
 
-  const previousWeekData = [
-    { day: 'Lun', value: 450 },
-    { day: 'Mar', value: 430 },
-    { day: 'Mié', value: 460 },
-    { day: 'Jue', value: 420 },
-    { day: 'Vie', value: 480 },
-    { day: 'Sáb', value: 520 },
-    { day: 'Dom', value: 490 },
-  ]
+  const donutChartData = ref<[DonutSegment, DonutSegment, DonutSegment]>([
+    { value: 0, color: '#4f46e5', label: 'Asleep' },
+    { value: 0, color: '#d97706', label: 'InBed' },
+    { value: 0, color: '#059669', label: 'Awake' },
+  ])
+  const trendDefault = {
+    value: '',
+    direction: 'stable' as const,
+    comparisonText: '',
+  }
 
-  const metrics = [
+  const metricCardsData = ref<MetricCardProps[]>([
     {
       title: 'Tiempo en Cama',
-      value: '8h 50m',
+      value: '',
       icon: 'bed',
-      trend: {
-        value: '',
-        direction: 'stable' as const,
-        comparisonText: 'Estable',
-      },
+      trend: trendDefault,
     },
     {
       title: 'Hora Media Sueño',
-      value: '7h 45m',
+      value: '',
       icon: 'schedule',
-      trend: {
-        value: '+15m',
-        direction: 'up' as const,
-        comparisonText: 'vs sem. ant.',
-      },
+      trend: trendDefault,
     },
     {
       title: 'Eficiencia Media',
-      value: '88%',
+      value: '',
       icon: 'bolt',
-      trend: {
-        value: '+2%',
-        direction: 'up' as const,
-        comparisonText: 'vs sem. ant.',
-      },
+      trend: trendDefault,
     },
     {
       title: 'Latencia al Sueño',
-      value: '45m',
+      value: '',
       icon: 'visibility',
-      trend: {
-        value: '+5m',
-        direction: 'down' as const,
-        comparisonText: 'vs sem. ant.',
-      },
+      trend: trendDefault,
     },
-  ]
-  const sleepSegments = [
-    { value: 100, color: '#059669', label: 'Awake' }, // 5h 30m
-    { value: 100, color: '#d97706', label: 'InBed' }, // 3h
-    { value: 132, color: '#4f46e5', label: 'Asleep' }, // h
-  ]
+  ])
 
   defineProps<{
     patient: Patient
@@ -92,6 +76,10 @@
   defineEmits(['exit', 'edit'])
 
   const selectedDate = ref<Date>(new Date())
+  const weekRange = computed<DateRange>(() => getWeekRange(selectedDate.value))
+  const monthRange = computed<DateRange>(() =>
+    getMonthRange(selectedDate.value)
+  )
   const periodText = computed<string>(() => {
     switch (selectedView.value) {
       case DashboardViews.DIARIA:
@@ -100,6 +88,8 @@
         return formatDateRange(weekRange.value)
       case DashboardViews.MENSUAL:
         return formatDateRange(monthRange.value)
+      case DashboardViews.ANUAL:
+        return selectedDate.value.getFullYear().toString()
     }
     return formatDay(selectedDate.value)
   })
@@ -112,62 +102,131 @@
 
   const isOpenCalendar = ref(false)
   const dayReg = ref<SleepReg | null>(null)
-  // const weekReg = ref<Reg[]>([])
-  // const monthReg = ref<Reg[]>([])
   const loading = ref(false)
-  const weekRange = computed<DateRange>(() => getWeekRange(selectedDate.value))
-  const monthRange = computed<DateRange>(() =>
-    getMonthRange(selectedDate.value)
-  )
 
-  // watch(
-  //   selectedView,
-  //   async v => {
-  //     loading.value = true
-  //     try {
-  //       if (v === DashboardViews.DIARIA && dayReg.value === null) {
-  //         // dayReg.value = await fetchDay(selectedDate.value)
-  //       }
-  //       if (v === DashboardViews.SEMANAL && weekReg.value.length === 0) {
-  //         // statRegs.value = await fetchWeek(selectedDate.value)
-  //       }
-  //       if (v === DashboardViews.MENSUAL && monthReg.value.length === 0) {
-  //         // statRegs.value = await fetchMonth(selectedDate.value)
-  //       }
-  //     } finally {
-  //       loading.value = false
-  //     }
-  //   },
-  //   { immediate: true }
-  // )
+  const checkIfHasDataForView = (view: DashboardViews): boolean => {
+    switch (view) {
+      case DashboardViews.DIARIA:
+        return dayReg.value !== null
+      case DashboardViews.SEMANAL:
+        return sleepChartData.value.periodType === 'day'
+      case DashboardViews.MENSUAL:
+        return sleepChartData.value.periodType === 'week'
+      case DashboardViews.ANUAL:
+        return sleepChartData.value.periodType === 'month'
+      default:
+        return false
+    }
+  }
+  function fillDonut(avgAsleep: number, avgInBed: number, avgAwake: number) {
+    donutChartData.value[0].value = avgAsleep
+    donutChartData.value[1].value = avgInBed
+    donutChartData.value[2].value = avgAwake
+  }
+  function fillMetric(
+    metric: MetricCardProps,
+    avg: string,
+    trendValue: string,
+    direction: 'up' | 'down' | 'stable',
+    comparisonText: string
+  ): void {
+    metric.value = avg
+    metric.trend.value = trendValue
+    metric.trend.direction = direction
+    metric.trend.comparisonText = comparisonText
+  }
+
   const route = useRoute()
-
-  watch(selectedDate, async () => {
-    dayReg.value = null
-    // weekReg.value = []
-    // monthReg.value = []
-
+  const fetchDataForView = async (view: DashboardViews, date: Date) => {
     loading.value = true
+
     try {
-      switch (selectedView.value) {
+      switch (view) {
         case DashboardViews.DIARIA:
-          const regValue: SleepReg | null = await fetchDailyReg({
+          dayReg.value = await fetchDailyReg({
             userId: Number(route.params.id),
-            day: selectedDate.value,
+            day: date,
           })
-          dayReg.value = regValue
           break
+
         case DashboardViews.SEMANAL:
-          // statRegs.value = await fetchWeek(selectedDate.value)
+          // const weekResult = await fetchWeek(date)
+          sleepChartData.value = {
+            ...sleepChartData.value,
+            chartData: dailySleepData,
+            periodType: 'day',
+            displayCount: 7,
+            // averageTimeAsleep: weekResult.averageFormatted,
+            // changePercent: weekResult.changePercent,
+            title: `Semana del ${periodText.value}`,
+          }
+          fillDonut(123, 134, 800)
+          fillMetric(
+            metricCardsData.value[0] as MetricCardProps,
+            '0h 00m',
+            '+0%',
+            'stable',
+            'vs semana anterior'
+          )
+
           break
+
         case DashboardViews.MENSUAL:
-          // statRegs.value = await fetchMonth(selectedDate.value)
+          // const monthResult = await fetchMonth(date)
+          sleepChartData.value = {
+            ...sleepChartData.value,
+            chartData: weeklyData,
+            periodType: 'week',
+            displayCount: 4,
+            // averageTimeAsleep: monthResult.averageFormatted,
+            // changePercent: monthResult.changePercent,
+            title: `Mes del ${periodText.value}`,
+          }
+          fillDonut(300, 123, 78)
+          break
+        case DashboardViews.ANUAL:
+          // const anualResult = await fetchMonth(date)
+          sleepChartData.value = {
+            ...sleepChartData.value,
+            chartData: monthlyData,
+            periodType: 'month',
+            displayCount: 12,
+            // averageTimeAsleep: monthResult.averageFormatted,
+            // changePercent: monthResult.changePercent,
+            title: `Anio ${periodText.value}`,
+          }
+          fillDonut(400, 150, 100)
           break
       }
     } finally {
       loading.value = false
     }
-  })
+  }
+  function refreshChartData() {
+    sleepChartData.value.chartData = []
+    dayReg.value = null
+    donutChartData.value.map(item => {
+      item.value = 0
+    })
+  }
+
+  watch(
+    [selectedView, selectedDate],
+    async ([newView, newDate], [oldView, oldDate]) => {
+      if (newDate !== oldDate) {
+        refreshChartData()
+        return fetchDataForView(newView, newDate)
+      }
+
+      if (newView !== oldView) {
+        const hasData = checkIfHasDataForView(newView)
+        if (!hasData) {
+          return fetchDataForView(newView, newDate)
+        }
+      }
+    },
+    { immediate: true }
+  )
 
   const handleDateSelected = (day: Date) => {
     selectedDate.value = day
@@ -235,18 +294,14 @@
       >
         <DonutChart
           title="Distribución del Sueño"
-          subtitle="Análisis semanal promedio"
-          :segments="sleepSegments"
+          subtitle="Análisis promedio"
+          :segments="donutChartData"
           center-subtitle="Total Noche"
         />
-        <SleepChart
-          title="Tiempo Dormido"
-          :chart-data="sleepData"
-          :previous-period-data="previousWeekData"
-        />
+        <SleepChart v-bind="sleepChartData" />
         <div class="grid grid-cols-2 lg:col-span-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            v-for="metric in metrics"
+            v-for="metric in metricCardsData"
             :key="metric.title"
             :title="metric.title"
             :value="metric.value"
