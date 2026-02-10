@@ -10,7 +10,7 @@
   } from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
   import { type SleepReg } from '@/types/sleepReg.types'
-  import { DashboardViews } from '@/types/dashboardP.types'
+  import { DashboardViews, type Metrics } from '@/types/dashboardP.types'
   import DonutChart, {
     type DonutSegment,
   } from '@/views/MiCuenta/components/DonutChart.vue'
@@ -25,6 +25,7 @@
   } from './utils/date.utils'
   import { fetchDailyReg } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
+  import { fetchMetrics } from '@/api/SleepData/metricData.api'
 
   const sleepChartData = ref<SleepLineChartProps>({
     chartData: [],
@@ -48,25 +49,25 @@
       title: 'Tiempo en Cama',
       value: '',
       icon: 'bed',
-      trend: trendDefault,
+      trend: { ...trendDefault },
     },
     {
       title: 'Hora Media Sueño',
       value: '',
       icon: 'schedule',
-      trend: trendDefault,
+      trend: { ...trendDefault },
     },
     {
       title: 'Eficiencia Media',
       value: '',
       icon: 'bolt',
-      trend: trendDefault,
+      trend: { ...trendDefault },
     },
     {
       title: 'Latencia al Sueño',
       value: '',
       icon: 'visibility',
-      trend: trendDefault,
+      trend: { ...trendDefault },
     },
   ])
 
@@ -127,14 +128,45 @@
   function fillMetric(
     metric: MetricCardProps,
     avg: string,
-    trendValue: string,
+    trendValue: number,
     direction: 'up' | 'down' | 'stable',
     comparisonText: string
   ): void {
     metric.value = avg
-    metric.trend.value = trendValue
+    metric.trend.value = `${trendValue}%`
     metric.trend.direction = direction
     metric.trend.comparisonText = comparisonText
+  }
+
+  function fillMetrics(weekResult: Metrics, comparison: string) {
+    fillMetric(
+      metricCardsData.value[1] as MetricCardProps,
+      weekResult.avgSleep.current.formatted,
+      weekResult.avgSleep.trendPercentaje,
+      weekResult.avgSleep.trend,
+      comparison
+    )
+    fillMetric(
+      metricCardsData.value[0] as MetricCardProps,
+      weekResult.avgInBed.current.formatted,
+      weekResult.avgInBed.trendPercentaje,
+      weekResult.avgInBed.trend,
+      comparison
+    )
+    fillMetric(
+      metricCardsData.value[2] as MetricCardProps,
+      weekResult.avgEfficiency.current.formatted,
+      weekResult.avgEfficiency.trendPercentaje,
+      weekResult.avgEfficiency.trend,
+      comparison
+    )
+    fillMetric(
+      metricCardsData.value[3] as MetricCardProps,
+      weekResult.avgLatency.current.formatted,
+      weekResult.avgLatency.trendPercentaje,
+      weekResult.avgLatency.trend,
+      comparison
+    )
   }
 
   const route = useRoute()
@@ -151,24 +183,27 @@
           break
 
         case DashboardViews.SEMANAL:
-          // const weekResult = await fetchWeek(date)
+          const weekResult = await fetchMetrics({
+            userId: Number(route.params.id),
+            start: weekRange.value.start,
+            end: weekRange.value.end,
+          })
+          console.log(weekResult)
           sleepChartData.value = {
             ...sleepChartData.value,
             chartData: dailySleepData,
             periodType: 'day',
             displayCount: 7,
-            // averageTimeAsleep: weekResult.averageFormatted,
-            // changePercent: weekResult.changePercent,
+            averageTimeAsleep: weekResult.avgSleep.current.formatted,
+            changePercent: weekResult.avgSleep.trendPercentaje,
             title: `Semana del ${periodText.value}`,
           }
-          fillDonut(123, 134, 800)
-          fillMetric(
-            metricCardsData.value[0] as MetricCardProps,
-            '0h 00m',
-            '+0%',
-            'stable',
-            'vs semana anterior'
+          fillDonut(
+            weekResult.avgSleep.current.raw,
+            weekResult.avgInBed.current.raw,
+            weekResult.avgAwake.current.raw
           )
+          fillMetrics(weekResult, 'vs semana anterior')
 
           break
 

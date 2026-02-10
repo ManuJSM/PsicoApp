@@ -2,7 +2,7 @@ import type { SleepReg, SleepRegDto } from '@/types/sleepReg.types'
 import { httpAuth } from '../http/httpAuth'
 import { fromRegDtoToReg } from './sleep.mappers'
 import type { RegCalendar } from '@/types/dashboardP.types'
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
   const day = date.getDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()

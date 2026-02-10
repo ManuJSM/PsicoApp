@@ -120,7 +120,7 @@
 
     <!-- Main section -->
     <div
-      class="flex-1"
+      class="flex-1 pb-safe-sm"
       :class="{
         'hidden md:block': !selectedPatient && currentView !== 'add',
       }"

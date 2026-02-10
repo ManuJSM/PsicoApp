@@ -11,15 +11,14 @@ export type RegCalendar = {
 }
 
 export type Metric = {
-  current: { raw: number; formatted: string; unit: 'minutes' }
-  previous: { raw: number; formatted: string; unit: 'minutes' }
+  current: { raw: number; formatted: string; unit: string }
+  previous: { raw: number; formatted: string; unit: string }
   trend: 'up' | 'down' | 'stable'
   trendPercentaje: number
 }
 
 export type Metrics = {
   period: {
-    type: string
     start: string
     end: string
     label: string
