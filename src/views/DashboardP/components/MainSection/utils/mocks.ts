@@ -16,15 +16,16 @@ export const dailySleepData = [
 ]
 
 export const monthlyData = [
-  { month: 'Ene', value: 14850 },
-  { month: 'Feb', value: 13500 },
-  { month: 'Mar', value: 15500 },
-  { month: 'Abr', value: 14400 },
-  { month: 'May', value: 15190 },
-  { month: 'Jun', value: 13800 },
-  { month: 'Ago', value: 14880 },
-  { month: 'Sep', value: 14100 },
-  { month: 'Oct', value: 15370 },
-  { month: 'Nov', value: 14700 },
-  { month: 'Dic', value: 16200 },
+  { date: '2025-01', value: 450 }, // Enero
+  { date: '2025-02', value: 465 }, // Febrero
+  { date: '2025-03', value: 480 }, // Marzo
+  { date: '2025-04', value: 470 }, // Abril
+  { date: '2025-05', value: 490 }, // Mayo
+  { date: '2025-06', value: 495 }, // Junio
+  { date: '2025-07', value: 500 }, // Julio
+  { date: '2025-08', value: 485 }, // Agosto
+  { date: '2025-09', value: 475 }, // Septiembre
+  { date: '2025-10', value: 460 }, // Octubre
+  { date: '2025-11', value: 455 }, // Noviembre
+  { date: '2025-12', value: 445 }, // Diciembre
 ]

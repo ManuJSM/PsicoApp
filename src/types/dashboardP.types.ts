@@ -29,3 +29,26 @@ export type Metrics = {
   avgInBed: Metric
   avgEfficiency: Metric
 }
+
+export enum CharGroup {
+  DAY = 'day',
+  WEEK = 'week',
+  YEAR = 'year',
+}
+export enum CharDataType {
+  ASLEEP = 'sleep',
+  EFFIC = 'efficiency',
+  INBED = 'inbed',
+  AWAKE = 'awake',
+  LATENCY = 'latency',
+}
+
+export interface CharPoint {
+  date: string
+  value: number
+}
+
+export interface CharData {
+  period: CharGroup
+  data: CharPoint[]
+}

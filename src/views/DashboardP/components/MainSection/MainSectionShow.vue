@@ -15,20 +15,21 @@
     type DonutSegment,
   } from '@/views/MiCuenta/components/DonutChart.vue'
   import DatePicker from './components/DatePicker.vue'
-  import { dailySleepData, monthlyData, weeklyData } from './utils/mocks'
   import {
     formatDateRange,
     formatDay,
     getMonthRange,
     getWeekRange,
+    getYearRange,
     type DateRange,
   } from './utils/date.utils'
   import { fetchDailyReg } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
-  import { fetchMetrics } from '@/api/SleepData/metricData.api'
+  import { fetchSleepData, fetchMetrics } from '@/api/SleepData/metricData.api'
 
   const sleepChartData = ref<SleepLineChartProps>({
     chartData: [],
+    period: 'day',
     averageTimeAsleep: '0h ',
     chartColor: '#935fe0',
   })
@@ -81,6 +82,7 @@
   const monthRange = computed<DateRange>(() =>
     getMonthRange(selectedDate.value)
   )
+  const yearRange = computed<DateRange>(() => getYearRange(selectedDate.value))
   const periodText = computed<string>(() => {
     switch (selectedView.value) {
       case DashboardViews.DIARIA:
@@ -110,12 +112,13 @@
     switch (view) {
       case DashboardViews.DIARIA:
         return dayReg.value !== null
-      case DashboardViews.SEMANAL:
-        return sleepChartData.value.periodType === 'day'
-      case DashboardViews.MENSUAL:
-        return sleepChartData.value.periodType === 'week'
-      case DashboardViews.ANUAL:
-        return sleepChartData.value.periodType === 'month'
+      //Esto tiene sentido si tengo un array por cada vista y no sobreescribo el chartData podria ser interesante?
+      // case DashboardViews.SEMANAL:
+      //   return sleepChartData.value.period === 'day'
+      // case DashboardViews.MENSUAL:
+      //   return sleepChartData.value.period === 'week'
+      // case DashboardViews.ANUAL:
+      //   return sleepChartData.value.period === 'month'
       default:
         return false
     }
@@ -140,19 +143,20 @@
 
   function fillMetrics(weekResult: Metrics, comparison: string) {
     fillMetric(
-      metricCardsData.value[1] as MetricCardProps,
-      weekResult.avgSleep.current.formatted,
-      weekResult.avgSleep.trendPercentaje,
-      weekResult.avgSleep.trend,
-      comparison
-    )
-    fillMetric(
       metricCardsData.value[0] as MetricCardProps,
       weekResult.avgInBed.current.formatted,
       weekResult.avgInBed.trendPercentaje,
       weekResult.avgInBed.trend,
       comparison
     )
+    fillMetric(
+      metricCardsData.value[1] as MetricCardProps,
+      weekResult.avgSleep.current.formatted,
+      weekResult.avgSleep.trendPercentaje,
+      weekResult.avgSleep.trend,
+      comparison
+    )
+
     fillMetric(
       metricCardsData.value[2] as MetricCardProps,
       weekResult.avgEfficiency.current.formatted,
@@ -170,6 +174,86 @@
   }
 
   const route = useRoute()
+
+  interface ViewConfig {
+    dateRange: DateRange
+    groupBy: 'day' | 'week' | 'month'
+    period: 'day' | 'week' | 'month'
+    displayCount: number
+    titlePrefix: string
+    comparisonText: string
+  }
+
+  const getViewConfig = (view: DashboardViews): ViewConfig => {
+    switch (view) {
+      case DashboardViews.SEMANAL:
+        return {
+          dateRange: weekRange.value,
+          groupBy: 'day',
+          period: 'day',
+          displayCount: 7,
+          titlePrefix: 'Semana del',
+          comparisonText: 'vs semana anterior',
+        }
+      case DashboardViews.MENSUAL:
+        return {
+          dateRange: monthRange.value,
+          groupBy: 'week',
+          period: 'week',
+          displayCount: 5,
+          titlePrefix: 'Mes del',
+          comparisonText: 'vs mes anterior',
+        }
+      case DashboardViews.ANUAL:
+        return {
+          dateRange: yearRange.value,
+          groupBy: 'month',
+          period: 'month',
+          displayCount: 12,
+          titlePrefix: 'Anio',
+          comparisonText: 'vs Anio anterior',
+        }
+      default:
+        throw new Error(`View ${view} not supported`)
+    }
+  }
+
+  const fetchPeriodData = async (view: DashboardViews) => {
+    const config = getViewConfig(view)
+
+    const [sleepData, metrics] = await Promise.all([
+      fetchSleepData({
+        userId: Number(route.params.id),
+        start: config.dateRange.start,
+        end: config.dateRange.end,
+        type: 'sleep',
+        groupBy: config.groupBy,
+      }),
+      fetchMetrics({
+        userId: Number(route.params.id),
+        start: config.dateRange.start,
+        end: config.dateRange.end,
+      }),
+    ])
+
+    sleepChartData.value = {
+      ...sleepChartData.value,
+      chartData: sleepData.data,
+      period: config.period,
+      displayCount: config.displayCount,
+      averageTimeAsleep: metrics.avgSleep.current.formatted,
+      changePercent: metrics.avgSleep.trendPercentaje,
+      title: `${config.titlePrefix} ${periodText.value}`,
+    }
+
+    fillDonut(
+      metrics.avgSleep.current.raw,
+      metrics.avgInBed.current.raw,
+      metrics.avgAwake.current.raw
+    )
+
+    fillMetrics(metrics, config.comparisonText)
+  }
   const fetchDataForView = async (view: DashboardViews, date: Date) => {
     loading.value = true
 
@@ -183,55 +267,9 @@
           break
 
         case DashboardViews.SEMANAL:
-          const weekResult = await fetchMetrics({
-            userId: Number(route.params.id),
-            start: weekRange.value.start,
-            end: weekRange.value.end,
-          })
-          console.log(weekResult)
-          sleepChartData.value = {
-            ...sleepChartData.value,
-            chartData: dailySleepData,
-            periodType: 'day',
-            displayCount: 7,
-            averageTimeAsleep: weekResult.avgSleep.current.formatted,
-            changePercent: weekResult.avgSleep.trendPercentaje,
-            title: `Semana del ${periodText.value}`,
-          }
-          fillDonut(
-            weekResult.avgSleep.current.raw,
-            weekResult.avgInBed.current.raw,
-            weekResult.avgAwake.current.raw
-          )
-          fillMetrics(weekResult, 'vs semana anterior')
-
-          break
-
         case DashboardViews.MENSUAL:
-          // const monthResult = await fetchMonth(date)
-          sleepChartData.value = {
-            ...sleepChartData.value,
-            chartData: weeklyData,
-            periodType: 'week',
-            displayCount: 4,
-            // averageTimeAsleep: monthResult.averageFormatted,
-            // changePercent: monthResult.changePercent,
-            title: `Mes del ${periodText.value}`,
-          }
-          fillDonut(300, 123, 78)
-          break
         case DashboardViews.ANUAL:
-          // const anualResult = await fetchMonth(date)
-          sleepChartData.value = {
-            ...sleepChartData.value,
-            chartData: monthlyData,
-            periodType: 'month',
-            displayCount: 12,
-            // averageTimeAsleep: monthResult.averageFormatted,
-            // changePercent: monthResult.changePercent,
-            title: `Anio ${periodText.value}`,
-          }
-          fillDonut(400, 150, 100)
+          await fetchPeriodData(view)
           break
       }
     } finally {

@@ -24,7 +24,7 @@
             {{ props.changePercent >= 0 ? 'trending_up' : 'trending_down' }}
           </span>
           {{ props.changePercent >= 0 ? '+' : ''
-          }}{{ props.changePercent.toFixed(0) }}% vs. pasada
+          }}{{ props.changePercent.toFixed(0) }}% vs. anterior
         </span>
         <span v-else-if="!hasData" class="text-sm text-[#9dabb9]">
           Sin datos
@@ -86,7 +86,7 @@
           :style="lineStyle"
         />
 
-        <!-- Data points (solo para días con datos) -->
+        <!-- Data points (solo para períodos con datos) -->
         <g class="data-points">
           <circle
             v-for="(point, index) in dataPoints"
@@ -117,36 +117,41 @@
 
     <!-- Labels -->
     <div class="w-full mt-3 overflow-hidden">
-      <div
-        class="hidden md:flex justify-between items-center text-[#9dabb9] text-xs font-bold uppercase gap-1"
-      >
+      <div class="relative w-full h-6 mt-3 hidden md:block">
         <div
           v-for="(period, index) in displayedLabels"
           :key="index"
-          class="flex-1 min-w-0"
+          class="absolute top-0 text-xs font-bold text-[#9dabb9] whitespace-nowrap"
+          :style="{
+            left: `${getLabelX(index)}px`,
+            transform:
+              index === 0
+                ? 'translateX(0%)'
+                : index === displayedLabels.length - 1
+                  ? 'translateX(-100%)'
+                  : 'translateX(-50%)',
+          }"
         >
-          <div
-            class="text-center truncate"
-            :class="{
-              'opacity-100': hasDataForPeriod(index),
-              'opacity-40': !hasDataForPeriod(index),
-            }"
-          >
-            {{ period }}
-            <div
-              v-if="!hasDataForPeriod(index)"
-              class="text-[10px] text-[#6b7280] font-normal normal-case"
-            ></div>
-          </div>
+          {{ period }}
         </div>
       </div>
-      <div
-        class="md:hidden flex justify-between items-center text-[#9dabb9] text-xs font-bold uppercase gap-1"
-      >
-        <div>{{ displayedLabels[0] }}</div>
-        <div>{{ displayedLabels[Math.floor(displayedLabels.length / 3)] }}</div>
-        <div>{{ displayedLabels[Math.ceil(displayedLabels.length / 2)] }}</div>
-        <div>{{ displayedLabels[displayedLabels.length - 1] }}</div>
+      <div class="relative w-full h-6 mt-3 md:hidden">
+        <div
+          v-for="(period, index) in displayedLabels"
+          :key="index"
+          class="absolute top-0 text-xs font-bold text-[#9dabb9] whitespace-nowrap"
+          :style="{
+            left: `${getLabelX(index)}px`,
+            transform:
+              index === 0
+                ? 'translateX(0%)'
+                : index === displayedLabels.length - 1
+                  ? 'translateX(-100%)'
+                  : 'translateX(-50%)',
+          }"
+        >
+          {{ period.slice(0, 2) }}
+        </div>
       </div>
     </div>
   </div>
@@ -155,29 +160,17 @@
 <script setup lang="ts">
   import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
-  interface ChartData {
-    day?: string
-    month?: string
-    year?: string | number
-    week?: string | number
-    weekNumber?: number
+  export interface SleepData {
+    date: string
     value: number
-    date?: string
-  }
-
-  interface DataPoint {
-    x: number
-    y: number
-    value: number
-    index: number
   }
 
   export interface SleepLineChartProps {
     averageTimeAsleep: string
     changePercent?: number
     title?: string
-    chartData: ChartData[]
-    periodType?: 'day' | 'month' | 'year' | 'week'
+    chartData: SleepData[]
+    period: 'day' | 'month' | 'year' | 'week' // Cambiado de periodType a period
     chartColor?: string
     displayCount?: number
   }
@@ -187,7 +180,7 @@
     title: 'Tiempo Dormido',
     changePercent: 0,
     averageTimeAsleep: '2h',
-    periodType: 'day',
+    period: 'day',
     chartColor: '#935fe0',
     displayCount: 12,
   })
@@ -206,15 +199,14 @@
   const viewBoxHeight: number = 250
   const ANIMATION_DURATION = 1000 // 1 segundo
 
-  // Labels según tipo de período - MANTENIENDO EL ORIGINAL pero añadiendo 'week'
+  // Labels según el período
   const periodLabels = computed(() => {
-    if (props.periodType === 'day') {
+    if (props.period === 'day') {
       return ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].slice(
         0,
         props.displayCount
       )
-    } else if (props.periodType === 'month') {
-      // <-- ESTO SIGUE IGUAL
+    } else if (props.period === 'month') {
       const months = [
         'Ene',
         'Feb',
@@ -230,7 +222,7 @@
         'Dic',
       ]
       return months.slice(0, props.displayCount)
-    } else if (props.periodType === 'week') {
+    } else if (props.period === 'week') {
       const weeks = []
       const maxWeeks = props.displayCount
       for (let i = 1; i <= maxWeeks; i++) {
@@ -253,82 +245,68 @@
     return props.chartData.length > 0
   })
 
-  // Mapear datos por período
-  const dataByPeriod = computed(() => {
-    const map = new Map<string, number>()
+  // Procesar datos agrupados por período
+  const groupedData = computed(() => {
+    const grouped = new Map<string, number[]>()
+
     props.chartData.forEach(item => {
-      const key = getPeriodKey(item)
-      if (key) {
-        map.set(key, item.value)
+      const periodKey = getPeriodKeyFromDate(item.date)
+      if (periodKey) {
+        if (!grouped.has(periodKey)) {
+          grouped.set(periodKey, [])
+        }
+        grouped.get(periodKey)?.push(item.value)
       }
     })
-    return map
+
+    // Calcular promedio para cada período
+    const averaged = new Map<string, number>()
+    grouped.forEach((values, key) => {
+      const sum = values.reduce((acc, val) => acc + val, 0)
+      averaged.set(key, sum / values.length)
+    })
+
+    return averaged
   })
 
-  // Obtener clave única para el período - AÑADIDO soporte para 'week'
-  const getPeriodKey = (item: ChartData): string | null => {
-    if (props.periodType === 'day' && item.day) {
-      return item.day.trim()
+  // Obtener clave única para el período desde una fecha
+  const getPeriodKeyFromDate = (dateStr: string): string | null => {
+    const date = new Date(dateStr)
+
+    if (props.period === 'day') {
+      const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+      return days[date.getDay()] as string
     }
 
-    if (props.periodType === 'month' && item.month) {
-      const month = item.month.trim()
-      // Asegurar que es formato abreviado (3 letras)
-      if (month.length > 3) {
-        return month.substring(0, 3)
-      }
-      return month
+    if (props.period === 'month') {
+      const months = [
+        'Ene',
+        'Feb',
+        'Mar',
+        'Abr',
+        'May',
+        'Jun',
+        'Jul',
+        'Ago',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dic',
+      ]
+      return months[date.getMonth()] as string
     }
 
-    if (props.periodType === 'week') {
-      // <-- AÑADIDO
-      // Prioridad: weekNumber, luego week
-      if (item.weekNumber !== undefined) {
-        return `S${item.weekNumber}`
-      }
-      if (item.week) {
-        if (typeof item.week === 'number') {
-          return `S${item.week}`
-        }
-        return item.week.toString().trim()
-      }
+    if (props.period === 'week') {
+      // Calcular número de semana del mes
+      const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+      const firstDay = firstDayOfMonth.getDay() // 0=Domingo, 1=Lunes...
+      const offsetDate = date.getDate() + (firstDay === 0 ? 6 : firstDay - 1)
+      const weekNumber = Math.floor(offsetDate / 7) + 1
+      return `S${weekNumber}`
     }
 
-    if (props.periodType === 'year' && item.year !== undefined) {
-      return item.year.toString().trim()
-    }
-
-    if (item.date) {
-      const date = new Date(item.date)
-      if (props.periodType === 'day') {
-        const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-        return days[date.getDay()] as string
-      } else if (props.periodType === 'month') {
-        const months = [
-          'Ene',
-          'Feb',
-          'Mar',
-          'Abr',
-          'May',
-          'Jun',
-          'Jul',
-          'Ago',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dic',
-        ]
-        return months[date.getMonth()] as string
-      } else if (props.periodType === 'week') {
-        // Calcular número de semana desde la fecha
-        const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
-        const firstDay = firstDayOfMonth.getDay() // 0=Domingo, 1=Lunes...
-        const offsetDate = date.getDate() + firstDay - 1
-        const weekNumber = Math.floor(offsetDate / 7) + 1
-        return `S${weekNumber}`
-      } else {
-        return date.getFullYear().toString()
-      }
+    if (props.period === 'year') {
+      return date.getFullYear().toString()
     }
 
     return null
@@ -337,7 +315,7 @@
   // Obtener valor para un período específico
   const getValueForPeriod = (periodIndex: number): number | null => {
     const periodKey = periodLabels.value[periodIndex] as string
-    return dataByPeriod.value.get(periodKey) || null
+    return groupedData.value.get(periodKey) || null
   }
 
   // Verificar si hay datos para un período específico
@@ -359,7 +337,7 @@
   })
 
   // Calcular puntos del gráfico
-  const dataPoints = computed<DataPoint[]>(() => {
+  const dataPoints = computed(() => {
     const validData = validChartValues.value
     if (validData.length === 0) return []
 
@@ -402,21 +380,21 @@
     return periodIndex * spacing
   }
 
-  // Generar la línea del gráfico CON CURVAS (manteniendo tu versión original)
+  // Generar la línea del gráfico CON CURVAS
   const chartPath = computed<string>(() => {
     const dp = dataPoints.value
     if (dp.length < 2) return ''
 
     // Ordenar puntos por índice
     const sortedPoints = [...dp].sort((a, b) => a.index - b.index)
-    const first = sortedPoints[0] as DataPoint
+    const first = sortedPoints[0] as { x: number; y: number }
 
     let path = `M${first.x},${first.y}`
 
-    // Usar curvas Bézier básicas (TU VERSIÓN ORIGINAL)
+    // Usar curvas Bézier básicas
     for (let i = 1; i < sortedPoints.length; i++) {
-      const prev = sortedPoints[i - 1] as DataPoint
-      const curr = sortedPoints[i] as DataPoint
+      const prev = sortedPoints[i - 1] as { x: number; y: number }
+      const curr = sortedPoints[i] as { x: number; y: number }
 
       // Calcular puntos de control para una curva suave
       const dx = curr.x - prev.x
@@ -438,17 +416,17 @@
     if (dp.length === 0) return ''
 
     const sortedPoints = [...dp].sort((a, b) => a.index - b.index)
-    const lastPoint = sortedPoints[sortedPoints.length - 1] as DataPoint
-    const firstPoint = sortedPoints[0] as DataPoint
+    const lastPoint = sortedPoints[sortedPoints.length - 1] as { x: number }
+    const firstPoint = sortedPoints[0] as { x: number }
 
     return ` L${lastPoint.x},${viewBoxHeight - 40} L${firstPoint.x},${viewBoxHeight - 40} Z`
   })
 
-  // Labels a mostrar (abreviados)
+  // Labels a mostrar
   const displayedLabels = computed(() => {
     return periodLabels.value.map(label => {
       // Si son meses largos, abreviar más si es necesario
-      if (props.periodType === 'month' && label.length > 3) {
+      if (props.period === 'month' && label.length > 3) {
         return label.substring(0, 3)
       }
       return label
@@ -460,7 +438,6 @@
     if (!chartPath.value) return 1000
 
     try {
-      // Crea un path temporal para calcular la longitud
       const tempPath = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'path'
@@ -502,7 +479,7 @@
 
   // Reiniciar animación cuando cambian los datos
   watch(
-    () => [props.chartData, props.periodType, props.displayCount],
+    () => [props.chartData, props.period, props.displayCount],
     () => {
       if (hasData.value) {
         startAnimation()
@@ -514,42 +491,33 @@
   const startAnimation = async () => {
     isAnimating.value = true
 
-    // Esperar al siguiente ciclo de renderizado
     await nextTick()
 
-    // Resetear todos los elementos a su estado inicial
     resetAnimation()
 
-    // Iniciar TODAS las animaciones al mismo tiempo
     setTimeout(() => {
-      // Asegurar que lineLength está calculado
       lineLength.value = calculateLineLength()
 
-      // Animar la línea (ahora con la longitud correcta)
       if (chartLine.value) {
         chartLine.value.style.transition = `stroke-dashoffset ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`
         chartLine.value.style.strokeDashoffset = '0'
       }
 
-      // Animar el área
       if (chartArea.value) {
         chartArea.value.style.transition = `opacity ${ANIMATION_DURATION}ms ease-in-out`
         chartArea.value.style.opacity = '1'
       }
 
-      // Animar puntos de datos
       dataPointsRef.value.forEach(point => {
         point.style.transition = `r ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`
         point.setAttribute('r', '3')
       })
 
-      // Animar puntos vacíos
       emptyPointsRef.value.forEach(point => {
         point.style.transition = `r ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`
         point.setAttribute('r', '2')
       })
 
-      // Marcar como completado después de la duración de la animación
       setTimeout(() => {
         isAnimating.value = false
       }, ANIMATION_DURATION)
@@ -568,17 +536,22 @@
       chartArea.value.style.transition = 'none'
     }
 
-    // Resetear puntos de datos
     dataPointsRef.value.forEach(point => {
       point.setAttribute('r', '0')
       point.style.transition = 'none'
     })
 
-    // Resetear puntos vacíos
     emptyPointsRef.value.forEach(point => {
       point.setAttribute('r', '0')
       point.style.transition = 'none'
     })
+  }
+  const svgElement = ref<SVGSVGElement | null>(null)
+  const getLabelX = (periodIndex: number) => {
+    if (!svgElement.value) return 0
+    const svgWidth = svgElement.value.clientWidth
+    const xInViewBox = getPeriodXPosition(periodIndex)
+    return (xInViewBox / viewBoxWidth) * svgWidth
   }
 
   // Limpiar animaciones al desmontar
@@ -590,10 +563,9 @@
 </script>
 
 <style scoped>
-  /* Asegurar que los períodos no se salgan */
   .period-cell {
     flex: 1 1 0;
-    min-width: 0; /* IMPORTANTE: permite que el truncate funcione */
+    min-width: 0;
   }
 
   .period-label {

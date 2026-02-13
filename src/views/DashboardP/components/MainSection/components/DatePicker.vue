@@ -356,8 +356,15 @@
 
   // Verificar si un día tiene registro
   const hasRegistro = (day: Day): boolean => {
-    const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
-    return registros.value.some(reg => reg.fecha === dateStr)
+    return registros.value.some(reg => {
+      const regDate = new Date(reg.fecha)
+
+      return (
+        regDate.getFullYear() === day.year &&
+        regDate.getMonth() === day.month &&
+        regDate.getDate() === day.date
+      )
+    })
   }
 
   // Verificar si es hoy

@@ -19,6 +19,18 @@ export const getWeekRange = (date: Date): DateRange => {
 
   return { start, end }
 }
+export function getYearRange(date: Date): DateRange {
+  const year = date.getFullYear()
+
+  const start = new Date(year, 0, 1)
+  start.setHours(0, 0, 0, 0)
+
+  const end = new Date(year, 11, 31)
+  end.setHours(23, 59, 59, 999)
+
+  return { start, end }
+}
+
 export const getMonthRange = (date: Date): DateRange => {
   const year = date.getFullYear()
   const month = date.getMonth()

@@ -26,9 +26,10 @@
               stroke-width="12"
             />
 
-            <!-- segmentos -->
+            <!-- segmentos con separación mínima -->
             <circle
               v-for="(segment, index) in renderedSegments"
+              v-show="segment.value > 0"
               :key="index"
               cx="50"
               cy="50"
@@ -36,8 +37,8 @@
               fill="transparent"
               :stroke="segment.color"
               stroke-width="12"
-              stroke-linecap="butt"
-              :stroke-dasharray="`${segment.length} ${circumference - segment.length}`"
+              stroke-linecap="inherit"
+              :stroke-dasharray="`${segment.length} ${circumference}`"
               :stroke-dashoffset="segment.offset"
               class="transition-all duration-700 ease-out"
             />
@@ -139,19 +140,40 @@
     })
   })
 
+  // const renderedSegments = computed(() => {
+  //   let offset = 0
+  //   return preparedSegments.value.map(seg => {
+  //     const full = (seg.percentage! / 100) * circumference
+  //     const length = full * animatedProgress.value
+
+  //     const data = {
+  //       ...seg,
+  //       length,
+  //       offset: -offset,
+  //     }
+
+  //     offset += full
+  //     return data
+  //   })
+  // })
+  const GAP = 2 // tamaño deseado de gap en unidades de circunferencia
+
   const renderedSegments = computed(() => {
-    let offset = 0
+    let offset = GAP
     return preparedSegments.value.map(seg => {
-      const full = (seg.percentage! / 100) * circumference
+      const full =
+        (seg.percentage! / 100) *
+        (circumference - GAP * preparedSegments.value.length)
       const length = full * animatedProgress.value
 
       const data = {
         ...seg,
         length,
+        dasharray: `${length} ${GAP}`,
         offset: -offset,
       }
 
-      offset += full
+      offset += full + GAP
       return data
     })
   })
