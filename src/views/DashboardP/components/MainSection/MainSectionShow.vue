@@ -10,11 +10,14 @@
   } from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
   import { type SleepReg } from '@/types/sleepReg.types'
-  import { DashboardViews, type Metrics } from '@/types/dashboardP.types'
+  import {
+    DashboardViews,
+    type Metrics,
+    type RegCalendar,
+  } from '@/types/dashboardP.types'
   import DonutChart, {
     type DonutSegment,
   } from '@/views/MiCuenta/components/DonutChart.vue'
-  import DatePicker from './components/DatePicker.vue'
   import {
     formatDateRange,
     formatDay,
@@ -23,9 +26,10 @@
     getYearRange,
     type DateRange,
   } from './utils/date.utils'
-  import { fetchDailyReg } from '@/api/SleepData/sleepReg.api'
+  import { fetchCalendar, fetchDailyReg } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
   import { fetchSleepData, fetchMetrics } from '@/api/SleepData/metricData.api'
+  import UserCalendar from '@/views/UserCalendar/components/UserCalendar.vue'
 
   const sleepChartData = ref<SleepLineChartProps>({
     chartData: [],
@@ -33,12 +37,7 @@
     averageTimeAsleep: '0h ',
     chartColor: '#935fe0',
   })
-
-  const donutChartData = ref<[DonutSegment, DonutSegment, DonutSegment]>([
-    { value: 0, color: '#4f46e5', label: 'Asleep' },
-    { value: 0, color: '#d97706', label: 'InBed' },
-    { value: 0, color: '#059669', label: 'Awake' },
-  ])
+  const donutChartData = ref<DonutSegment[]>([])
   const trendDefault = {
     value: '',
     direction: 'stable' as const,
@@ -77,7 +76,8 @@
   }>()
   defineEmits(['exit', 'edit'])
 
-  const selectedDate = ref<Date>(new Date())
+  const date = ref<string>(new Date().toISOString())
+  const selectedDate = computed<Date>(() => new Date(date.value))
   const weekRange = computed<DateRange>(() => getWeekRange(selectedDate.value))
   const monthRange = computed<DateRange>(() =>
     getMonthRange(selectedDate.value)
@@ -124,9 +124,19 @@
     }
   }
   function fillDonut(avgAsleep: number, avgInBed: number, avgAwake: number) {
-    donutChartData.value[0].value = avgAsleep
-    donutChartData.value[1].value = avgInBed
-    donutChartData.value[2].value = avgAwake
+    const segments = []
+
+    if (avgAsleep > 0) {
+      segments.push({ value: avgAsleep, color: '#4f46e5', label: 'Asleep' })
+    }
+    if (avgInBed > 0) {
+      segments.push({ value: avgInBed, color: '#d97706', label: 'InBed' })
+    }
+    if (avgAwake > 0) {
+      segments.push({ value: avgAwake, color: '#059669', label: 'Awake' })
+    }
+
+    donutChartData.value = segments
   }
   function fillMetric(
     metric: MetricCardProps,
@@ -283,10 +293,16 @@
       item.value = 0
     })
   }
+  const calendarDays = ref<RegCalendar[]>([])
 
   watch(
-    [selectedView, selectedDate],
-    async ([newView, newDate], [oldView, oldDate]) => {
+    [selectedView, selectedDate, () => Number(route.params.id)],
+    async ([newView, newDate, newId], [oldView, oldDate, oldId]) => {
+      if (newId !== oldId) {
+        calendarDays.value = await fetchCalendar({ userId: newId })
+        date.value = new Date().toISOString()
+        return fetchDataForView(newView, newDate)
+      }
       if (newDate !== oldDate) {
         refreshChartData()
         return fetchDataForView(newView, newDate)
@@ -301,10 +317,6 @@
     },
     { immediate: true }
   )
-
-  const handleDateSelected = (day: Date) => {
-    selectedDate.value = day
-  }
 </script>
 <template>
   <section
@@ -362,39 +374,49 @@
         @view-change="handleViewChange"
         @calendar-click="isOpenCalendar = true"
       />
-      <div
-        v-if="selectedView != DashboardViews.DIARIA && loading === false"
-        class="grid lg:grid-cols-2 gap-4"
-      >
-        <DonutChart
-          title="Distribución del Sueño"
-          subtitle="Análisis promedio"
-          :segments="donutChartData"
-          center-subtitle="Total Noche"
-        />
-        <SleepChart v-bind="sleepChartData" />
-        <div class="grid grid-cols-2 lg:col-span-2 lg:grid-cols-4 gap-4">
-          <MetricCard
-            v-for="metric in metricCardsData"
-            :key="metric.title"
-            :title="metric.title"
-            :value="metric.value"
-            :icon="metric.icon"
-            :trend="metric.trend"
+      <section v-if="loading === false">
+        <div
+          v-if="selectedView != DashboardViews.DIARIA"
+          class="grid lg:grid-cols-2 gap-4"
+        >
+          <DonutChart
+            title="Distribución del Sueño"
+            subtitle="Análisis promedio"
+            :segments="donutChartData"
+            center-subtitle="Total Noche"
           />
+          <SleepChart v-bind="sleepChartData" />
+          <div class="grid grid-cols-2 lg:col-span-2 lg:grid-cols-4 gap-4">
+            <MetricCard
+              v-for="metric in metricCardsData"
+              :key="metric.title"
+              :title="metric.title"
+              :value="metric.value"
+              :icon="metric.icon"
+              :trend="metric.trend"
+            />
+          </div>
         </div>
-      </div>
-      <DetailSleep
-        v-if="selectedView === DashboardViews.DIARIA && loading === false"
-        :date="selectedDate"
-        :dayReg="dayReg"
-      />
-      <DatePicker
-        :is-open="isOpenCalendar"
-        :selected-date="selectedDate"
-        @close="isOpenCalendar = false"
-        @date-selected="handleDateSelected"
-      />
+        <DetailSleep
+          v-if="selectedView === DashboardViews.DIARIA"
+          :date="selectedDate"
+          :dayReg="dayReg"
+        />
+      </section>
+      <Teleport to="body">
+        <div
+          class="hidden md:block fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-500 ease-in-out"
+          :class="
+            isOpenCalendar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          "
+          @click="isOpenCalendar = false"
+        ></div>
+        <UserCalendar
+          v-model="isOpenCalendar"
+          :registros="calendarDays"
+          v-model:selected-date="date"
+        />
+      </Teleport>
     </div>
   </section>
 </template>

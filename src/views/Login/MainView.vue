@@ -150,7 +150,7 @@
               </p>
               <input
                 class="form-input h-12 w-full flex-1 resize-none overflow-hidden rounded-lg border border-gray-300 bg-white/50 dark:bg-black/30 px-4 py-2.5 text-base font-normal text-gray-900 placeholder:text-gray-400 focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 transition-all duration-300 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-500"
-                placeholder="Introduce tu usuario o correo"
+                placeholder="Introduce tu correo"
                 type="email"
                 v-model="email"
               />

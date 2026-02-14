@@ -1,67 +1,88 @@
 <script setup lang="ts">
-  import RegTable from '../components/RegTable.vue'
-  import {
-    calculateDuration,
-    getBorderColor,
-    getQualityColor,
-  } from '@/views/components/utils/utils'
+  import { ref } from 'vue'
+  import UserCalendar from './components/UserCalendar.vue'
 
-  const eficiencia = 98
-  const hours = 7.34
-  const duration = calculateDuration(hours)
+  const isDrawerOpen = ref(false)
+  const selectDate = ref('')
+
+  const toggleDrawer = () => {
+    isDrawerOpen.value = !isDrawerOpen.value
+  }
+  const registros = ref([
+    { fecha: '2025-01-04T00:00:00.000Z', notification: true },
+    { fecha: '2025-01-12T00:00:00.000Z', notification: true },
+    { fecha: '2025-01-20T00:00:00.000Z', notification: true },
+    { fecha: '2025-01-25T00:00:00.000Z', notification: true },
+    { fecha: '2024-12-15T00:00:00.000Z', notification: true },
+    { fecha: '2024-11-03T00:00:00.000Z', notification: true },
+  ])
 </script>
 
 <template>
-  <main
-    class="flex justify-center pb-safe-sm px-4 py-6 sm:py-8 w-full overflow-y-auto sm:px-40"
-  >
-    <div class="max-w-3xl">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div
-          class="rounded-xl border border-gray-200 dark:border-primary bg-white dark:bg-[#1c2127] p-5 shadow-sm flex flex-row md:flex-row items-center justify-between gap-4"
-        >
-          <div class="flex items-center gap-3">
-            <div
-              class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-primary"
-            >
-              <span class="material-symbols-outlined text-[24px]">bedtime</span>
-            </div>
-            <div class="flex flex-col">
-              <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >Promedio de Sueño</span
-              >
-              <span class="text-xs text-gray-400">7 días</span>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ duration }}
+  <main class="flex-1 flex justify-center py-8 px-4 sm:px-10 lg:px-20">
+    <div class="w-full flex flex-col gap-6">
+      <div
+        class="flex flex-col justify-center items-center lg:flex-row lg:justify-between lg:items-end gap-6 px-2"
+      >
+        <div class="flex flex-col gap-1">
+          <h1
+            class="text-white text-3xl font-black leading-tight tracking-tight"
+          >
+            Vista Diaria Detallada
+          </h1>
+          <p class="text-[#9dabb9] text-sm font-medium flex items-center gap-2">
+            Análisis técnico de la jornada para el paciente.
           </p>
         </div>
         <div
-          class="rounded-xl border bg-white dark:bg-[#1c2127] p-5 shadow-sm flex flex-row md:flex-row items-center justify-between gap-4"
-          :class="[getBorderColor(eficiencia)]"
+          class="flex flex-wrap justify-center items-center gap-4 p-1.5 rounded-2xl bg-primary/10 border border-primary/20 backdrop-blur-sm"
         >
-          <div class="flex items-center gap-3">
-            <div
-              :class="[getQualityColor(eficiencia)]"
-              class="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl"
-            >
-              <span class="material-symbols-outlined text-[24px]"
-                >battery_charging_full</span
-              >
-            </div>
-            <div class="flex flex-col">
-              <span class="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >Promedio Eficiencia</span
-              >
-              <span class="text-xs text-gray-400">7 días</span>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ `${eficiencia}%` }}
-          </p>
+          <button
+            class="bg-primary text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider shadow-lg shadow-primary/25"
+          >
+            Día
+          </button>
+          <button
+            class="text-[#9dabb9] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-white transition-all"
+          >
+            Semana
+          </button>
+          <button
+            class="text-[#9dabb9] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-white transition-all"
+          >
+            Mes
+          </button>
+          <button
+            class="text-[#9dabb9] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:text-white transition-all"
+          >
+            Año
+          </button>
         </div>
+        <button
+          class="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-bold transition-all border border-primary/20 group"
+          @click="toggleDrawer"
+        >
+          <span
+            class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform"
+            >calendar_today</span
+          >
+          <span>{{ selectDate }}</span>
+        </button>
       </div>
     </div>
+
+    <!-- Overlay y Drawer con v-model -->
+    <Teleport to="body">
+      <div
+        class="hidden md:block fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-500 ease-in-out"
+        :class="isDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+        @click="isDrawerOpen = false"
+      ></div>
+      <UserCalendar
+        v-model="isDrawerOpen"
+        :registros="registros"
+        v-model:selected-date="selectDate"
+      />
+    </Teleport>
   </main>
 </template>
