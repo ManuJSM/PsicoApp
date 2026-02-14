@@ -34,20 +34,7 @@
 
     <!-- Chart Container -->
     <div class="relative grow w-full mt-2">
-      <!-- Estado sin datos -->
-      <div
-        v-if="!hasData"
-        class="absolute inset-0 flex flex-col items-center justify-center text-[#9dabb9] min-h-[180px]"
-      >
-        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">
-          show_chart
-        </span>
-        <p class="text-sm font-medium">No hay datos disponibles</p>
-      </div>
-
-      <!-- Chart SVG -->
       <svg
-        v-else
         :viewBox="`0 0 ${viewBoxWidth} ${viewBoxHeight}`"
         preserveAspectRatio="xMidYMid meet"
         width="100%"
@@ -55,7 +42,7 @@
         class="relative z-0"
         ref="svgElement"
       >
-        <!-- Gradiente único -->
+        <!-- Gradiente -->
         <defs>
           <linearGradient :id="gradientId" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" :stop-color="chartColor" stop-opacity="0.5" />
@@ -75,6 +62,7 @@
           }"
         />
 
+        <!-- Chart line -->
         <path
           ref="chartLine"
           :d="chartPath"
@@ -86,7 +74,7 @@
           :style="lineStyle"
         />
 
-        <!-- Data points (solo para períodos con datos) -->
+        <!-- Data points -->
         <g class="data-points">
           <circle
             v-for="(point, index) in dataPoints"
@@ -99,60 +87,38 @@
           />
         </g>
 
-        <!-- Puntos vacíos para periodos sin datos -->
+        <!-- Empty points -->
         <g class="empty-points">
           <circle
             v-for="(period, index) in emptyPeriods"
             :key="'empty-' + index"
-            :cx="getPeriodXPosition(index)"
-            :cy="viewBoxHeight - 60"
+            :cx="getXPosition(index)"
+            :cy="viewBoxHeight - 40"
             fill="#6b7280"
             r="0"
             opacity="0.3"
             ref="emptyPointsRef"
           />
         </g>
-      </svg>
-    </div>
 
-    <!-- Labels -->
-    <div class="w-full mt-3 overflow-hidden">
-      <div class="relative w-full h-6 mt-3 hidden md:block">
-        <div
-          v-for="(period, index) in displayedLabels"
-          :key="index"
-          class="absolute top-0 text-xs font-bold text-[#9dabb9] whitespace-nowrap"
-          :style="{
-            left: `${getLabelX(index)}px`,
-            transform:
-              index === 0
-                ? 'translateX(0%)'
-                : index === displayedLabels.length - 1
-                  ? 'translateX(-100%)'
-                  : 'translateX(-50%)',
-          }"
-        >
-          {{ period }}
-        </div>
-      </div>
-      <div class="relative w-full h-6 mt-3 md:hidden">
-        <div
-          v-for="(period, index) in displayedLabels"
-          :key="index"
-          class="absolute top-0 text-xs font-bold text-[#9dabb9] whitespace-nowrap"
-          :style="{
-            left: `${getLabelX(index)}px`,
-            transform:
-              index === 0
-                ? 'translateX(0%)'
-                : index === displayedLabels.length - 1
-                  ? 'translateX(-100%)'
-                  : 'translateX(-50%)',
-          }"
-        >
-          {{ period.slice(0, 2) }}
-        </div>
-      </div>
+        <!-- LABELS - MÁS ARRIBA -->
+        <g v-for="(label, index) in displayedLabels" :key="index">
+          <text
+            :x="getXPosition(index)"
+            :y="viewBoxHeight - 30"
+            text-anchor="middle"
+            :class="{
+              'first-label': index === 0,
+              'last-label': index === displayedLabels.length - 1,
+            }"
+            fill="#9dabb9"
+            font-size="20"
+            font-weight="bold"
+          >
+            {{ label }}
+          </text>
+        </g>
+      </svg>
     </div>
   </div>
 </template>
@@ -170,7 +136,7 @@
     changePercent?: number
     title?: string
     chartData: SleepData[]
-    period: 'day' | 'month' | 'year' | 'week' // Cambiado de periodType a period
+    period: 'day' | 'month' | 'year' | 'week'
     chartColor?: string
     displayCount?: number
   }
@@ -191,13 +157,15 @@
   const chartArea = ref<SVGPathElement | null>(null)
   const dataPointsRef = ref<SVGCircleElement[]>([])
   const emptyPointsRef = ref<SVGCircleElement[]>([])
+  const svgElement = ref<SVGSVGElement | null>(null)
+
   const isAnimating = ref(true)
   const lineLength = ref(1000)
 
-  // Constantes
-  const viewBoxWidth: number = 800
-  const viewBoxHeight: number = 250
-  const ANIMATION_DURATION = 1000 // 1 segundo
+  // viewBox
+  const viewBoxWidth = 1000
+  const viewBoxHeight = 400
+  const ANIMATION_DURATION = 1000
 
   // Labels según el período
   const periodLabels = computed(() => {
@@ -239,6 +207,13 @@
       return years
     }
   })
+
+  // Función para posición X
+  const getXPosition = (index: number): number => {
+    const total = periodLabels.value.length
+    if (total === 1) return viewBoxWidth / 2
+    return (index / (total - 1)) * viewBoxWidth
+  }
 
   // Verificar si hay datos
   const hasData = computed(() => {
@@ -297,9 +272,8 @@
     }
 
     if (props.period === 'week') {
-      // Calcular número de semana del mes
       const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
-      const firstDay = firstDayOfMonth.getDay() // 0=Domingo, 1=Lunes...
+      const firstDay = firstDayOfMonth.getDay()
       const offsetDate = date.getDate() + (firstDay === 0 ? 6 : firstDay - 1)
       const weekNumber = Math.floor(offsetDate / 7) + 1
       return `S${weekNumber}`
@@ -346,16 +320,9 @@
     const minValue = Math.min(...values)
     const range = maxValue - minValue || 1
 
-    // Calcular posición X basada en el período
-    const getXPosition = (periodIndex: number) => {
-      const totalPeriods = periodLabels.value.length
-      const spacing = viewBoxWidth / Math.max(1, totalPeriods - 1)
-      return periodIndex * spacing
-    }
-
     return validData.map(item => {
-      const normalizedY = ((item.value - minValue) / range) * 180
-      const y = viewBoxHeight - 60 - normalizedY
+      const normalizedY = ((item.value - minValue) / range) * 250
+      const y = viewBoxHeight - 80 - normalizedY
 
       return {
         x: getXPosition(item.index),
@@ -373,32 +340,21 @@
       .filter(item => !hasDataForPeriod(item.index))
   })
 
-  // Función para obtener posición X de un período
-  const getPeriodXPosition = (periodIndex: number): number => {
-    const totalPeriods = periodLabels.value.length
-    const spacing = viewBoxWidth / Math.max(1, totalPeriods - 1)
-    return periodIndex * spacing
-  }
-
-  // Generar la línea del gráfico CON CURVAS
+  // Generar la línea del gráfico
   const chartPath = computed<string>(() => {
     const dp = dataPoints.value
     if (dp.length < 2) return ''
 
-    // Ordenar puntos por índice
     const sortedPoints = [...dp].sort((a, b) => a.index - b.index)
     const first = sortedPoints[0] as { x: number; y: number }
 
     let path = `M${first.x},${first.y}`
 
-    // Usar curvas Bézier básicas
     for (let i = 1; i < sortedPoints.length; i++) {
       const prev = sortedPoints[i - 1] as { x: number; y: number }
       const curr = sortedPoints[i] as { x: number; y: number }
 
-      // Calcular puntos de control para una curva suave
       const dx = curr.x - prev.x
-
       const cp1x = prev.x + dx * 0.3
       const cp1y = prev.y
       const cp2x = curr.x - dx * 0.3
@@ -419,13 +375,12 @@
     const lastPoint = sortedPoints[sortedPoints.length - 1] as { x: number }
     const firstPoint = sortedPoints[0] as { x: number }
 
-    return ` L${lastPoint.x},${viewBoxHeight - 40} L${firstPoint.x},${viewBoxHeight - 40} Z`
+    return ` L${lastPoint.x},${viewBoxHeight - 60} L${firstPoint.x},${viewBoxHeight - 60} Z`
   })
 
   // Labels a mostrar
   const displayedLabels = computed(() => {
     return periodLabels.value.map(label => {
-      // Si son meses largos, abreviar más si es necesario
       if (props.period === 'month' && label.length > 3) {
         return label.substring(0, 3)
       }
@@ -460,7 +415,7 @@
       : `stroke-dashoffset ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
   }))
 
-  // Inicializar ID único para el gradiente
+  // Inicializar
   onMounted(() => {
     gradientId.value = `gradient-${Math.random().toString(36).substring(2, 9)}`
     startAnimation()
@@ -487,7 +442,7 @@
     }
   )
 
-  // Función para iniciar la animación simultánea
+  // Función para iniciar la animación
   const startAnimation = async () => {
     isAnimating.value = true
 
@@ -546,13 +501,6 @@
       point.style.transition = 'none'
     })
   }
-  const svgElement = ref<SVGSVGElement | null>(null)
-  const getLabelX = (periodIndex: number) => {
-    if (!svgElement.value) return 0
-    const svgWidth = svgElement.value.clientWidth
-    const xInViewBox = getPeriodXPosition(periodIndex)
-    return (xInViewBox / viewBoxWidth) * svgWidth
-  }
 
   // Limpiar animaciones al desmontar
   onUnmounted(() => {
@@ -563,15 +511,16 @@
 </script>
 
 <style scoped>
-  .period-cell {
-    flex: 1 1 0;
-    min-width: 0;
+  .first-label {
+    text-anchor: start;
   }
 
-  .period-label {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .last-label {
+    text-anchor: end;
+  }
+
+  text {
+    dominant-baseline: hanging;
+    font-family: inherit;
   }
 </style>

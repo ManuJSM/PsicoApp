@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { RouterLink } from 'vue-router'
+</script>
 <template>
   <div
     class="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden p-6"
@@ -47,15 +49,15 @@
           existe.
         </h3>
         <div class="flex flex-col gap-4 w-full px-4">
-          <a
+          <RouterLink
             class="flex items-center justify-center h-10 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors group"
-            href="#"
+            :to="{ name: 'login' }"
           >
             <span class="material-symbols-outlined mr-2 text-[18px]"
-              >support_agent</span
+              >login</span
             >
-            Contactar soporte
-          </a>
+            Ir al inicio de sesión
+          </RouterLink>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@
 
     <!-- Content -->
     <div class="flex flex-col md:flex-row items-center md:items-stretch gap-4">
-      <!-- Donut (responsive real, sin tamaños fijos) -->
+      <!-- Donut -->
       <div class="flex-1 flex items-center justify-center">
         <div class="relative w-full aspect-square">
           <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
@@ -26,10 +26,9 @@
               stroke-width="12"
             />
 
-            <!-- segmentos con separación mínima -->
+            <!-- segmentos (siempre renderizados pero invisibles cuando no hay datos) -->
             <circle
               v-for="(segment, index) in renderedSegments"
-              v-show="segment.value > 0"
               :key="index"
               cx="50"
               cy="50"
@@ -37,10 +36,13 @@
               fill="transparent"
               :stroke="segment.color"
               stroke-width="12"
-              stroke-linecap="inherit"
-              :stroke-dasharray="`${segment.length} ${circumference}`"
+              stroke-linecap="butt"
+              :stroke-dasharray="segment.dashArray"
               :stroke-dashoffset="segment.offset"
-              class="transition-all duration-700 ease-out"
+              :class="[
+                'transition-all duration-700 ease-out',
+                { 'opacity-0': !hasSegments },
+              ]"
             />
           </svg>
 
@@ -62,7 +64,7 @@
 
       <!-- Legend lateral -->
       <div
-        v-if="showLegend && preparedSegments.length"
+        v-if="showLegend && hasSegments"
         class="flex-1 flex md:flex-col justify-center gap-4"
       >
         <div
@@ -80,12 +82,20 @@
           <span class="text-sm text-slate-400">{{ segment.percentage }}%</span>
         </div>
       </div>
+
+      <!-- Mensaje cuando no hay datos -->
+      <div
+        v-else-if="showLegend"
+        class="flex-1 flex items-center justify-center text-slate-500 text-sm"
+      >
+        No hay datos disponibles
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { computed, ref, onMounted, watch, nextTick } from 'vue'
 
   export interface DonutSegment {
     value: number
@@ -119,16 +129,22 @@
   defineEmits(['analytics-click'])
 
   const animatedProgress = ref(0)
+  const isReady = ref(false)
 
   const radius = 40
   const circumference = 2 * Math.PI * radius
 
+  const hasSegments = computed(() => props.segments.length > 0)
+
   const totalValue = computed(() => {
     if (props.centerValue > 0) return props.centerValue
+    if (!hasSegments.value) return 0
     return props.segments.reduce((s, seg) => s + seg.value, 0)
   })
 
   const preparedSegments = computed(() => {
+    if (!hasSegments.value) return []
+
     const total = totalValue.value || 1
     let acc = 0
 
@@ -140,41 +156,43 @@
     })
   })
 
-  // const renderedSegments = computed(() => {
-  //   let offset = 0
-  //   return preparedSegments.value.map(seg => {
-  //     const full = (seg.percentage! / 100) * circumference
-  //     const length = full * animatedProgress.value
-
-  //     const data = {
-  //       ...seg,
-  //       length,
-  //       offset: -offset,
-  //     }
-
-  //     offset += full
-  //     return data
-  //   })
-  // })
-  const GAP = 2 // tamaño deseado de gap en unidades de circunferencia
+  const GAP = 2 // Reducido para que sea menos notable
 
   const renderedSegments = computed(() => {
-    let offset = GAP
-    return preparedSegments.value.map(seg => {
-      const full =
-        (seg.percentage! / 100) *
-        (circumference - GAP * preparedSegments.value.length)
-      const length = full * animatedProgress.value
+    if (!hasSegments.value || preparedSegments.value.length === 0) {
+      // Retornar un array con un segmento invisible en lugar de vacío
+      return [
+        {
+          color: 'transparent',
+          dashArray: `0 ${circumference}`,
+          offset: 0,
+          value: 0,
+        },
+      ]
+    }
 
-      const data = {
-        ...seg,
-        length,
-        dasharray: `${length} ${GAP}`,
-        offset: -offset,
+    let offset = 0
+    const segmentsWithGap = preparedSegments.value.filter(s => s.percentage > 0)
+    const totalGap = GAP * segmentsWithGap.length
+
+    return segmentsWithGap.map((seg, index) => {
+      const full = (seg.percentage! / 100) * (circumference - totalGap)
+      const length = Math.max(0, full * animatedProgress.value)
+
+      // Calcular offset considerando el gap acumulado
+      if (index > 0) {
+        const segment = segmentsWithGap[index - 1] as DonutSegment
+        const prevLength =
+          (segment.percentage! / 100) * (circumference - totalGap)
+        offset += prevLength + GAP
       }
 
-      offset += full + GAP
-      return data
+      return {
+        ...seg,
+        length,
+        dashArray: `${length} ${circumference}`,
+        offset: -offset,
+      }
     })
   })
 
@@ -186,29 +204,58 @@
     return `${h}h ${m}m`
   }
 
-  const startAnimation = () => {
-    if (!props.animate) {
-      animatedProgress.value = 1
+  const resetAndStartAnimation = async () => {
+    // Resetear progreso
+    animatedProgress.value = 0
+    isReady.value = false
 
+    // Esperar al próximo tick para asegurar que el DOM se actualice
+    await nextTick()
+
+    if (!props.animate || !hasSegments.value) {
+      animatedProgress.value = 1
+      isReady.value = true
       return
     }
 
     const start = performance.now()
-
     const d = props.animationDuration
 
     const step = (t: number) => {
       const p = Math.min((t - start) / d, 1)
-
       animatedProgress.value = 1 - Math.pow(1 - p, 3)
 
-      if (p < 1) requestAnimationFrame(step)
+      if (p >= 1) {
+        isReady.value = true
+      }
+
+      if (p < 1) {
+        requestAnimationFrame(step)
+      }
     }
 
     requestAnimationFrame(step)
   }
 
-  onMounted(startAnimation)
+  // Iniciar animación cuando el componente se monta
+  onMounted(() => {
+    resetAndStartAnimation()
+  })
 
-  watch(() => props.segments, startAnimation, { deep: true })
+  // Reiniciar animación cuando cambian los segmentos
+  watch(
+    () => props.segments,
+    () => {
+      resetAndStartAnimation()
+    },
+    { deep: true }
+  )
+
+  // También reiniciar cuando cambia centerValue
+  watch(
+    () => props.centerValue,
+    () => {
+      resetAndStartAnimation()
+    }
+  )
 </script>
