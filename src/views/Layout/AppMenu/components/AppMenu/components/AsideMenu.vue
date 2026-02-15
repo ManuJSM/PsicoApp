@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import MenuButton from '../../MenuButton.vue'
-import HeaderLogo from '../../HeaderLogo.vue'
-import { RouterLink } from 'vue-router'
-import { useRoute } from 'vue-router'
-import type { MenuItems } from '@/types/types'
-import menuUtils from './utils'
+  import MenuButton from '../../MenuButton.vue'
+  import HeaderLogo from '../../HeaderLogo.vue'
+  import { RouterLink } from 'vue-router'
+  import { useRoute } from 'vue-router'
+  import type { MenuItems } from '@/types/types'
+  import menuUtils from './utils'
+  import { name } from '@/../package.json'
 
-const appName = 'SleepHealth'
-const emit = defineEmits(['close'])
-const route = useRoute()
-const props = defineProps<{ menuItems: MenuItems[] }>()
+  const appName = name.toUpperCase()
+  const emit = defineEmits(['close'])
+  const route = useRoute()
+  const props = defineProps<{ menuItems: MenuItems[] }>()
 </script>
 <template>
   <aside>
@@ -40,11 +41,15 @@ const props = defineProps<{ menuItems: MenuItems[] }>()
           v-for="(item, index) in props.menuItems"
           :key="index"
           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
-          :class="menuUtils.getLinkSelected(item.routeName, route.name as string)"
+          :class="
+            menuUtils.getLinkSelected(item.routeName, route.name as string)
+          "
           :to="{ name: item.routeName }"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined transition-colors">{{ item.icon }}</span>
+          <span class="material-symbols-outlined transition-colors">{{
+            item.icon
+          }}</span>
           {{ item.title }}
         </router-link>
       </nav>

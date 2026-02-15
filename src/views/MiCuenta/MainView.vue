@@ -1,7 +1,13 @@
 <script setup lang="ts">
   import { onMounted } from 'vue'
+  import { useMeStore } from '@/stores/me.store'
 
-  onMounted(() => {})
+  const meStore = useMeStore()
+
+  onMounted(async () => {
+    meStore.reset()
+    await meStore.fetchMe()
+  })
 </script>
 <template>
   <div class="pb-safe-sm container mx-auto p-6">

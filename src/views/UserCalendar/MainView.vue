@@ -2,8 +2,10 @@
   import { ref } from 'vue'
   import UserCalendar from './components/UserCalendar.vue'
 
-  const isDrawerOpen = ref(false)
-  const selectDate = ref('')
+  const isDrawerOpen = ref<boolean>(false)
+  const selectDate = ref<string>(
+    new Date().toISOString().split('T')[0] as string
+  )
 
   const toggleDrawer = () => {
     isDrawerOpen.value = !isDrawerOpen.value

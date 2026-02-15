@@ -25,7 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref<string | null>(null)
   const role = ref<Role | null>(null)
   const isLoggedIn = ref(false)
-  const bootstrapped = ref(false)
 
   function setToken(token: string) {
     accessToken.value = token
@@ -44,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
     setToken(res.accessToken)
   }
 
-  async function bootstrapAuth(): Promise<void> {
+  async function authRefresh(): Promise<void> {
     try {
       const res = await refresh()
       if (res.accessToken) {
@@ -52,8 +51,6 @@ export const useAuthStore = defineStore('auth', () => {
       }
     } catch {
       logout()
-    } finally {
-      bootstrapped.value = true
     }
   }
 
@@ -61,17 +58,15 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken.value = null
     role.value = null
     isLoggedIn.value = false
-    // TODO: deslogear en el backend
   }
 
   return {
     accessToken,
     role,
     isLoggedIn,
-    bootstrapped,
     setToken,
     login,
-    bootstrapAuth,
+    authRefresh,
     logout,
   }
 })

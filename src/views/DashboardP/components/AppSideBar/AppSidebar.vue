@@ -30,7 +30,7 @@
 </script>
 <template>
   <aside
-    class="col-span-1 flex flex-col border-r border-white/10 bg-slate-100/30 dark:bg-white/5 h-full"
+    class="col-span-1 flex flex-col border-r border-white/10 h-full pb-safe-sm bg-slate-100/30 dark:bg-white/5"
   >
     <div
       class="p-4 space-y-4 bg-slate-100/80 dark:bg-background-dark border-b border-white/10"
@@ -49,7 +49,7 @@
         v-model:searchQuery="searchQuery"
         placeholder="Buscar paciente"
       />
-      <div class="flex gap-3 overflow-x-auto pb-1">
+      <div class="flex gap-3 pb-1">
         <FilterButton
           label="Activos"
           :active="filterButton === 'active'"

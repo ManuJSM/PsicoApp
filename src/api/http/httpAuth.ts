@@ -12,7 +12,7 @@ export async function httpAuth<T>(
     return await http<T>(endpoint, options)
   } catch (err: unknown) {
     if (err instanceof AuthenticationError) {
-      await authStore.bootstrapAuth()
+      await authStore.authRefresh()
       if (authStore.isLoggedIn) {
         return await http<T>(endpoint, options)
       }

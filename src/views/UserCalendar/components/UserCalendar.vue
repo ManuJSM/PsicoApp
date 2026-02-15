@@ -131,7 +131,7 @@
           @click="changeYear(-1)"
           :disabled="availableYears.indexOf(selectedYear) === 0"
         >
-          ←
+          <span class="material-symbols-outlined text-lg">chevron_left</span>
         </button>
         <span class="text-white font-bold text-lg">{{ selectedYear }}</span>
         <button
@@ -141,7 +141,7 @@
             availableYears.indexOf(selectedYear) === availableYears.length - 1
           "
         >
-          →
+          <span class="material-symbols-outlined text-lg">chevron_right</span>
         </button>
       </div>
     </div>

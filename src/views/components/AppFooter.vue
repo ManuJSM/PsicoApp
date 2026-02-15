@@ -7,7 +7,7 @@
 
 <template>
   <footer
-    class="px-6 md:px-10 py-6 hidden md:block border-t border-[#283039] bg-background-dark/80 backdrop-blur-md mt-auto"
+    class="px-6 md:px-10 py-3 hidden md:block border-t border-[#283039] bg-background-dark/80 backdrop-blur-md mt-auto"
   >
     <div
       class="mx-auto flex flex-col md:flex-row justify-between items-center gap-4"
