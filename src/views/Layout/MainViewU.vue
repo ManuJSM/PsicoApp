@@ -22,10 +22,9 @@
   provide('menuItems', menuItems)
 </script>
 
-<!-- class="relative flex h-screen flex-col bg-background-light dark:bg-background-dark overflow-y-auto" -->
 <template>
   <div
-    class="relative flex h-screen flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100"
+    class="relative flex h-full md:h-screen flex-col bg-background-light dark:bg-background-dark pt-safe-top pb-safe-sm"
   >
     <AppMenu />
     <router-view />

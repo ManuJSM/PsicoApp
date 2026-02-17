@@ -2,7 +2,7 @@
   <!-- Vista cuando no hay registro -->
   <div
     v-if="!dayReg"
-    class="flex flex-col items-center justify-center min-h-[400px] p-8 text-center"
+    class="flex flex-col items-center p-4 justify-center text-center"
   >
     <div class="mb-8">
       <div

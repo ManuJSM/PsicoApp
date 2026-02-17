@@ -30,10 +30,10 @@
 </script>
 <template>
   <aside
-    class="col-span-1 flex flex-col border-r border-white/10 h-full pb-safe-sm bg-slate-100/30 dark:bg-white/5"
+    class="col-span-1 flex h-full flex-1 min-h-0 flex-col border-r border-white/10 bg-slate-100/30 dark:bg-white/5"
   >
     <div
-      class="p-4 space-y-4 bg-slate-100/80 dark:bg-background-dark border-b border-white/10"
+      class="p-4 space-y-4 bg-slate-100/80 dark:bg-background-dark border-b border-white/10 sticky top-16"
     >
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold text-white">Pacientes</h3>

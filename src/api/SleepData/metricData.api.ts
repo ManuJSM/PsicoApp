@@ -1,6 +1,6 @@
 import { httpAuth } from '../http/httpAuth'
 import { formatDate } from './sleepReg.api'
-import type { CharData, Metrics } from '@/types/dashboardP.types'
+import type { CharData, Metrics } from '@/types/metrics.types'
 
 const regEndpoint = '/sleep/metrics'
 const queryDate = (start: Date, end: Date) => {

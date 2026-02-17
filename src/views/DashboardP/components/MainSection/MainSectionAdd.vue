@@ -23,24 +23,15 @@
     <BackButton @click="$emit('back')" label="Cerrar" />
     <div class="max-w-2xl md:self-center overflow-y-auto">
       <section class="flex flex-col items-center mb-5">
-        <div class="relative group">
-          <div
-            class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
-            data-alt="Patient avatar"
-            :style="{ backgroundImage: `url(${editPatient.avatar})` }"
-          ></div>
-          <button
-            class="absolute bottom-1 right-1 flex items-center justify-center bg-primary rounded-full size-9 text-white hover:bg-primary/90 transition-colors duration-200 ring-2 ring-white dark:ring-gray-800 touch-manipulation shadow-md"
-          >
-            <span class="material-symbols-outlined text-lg md:text-xl"
-              >edit</span
-            >
-          </button>
-        </div>
+        <div
+          class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
+          data-alt="Patient avatar"
+          :style="{ backgroundImage: `url(${editPatient.avatar})` }"
+        ></div>
       </section>
       <div class="p-6 space-y-6">
         <div
-          class="bg-white dark:bg-gray-800/50 p-5 sm:p-6 md:p-10 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800"
+          class="bg-white dark:bg-card-dark p-5 sm:p-6 md:p-10 rounded-2xl border border-gray-100 dark:border-gray-800"
         >
           <h3
             class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-2"
@@ -77,19 +68,6 @@
                 v-model="editPatient.phone"
                 :optional="true"
               />
-            </div>
-            <div class="md:col-span-2">
-              <label
-                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                for="notes"
-                >Notas del Profesional</label
-              >
-              <textarea
-                class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary dark:focus:border-primary text-base min-h-[120px] md:min-h-[160px] p-4 transition-all resize-y placeholder:text-gray-400"
-                id="notes"
-                placeholder="Añadir notas clínicas o de seguimiento..."
-                rows="4"
-              ></textarea>
             </div>
           </form>
         </div>

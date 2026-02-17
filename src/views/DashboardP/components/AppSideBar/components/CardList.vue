@@ -12,7 +12,7 @@
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col overflow-y-auto min-h-0">
+  <div class="flex flex-col md:overflow-y-auto min-h-0">
     <router-link
       v-for="patient in patients"
       :key="patient.id"

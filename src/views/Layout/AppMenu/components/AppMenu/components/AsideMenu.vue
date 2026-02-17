@@ -36,7 +36,7 @@
         </div>
       </div>
       <!-- navigation -->
-      <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav class="flex-1 p-4 overflow-y-auto space-y-2">
         <router-link
           v-for="(item, index) in props.menuItems"
           :key="index"

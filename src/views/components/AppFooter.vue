@@ -13,13 +13,6 @@
       class="mx-auto flex flex-col md:flex-row justify-between items-center gap-4"
     >
       <div class="flex items-center gap-2">
-        <div class="size-6 bg-primary rounded-full p-0.5">
-          <img
-            src="@/assets/appIcon.svg"
-            alt="Logo"
-            class="w-full h-full object-contain"
-          />
-        </div>
         <p
           class="text-[#9dabb9] text-[10px] uppercase font-bold tracking-widest"
         >

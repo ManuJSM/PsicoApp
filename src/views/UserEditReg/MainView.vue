@@ -42,7 +42,7 @@
   }
 </script>
 <template>
-  <main class="pb-safe-sm p-2 mb-2 sm:px-6 lg:px-8 h-full overflow-y-auto">
+  <main class="p-2 mb-2 sm:px-6 lg:px-8 h-full">
     <div
       class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
     >

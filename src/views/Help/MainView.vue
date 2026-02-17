@@ -3,14 +3,10 @@
 </script>
 
 <template>
-  <!-- Main Content -->
-  <main
-    class="flex-1 pb-safe-sm md:overflow-y-auto flex flex-col items-center px-4 overflow-y-auto"
-  >
+  <main class="flex-1 flex flex-col items-center px-4">
     <div
       class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1 gap-8"
     >
-      <!-- Page Heading -->
       <div class="flex flex-col items-center gap-3 py-4 md:py-8">
         <p
           class="text-[#111418] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]"
@@ -25,9 +21,7 @@
           soporte.
         </p>
       </div>
-      <!-- Two Column Layout: FAQ & Contact Form -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Left Column: FAQ (Takes up 7 cols on desktop) -->
         <div class="lg:col-span-7 flex flex-col gap-6">
           <h2
             class="text-[#111418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]"
@@ -35,7 +29,6 @@
             Preguntas Frecuentes (FAQ)
           </h2>
           <div class="flex flex-col gap-3">
-            <!-- Accordion Item 1 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
@@ -60,7 +53,6 @@
                 Podrás ingresar las horas dormidas y la calidad del descanso.
               </div>
             </details>
-            <!-- Accordion Item 2 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
@@ -85,7 +77,6 @@
                 verificar su disponibilidad en la sección "Calendario".
               </div>
             </details>
-            <!-- Accordion Item 3 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
@@ -110,7 +101,6 @@
                 persiste, verifica tu conexión a internet o contacta a soporte.
               </div>
             </details>
-            <!-- Accordion Item 4 -->
             <details
               class="flex flex-col rounded-xl border border-[#dce0e5] dark:border-[#3b4754] bg-white dark:bg-background-dark px-[15px] py-2 group shadow-sm"
             >
@@ -137,7 +127,6 @@
             </details>
           </div>
         </div>
-        <!-- Right Column: Contact Form (Takes up 5 cols on desktop) -->
         <div class="lg:col-span-5 flex flex-col gap-6">
           <h2
             class="text-[#111418] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]"

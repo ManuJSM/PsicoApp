@@ -4,7 +4,7 @@
 </script>
 <template>
   <main
-    class="flex flex-col pb-safe-sm flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent md:px-20 overflow-y-auto"
+    class="flex flex-col flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent md:px-20"
   >
     <div class="flex items-center flex-col gap-1 lg:gap-2">
       <h1

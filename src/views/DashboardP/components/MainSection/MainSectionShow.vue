@@ -9,12 +9,9 @@
     type SleepLineChartProps,
   } from '@/views/MiCuenta/components/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
+  import { DashboardViews } from '@/types/dashboard.types'
   import { type SleepReg } from '@/types/sleepReg.types'
-  import {
-    DashboardViews,
-    type Metrics,
-    type RegCalendar,
-  } from '@/types/dashboardP.types'
+  import { type Metrics, type RegCalendar } from '@/types/metrics.types'
   import DonutChart, {
     type DonutSegment,
   } from '@/views/MiCuenta/components/DonutChart.vue'
@@ -320,10 +317,10 @@
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
+    class="md:col-span-2 xl:col-span-3 flex h-full min-h-0 flex-1 flex-col bg-background-light dark:bg-background-dark"
   >
     <BackButton @click="$emit('exit')" label="Cerrar" />
-    <div class="p-6 space-y-6 overflow-y-auto">
+    <div class="flex-1 h-full min-h-0 overflow-y-auto p-6 space-y-6">
       <div class="md:hidden flex flex-wrap items-center gap-4 justify-between">
         <div class="flex items-center gap-6">
           <div

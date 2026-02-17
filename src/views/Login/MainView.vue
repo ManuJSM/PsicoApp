@@ -4,6 +4,7 @@
   import { ToastType } from '@/types/types'
   import { AuthenticationError } from '@/types/errors.types'
   import { useAuthStore } from '@/stores/auth.store'
+  import HeaderLogo from '../Layout/AppMenu/components/HeaderLogo.vue'
   const { setToast } = useToast()
 
   const mounted = ref(false)
@@ -82,21 +83,7 @@
         "
       >
         <!-- Icono -->
-        <div
-          class="flex flex-col items-center justify-center"
-          :class="{
-            'opacity-0': !mounted,
-            'opacity-100': mounted,
-          }"
-          style="transition: opacity 0.6s ease 0.2s"
-        >
-          <div
-            class="flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg"
-          >
-            <img src="@/assets/appIcon.svg" alt="icon" class="h-8 w-8" />
-          </div>
-        </div>
-
+        <HeaderLogo />
         <!-- Texto -->
         <div class="flex w-full flex-col items-center gap-2 text-center">
           <p

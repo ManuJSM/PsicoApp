@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { DashboardViews } from '@/types/dashboardP.types'
+  import { DashboardViews } from '@/types/dashboard.types'
 
   interface DateNavigationProps {
     activeView?: string
