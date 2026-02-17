@@ -55,9 +55,9 @@
 
 <template>
   <main class="flex-1 h-full min-h-0 overflow-y-auto flex justify-center">
-    <div class="w-full flex flex-col gap-6 p-6 xl:px-20">
+    <div class="w-full flex flex-col gap-4 p-4 xl:px-20">
       <div
-        class="flex flex-col justify-center items-center lg:flex-row lg:justify-between lg:items-end gap-6 px-2"
+        class="flex flex-col justify-center items-center lg:flex-row lg:justify-between lg:items-end gap-6"
       >
         <div class="flex flex-col gap-1">
           <h1
@@ -104,7 +104,7 @@
           <span>{{ selectDate }}</span>
         </button>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-4">
         <MetricCard
           title="Sueño Real"
           value="7h 20m"

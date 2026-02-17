@@ -116,13 +116,6 @@
   })
 </script>
 <style>
-  .bento-glow-tl {
-    background: radial-gradient(
-      circle at 0% 0%,
-      rgba(19, 127, 236, 0.1) 0%,
-      transparent 50%
-    );
-  }
   .glass-card {
     background: rgba(28, 33, 39, 0.7);
     backdrop-filter: blur(12px);
@@ -130,8 +123,5 @@
   }
   .btn-glow {
     box-shadow: 0 0 20px rgba(19, 127, 236, 0.4);
-  }
-  .calendar-glow {
-    box-shadow: 0 0 15px rgba(19, 127, 236, 0.4);
   }
 </style>

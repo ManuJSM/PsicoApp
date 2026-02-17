@@ -295,6 +295,7 @@
   watch(
     [selectedView, selectedDate, () => Number(route.params.id)],
     async ([newView, newDate, newId], [oldView, oldDate, oldId]) => {
+      console.log('ejecutado')
       if (newId !== oldId) {
         calendarDays.value = await fetchCalendar({ userId: newId })
         date.value = new Date().toISOString()
@@ -316,13 +317,11 @@
   )
 </script>
 <template>
-  <section
-    class="md:col-span-2 xl:col-span-3 flex h-full min-h-0 flex-1 flex-col bg-background-light dark:bg-background-dark"
-  >
+  <section class="flex min-h-0 flex-1 h-full flex-col">
     <BackButton @click="$emit('exit')" label="Cerrar" />
-    <div class="flex-1 h-full min-h-0 overflow-y-auto p-6 space-y-6">
+    <div class="flex flex-col gap-4 h-full min-h-0 overflow-y-auto p-4">
       <div class="md:hidden flex flex-wrap items-center gap-4 justify-between">
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0"
             :data-alt="`Profile picture of ${patient.name}`"
@@ -346,7 +345,7 @@
         </button>
       </div>
       <div class="flex justify-between border-b border-white/10">
-        <nav class="flex gap-6 -mb-px">
+        <nav class="flex gap-6">
           <a
             class="py-3 px-1 border-b-2 border-primary text-primary font-semibold"
             href="#"
@@ -371,10 +370,10 @@
         @view-change="handleViewChange"
         @calendar-click="isOpenCalendar = true"
       />
-      <section v-if="loading === false">
+      <section class="min-h-0 h-full" v-if="loading === false">
         <div
           v-if="selectedView != DashboardViews.DIARIA"
-          class="grid lg:grid-cols-2 gap-4"
+          class="grid lg:grid-cols-2 gap-4 content-around h-full"
         >
           <DonutChart
             title="Distribución del Sueño"
@@ -394,11 +393,12 @@
             />
           </div>
         </div>
-        <DetailSleep
-          v-if="selectedView === DashboardViews.DIARIA"
-          :date="selectedDate"
-          :dayReg="dayReg"
-        />
+        <!-- <div class="flex flex-col h-full min-h-0" v-else>
+          <DetailSleep class="flex-1" :date="selectedDate" :dayReg="dayReg" />
+        </div> -->
+        <div class="grid h-full min-h-0" v-else>
+          <DetailSleep :date="selectedDate" :dayReg="dayReg" />
+        </div>
       </section>
       <Teleport to="body">
         <div

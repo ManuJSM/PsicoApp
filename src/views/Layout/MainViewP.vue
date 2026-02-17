@@ -29,3 +29,12 @@
     <router-view />
   </div>
 </template>
+<style scoped>
+  .bento-glow-tl {
+    background: radial-gradient(
+      circle at 0% 0%,
+      rgba(19, 127, 236, 0.1) 0%,
+      transparent 50%
+    );
+  }
+</style>

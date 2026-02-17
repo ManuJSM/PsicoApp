@@ -81,7 +81,7 @@
 </script>
 <template>
   <header
-    class="fixed top-0 left-0 right-0 md:relative z-40 bg-background-light dark:bg-background-dark flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
+    class="fixed top-0 left-0 right-0 md:relative z-40 bg-background-light dark:bg-background-dark/50 backdrop-blur-md flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-white/10 px-6 py-3 shrink-0"
   >
     <div class="flex items-center gap-4 text-white">
       <MenuButton @click="open" />

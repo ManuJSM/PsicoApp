@@ -112,7 +112,7 @@
 
 <template>
   <aside
-    class="fixed top-0 right-0 h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
+    class="fixed calendar-glow top-0 right-0 h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
     :class="model ? 'translate-x-0' : 'translate-x-full'"
   >
     <!-- Header -->
@@ -220,6 +220,10 @@
 </template>
 
 <style scoped>
+  .calendar-glow {
+    box-shadow: 0 0 15px rgba(19, 127, 236, 0.4);
+  }
+
   .animate-pulse {
     animation: pulse 1.5s infinite;
   }
