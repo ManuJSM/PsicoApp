@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main class="flex-1 flex flex-col items-center px-4">
+  <main class="flex-1 flex flex-col md:overflow-y-auto items-center px-4">
     <div
       class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1 gap-8"
     >

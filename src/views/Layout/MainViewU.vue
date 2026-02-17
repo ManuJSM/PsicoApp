@@ -24,7 +24,7 @@
 
 <template>
   <div
-    class="relative flex h-full md:h-screen flex-col bg-background-light dark:bg-background-dark pt-safe-top pb-safe-sm"
+    class="relative flex h-full md:h-screen flex-col bg-background-light dark:bg-background-dark pt-safe-top pb-safe-sm dark:text-white"
   >
     <AppMenu />
     <router-view />

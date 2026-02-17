@@ -1,7 +1,7 @@
 <template>
   <div class="relative w-full pt-2 pb-2">
     <!-- Línea de tiempo dinámica -->
-    <div class="h-8 w-full flex p-1 gap-1 mb-1">
+    <div class="h-8 w-full flex py-1 gap-1 mb-1">
       <div
         v-for="(interval, index) in intervals"
         :key="index"
