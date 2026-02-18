@@ -103,7 +103,6 @@
     }
   }
 
-  // Seleccionar fecha
   const selectDate = (fecha: string) => {
     selectedDate.value = fecha
     model.value = false // Cierra el drawer
@@ -112,7 +111,7 @@
 
 <template>
   <aside
-    class="fixed calendar-glow top-0 right-0 h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
+    class="fixed top-0 right-0 h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
     :class="model ? 'translate-x-0' : 'translate-x-full'"
   >
     <!-- Header -->
@@ -199,7 +198,7 @@
             <!-- Punto notificación -->
             <span
               v-if="day.notification"
-              class="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"
+              class="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"
             >
             </span>
           </div>
@@ -218,23 +217,3 @@
     </div>
   </aside>
 </template>
-
-<style scoped>
-  .calendar-glow {
-    box-shadow: 0 0 15px rgba(19, 127, 236, 0.4);
-  }
-
-  .animate-pulse {
-    animation: pulse 1.5s infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.3;
-    }
-  }
-</style>

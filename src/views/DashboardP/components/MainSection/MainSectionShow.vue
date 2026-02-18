@@ -295,10 +295,9 @@
   watch(
     [selectedView, selectedDate, () => Number(route.params.id)],
     async ([newView, newDate, newId], [oldView, oldDate, oldId]) => {
-      console.log('ejecutado')
       if (newId !== oldId) {
+        loading.value = true
         calendarDays.value = await fetchCalendar({ userId: newId })
-        date.value = new Date().toISOString()
         return fetchDataForView(newView, newDate)
       }
       if (newDate !== oldDate) {

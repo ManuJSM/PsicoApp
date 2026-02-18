@@ -1,6 +1,9 @@
 <script lang="ts"></script>
 <template>
-  <router-link :to="{ name: 'UserCalendar' }" class="lg:col-span-5 xl:col-span-4 flex flex-col">
+  <router-link
+    :to="{ name: 'UserCalendar' }"
+    class="lg:col-span-5 xl:col-span-4 flex flex-col"
+  >
     <div
       class="relative overflow-hidden rounded-2xl bg-linear-to-br from-[#4b39ef] to-[#39d2c0] dark:from-primary dark:to-[#39d2c0] shadow-lg shadow-indigo-500/20 dark:shadow-primary/20 text-white cursor-pointer group transition-transform active:scale-[0.98] h-full min-h-[250px] lg:min-h-[340px] flex flex-col"
     >
@@ -24,7 +27,9 @@
         </div>
         <div class="flex flex-col gap-1 lg:gap-2">
           <h3 class="text-xl lg:text-2xl font-bold">Calendario de Sueño</h3>
-          <p class="text-white/80 text-sm lg:text-base max-w-[220px] lg:max-w-[260px] mx-auto">
+          <p
+            class="text-white/80 text-sm lg:text-base max-w-[220px] lg:max-w-[260px] mx-auto"
+          >
             Registra tu descanso diario y mejora tus hábitos nocturnos.
           </p>
         </div>

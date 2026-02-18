@@ -29,10 +29,10 @@
   })
 </script>
 <template>
-  <aside
-    class="col-span-1 flex h-full flex-1 min-h-0 flex-col border-r border-white/10"
-  >
-    <div class="p-4 space-y-4 border-b border-white/10 sticky top-16">
+  <aside class="flex h-full flex-1 min-h-0 flex-col border-r border-white/10">
+    <div
+      class="p-4 space-y-4 border-b border-white/10 dark:bg-background-dark sticky top-16"
+    >
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-bold text-white">Pacientes</h3>
         <button

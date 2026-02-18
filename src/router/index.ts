@@ -20,7 +20,7 @@ export function createAppRouter(rol: Role | null) {
     const auth = useAuthStore()
 
     const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    const rol = to.matched.find(record => record.meta.role)?.meta.role
+    // const rol = to.matched.find(record => record.meta.role)?.meta.role
 
     if (requiresAuth && !auth.isLoggedIn) {
       return { name: 'login' }
@@ -34,9 +34,9 @@ export function createAppRouter(rol: Role | null) {
       }
     }
 
-    if (rol && auth.role !== rol) {
-      return { name: 'unauthorized' }
-    }
+    // if (rol && auth.role !== rol) {
+    //   return { name: 'unauthorized' }
+    // }
   })
 
   return router

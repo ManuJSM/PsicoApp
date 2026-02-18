@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import { provide } from 'vue'
   import AppMenu from './AppMenu/MainView.vue'
   import type { MenuItems } from '@/types/types'
+  import { provide } from 'vue'
   const menuItems: MenuItems[] = [
     {
       title: 'Apps',

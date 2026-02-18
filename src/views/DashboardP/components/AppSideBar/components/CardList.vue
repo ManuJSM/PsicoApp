@@ -16,7 +16,7 @@
     <router-link
       v-for="patient in patients"
       :key="patient.id"
-      class="flex items-center gap-4 px-4 py-2 justify-between cursor-pointer transition-colors duration-200"
+      class="flex items-center gap-4 px-4 py-2 justify-between cursor-pointer md:transition-colors md:duration-200"
       :class="{
         'bg-primary/20 dark:bg-primary/20 border-l-4 border-primary':
           activePatientId === patient.id,

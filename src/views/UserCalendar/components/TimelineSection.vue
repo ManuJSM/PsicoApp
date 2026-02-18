@@ -1,6 +1,6 @@
 <!-- SleepArchitecture.vue -->
 <template>
-  <div class="glass-card h-full rounded-3xl p-8">
+  <div class="glass-card h-full flex flex-col justify-center rounded-3xl p-6">
     <!-- Header -->
     <div
       class="flex justify-center flex-col md:flex-row items-center md:justify-between mb-2"

@@ -18,7 +18,7 @@
         Accede a tus herramientas de salud y seguimiento.
       </p>
     </div>
-    <div class="flex flex-col lg:grid lg:grid-cols-12 lg:gap-8 gap-6">
+    <div class="grid lg:grid lg:grid-cols-12 lg:gap-8 gap-6">
       <SleepC />
       <div
         class="lg:col-span-7 xl:col-span-8 mb-2 flex flex-col gap-3 lg:gap-6"

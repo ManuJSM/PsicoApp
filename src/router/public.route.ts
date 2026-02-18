@@ -14,7 +14,6 @@ export const publicRoutes: Array<RouteRecordRaw> = [
     name: 'unauthorized',
     component: Login,
   },
-  //TODO poner una pagina de no encontrado
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',

@@ -16,7 +16,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'myAccountP',
     component: lazyLoad('MiCuenta'),
   },
-
   {
     path: 'Help',
     name: 'HelpP',
