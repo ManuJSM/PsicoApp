@@ -17,12 +17,13 @@ const routes: Array<RouteRecordRaw> = [
     component: lazyLoad('MiCuenta'),
   },
   {
-    path: 'Calendar',
+    path: 'Sleep/:date(\\d{4}-\\d{2}-\\d{2})',
     name: 'UserCalendar',
     component: lazyLoad('UserCalendar'),
+    props: true,
   },
   {
-    path: 'Calendar/Edit/:id',
+    path: 'Sleep/:date(\\d{4}-\\d{2}-\\d{2})/Form',
     name: 'UserEditReg',
     component: lazyLoad('UserEditReg'),
     props: true,

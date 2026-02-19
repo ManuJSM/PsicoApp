@@ -1,11 +1,11 @@
 <!-- DoctorFeedback.vue -->
 <template>
   <div
-    class="glass-card rounded-3xl p-6 h-full flex flex-col border-t-2"
+    class="glass-card rounded-3xl p-6 h-full flex flex-col gap-2 border-t-2"
     :class="borderClass"
   >
     <!-- Header con información del doctor -->
-    <div class="flex items-center gap-4 mb-6">
+    <div class="flex items-center gap-4">
       <div class="relative">
         <div
           class="size-14 rounded-2xl border-2 p-0.5"
@@ -40,7 +40,7 @@
       >
         format_quote
       </span>
-      <p class="text-white/80 italic leading-relaxed text-xs">
+      <p class="text-white/80 italic leading-relaxed text-sm">
         "{{ feedback }}"
       </p>
     </div>

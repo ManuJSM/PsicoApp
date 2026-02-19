@@ -1,6 +1,6 @@
 <!-- IntervalList.vue -->
 <template>
-  <div class="glass-card rounded-3xl p-6">
+  <div class="glass-card rounded-3xl p-6 flex flex-col min-h-0 h-full">
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
@@ -81,7 +81,7 @@
     <!-- Estado vacío (SIN DATOS) -->
     <div
       v-else
-      class="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed border-white/5 rounded-2xl"
+      class="flex flex-col flex-1 items-center justify-center py-16 px-4 border-2 border-dashed border-white/5 rounded-2xl"
     >
       <div class="relative">
         <div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>

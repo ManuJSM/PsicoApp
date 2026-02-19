@@ -126,19 +126,19 @@
       <!-- Selector año -->
       <div class="flex items-center justify-between">
         <button
-          class="text-white/60 hover:text-white disabled:opacity-30 text-xl"
-          @click="changeYear(-1)"
-          :disabled="availableYears.indexOf(selectedYear) === 0"
+          class="text-white hover:text-primary cursor-pointer disabled:opacity-30 text-xl"
+          @click="changeYear(1)"
+          :disabled="
+            availableYears.indexOf(selectedYear) === availableYears.length - 1
+          "
         >
           <span class="material-symbols-outlined text-lg">chevron_left</span>
         </button>
         <span class="text-white font-bold text-lg">{{ selectedYear }}</span>
         <button
-          class="text-white/60 hover:text-white disabled:opacity-30 text-xl"
-          @click="changeYear(1)"
-          :disabled="
-            availableYears.indexOf(selectedYear) === availableYears.length - 1
-          "
+          class="text-white hover:text-primary cursor-pointer disabled:opacity-30 text-xl"
+          @click="changeYear(-1)"
+          :disabled="availableYears.indexOf(selectedYear) === 0"
         >
           <span class="material-symbols-outlined text-lg">chevron_right</span>
         </button>

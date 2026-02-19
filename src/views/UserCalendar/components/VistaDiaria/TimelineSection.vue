@@ -11,7 +11,7 @@
         >
           Timeline del Sueño
         </h3>
-        <p class="text-white text-xl font-bold">Visualizador de 24 Horas</p>
+        <p class="text-white text-xl font-bold">Visualizador por Horas</p>
       </div>
 
       <!-- Leyenda -->
@@ -53,20 +53,14 @@
         :wakeup-date="wakeupDate"
       />
 
-      <!-- Estado vacío (si no hay datos) -->
-      <div
-        v-else
-        class="relative w-full h-24 bg-background-dark/30 rounded-2xl overflow-hidden border border-glass-border/30 flex items-center justify-center"
-      >
-        <div class="absolute inset-x-0 h-px bg-technical-divider mx-4"></div>
+      <div v-else class="relative w-full m-2 flex items-center justify-center">
         <span
-          class="text-technical-divider text-[10px] font-bold uppercase tracking-[0.2em] relative z-10"
+          class="text-technical-divider text-[10px] font-bold uppercase tracking-[0.2em] relative"
         >
           {{ emptyMessage }}
         </span>
       </div>
     </div>
-    <!-- Nota al pie (personalizable según estado) -->
     <p
       class="text-xs text-center italic"
       :class="hasData ? 'text-[#9dabb9]' : 'text-[#9dabb9]/50'"

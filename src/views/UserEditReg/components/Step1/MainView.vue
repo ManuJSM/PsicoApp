@@ -70,12 +70,10 @@
   }
 </script>
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full content-center">
     <div class="lg:col-span-8 space-y-6">
-      <div
-        class="bg-card-dark border border-border-dark rounded-xl p-8 shadow-sm"
-      >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div class="bg-card-dark border border-border-dark rounded-xl p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-8 gap-6">
           <HourSelector v-model:time="bedtime" :title="'Hora Acostado'" />
           <HourSelector v-model:time="wakeup" :title="'Hora Levantado'" />
         </div>
@@ -129,11 +127,11 @@
         </div>
       </div>
       <div
-        class="mt-12 mb-2 pt-8 border-t border-border-dark flex flex-col sm:flex-row items-center justify-center gap-4"
+        class="mb-2 pt-8 border-t border-border-dark flex flex-col sm:flex-row items-center justify-center gap-4"
       >
         <button
           @click="nextStep"
-          class="w-full sm:w-[240px] bg-primary hover:cursor-pointer hover:brightness-110 text-white font-bold py-4 rounded-lg transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
+          class="w-full sm:w-[240px] bg-primary hover:cursor-pointer hover:brightness-110 text-white font-bold py-4 rounded-lg transition-all shadow-primary/20 flex items-center justify-center gap-2 uppercase tracking-widest text-sm"
         >
           Siguiente Paso
           <span class="material-symbols-outlined">chevron_right</span>

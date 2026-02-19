@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <h3 class="text-[#9dabb9] text-xs font-bold uppercase tracking-widest">
-        Valoración del Paciente
+        Tus Notas del Dia
       </h3>
     </div>
 

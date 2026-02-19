@@ -1,7 +1,10 @@
 <script lang="ts"></script>
 <template>
   <router-link
-    :to="{ name: 'UserCalendar' }"
+    :to="{
+      name: 'UserCalendar',
+      params: { date: new Date().toISOString().split('T')[0] },
+    }"
     class="lg:col-span-5 xl:col-span-4 flex flex-col"
   >
     <div

@@ -22,8 +22,10 @@
     },
   ]
   const router = useRouter()
-  //FIXME se pasara por prop
-  const fecha = new Date()
+  const props = defineProps<{
+    date: string
+  }>()
+  const fecha = new Date(props.date)
 
   const registro: SleepReg = {
     fecha: fecha,
@@ -42,15 +44,15 @@
   }
 </script>
 <template>
-  <main class="p-2 mb-2 sm:px-6 lg:px-8 h-full">
-    <div
-      class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6"
-    >
-      <div class="space-y-2">
+  <main
+    class="flex-1 p-4 xl:px-20 sm:px-6 lg:px-8 flex flex-col gap-4 md:overflow-y-auto"
+  >
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="flex flex-col gap-1">
         <div
           class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]"
         >
-          -&gt; PASO {{ step }} DE 3
+          -&gt; PASO {{ step }} DE 3 | {{ props.date }}
         </div>
         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">
           {{ header[step - 1]?.title }}
@@ -59,7 +61,7 @@
           {{ header[step - 1]?.text }}
         </p>
       </div>
-      <div class="w-full md:w-72 space-y-2.5">
+      <div class="w-full md:w-72 flex flex-col gap-2">
         <div class="flex justify-between items-end">
           <span
             class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
@@ -77,8 +79,10 @@
         </div>
       </div>
     </div>
-    <Step1 v-if="step === 1" @next="step++" />
-    <Step2 v-if="step === 2" @next="step++" @back="step--" />
-    <Step3 v-if="step === 3" @back="step--" @save="saveReg" />
+    <div class="grid h-full min-h-0">
+      <Step1 v-if="step === 1" @next="step++" />
+      <Step2 v-if="step === 2" @next="step++" @back="step--" />
+      <Step3 v-if="step === 3" @back="step--" @save="saveReg" />
+    </div>
   </main>
 </template>

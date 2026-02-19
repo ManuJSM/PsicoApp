@@ -1,10 +1,8 @@
 <template>
-  <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
+  <div class="grid md:grid-cols-2 gap-4 md:gap-8 h-full content-center">
     <!-- Panel izquierdo: Interval Adder -->
-    <section class="md:min-w-110 space-y-2">
-      <div
-        class="bg-card-dark border border-border-dark rounded-xl shadow-xl overflow-hidden"
-      >
+    <section class="">
+      <div class="bg-card-dark border border-border-dark rounded-xl shadow-xl">
         <!-- Parte superior: Línea de tiempo -->
         <div class="p-4 pb-2">
           <div class="flex items-center justify-between mb-4">
@@ -79,7 +77,7 @@
                     v-else
                     @click="cancelEditing"
                     :class="[
-                      'h-full rounded-full timeline-pill flex items-center justify-center  scale-105 z-10 cursor-pointer',
+                      'h-full rounded-full timeline-pill flex items-center justify-center  scale-105 cursor-pointer',
                       getStateClass(editingInterval.state),
                     ]"
                     :style="{ width: getEditingIntervalWidth() + '%' }"
@@ -362,9 +360,8 @@
       </div>
     </section>
     <!-- Panel derecho: Instrucciones y navegación -->
-    <div class="flex flex-col lg:col-span-4 gap-2">
+    <div class="flex flex-col gap-2">
       <InstructionsPanel :instructions="instructions" />
-      <!-- Botones de navegación -->
       <section
         class="pt-6 flex flex-col w-full sm:flex-row items-center justify-center md:justify-between gap-4 border-t border-border-dark"
       >
