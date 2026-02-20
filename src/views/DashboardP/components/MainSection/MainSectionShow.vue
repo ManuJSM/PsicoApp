@@ -297,11 +297,11 @@
     async ([newView, newDate, newId], [oldView, oldDate, oldId]) => {
       if (newId !== oldId) {
         loading.value = true
+        refreshChartData()
         calendarDays.value = await fetchCalendar({ userId: newId })
         return fetchDataForView(newView, newDate)
       }
       if (newDate !== oldDate) {
-        refreshChartData()
         return fetchDataForView(newView, newDate)
       }
 
@@ -323,12 +323,12 @@
         <div class="flex items-center gap-4">
           <div
             class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0"
-            :data-alt="`Profile picture of ${patient.name}`"
+            :data-alt="`Profile picture of ${patient.fullName}`"
             :style="{ backgroundImage: `url(${patient.avatar})` }"
           ></div>
           <div class="grow">
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
-              {{ patient.name }}
+              {{ patient.fullName }}
             </h1>
             <p class="text-slate-600 dark:text-slate-400 mt-1">
               {{ patient.email }} • {{ patient.phone }}

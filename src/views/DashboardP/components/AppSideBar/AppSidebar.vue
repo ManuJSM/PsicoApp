@@ -23,7 +23,9 @@
     if (!searchQuery.value) return currentFilter
     return currentFilter.filter(
       (patient: Patient) =>
-        patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        patient.fullName
+          .toLowerCase()
+          .includes(searchQuery.value.toLowerCase()) ||
         patient.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
   })

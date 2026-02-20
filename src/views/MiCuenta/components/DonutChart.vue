@@ -20,10 +20,10 @@
             <circle
               cx="50"
               cy="50"
-              r="40"
+              :r="radius"
               fill="transparent"
               stroke="#262c33"
-              stroke-width="12"
+              stroke-width="10"
             />
 
             <!-- segmentos (siempre renderizados pero invisibles cuando no hay datos) -->
@@ -32,10 +32,10 @@
               :key="index"
               cx="50"
               cy="50"
-              r="40"
+              :r="radius"
               fill="transparent"
               :stroke="segment.color"
-              stroke-width="12"
+              stroke-width="10"
               stroke-linecap="butt"
               :stroke-dasharray="segment.dashArray"
               :stroke-dashoffset="segment.offset"

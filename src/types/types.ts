@@ -34,7 +34,7 @@ export type User = Patient
 
 export interface Patient {
   id: number
-  name: string
+  fullName: string
   email: string
   phone: string
   avatar: string

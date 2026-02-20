@@ -12,7 +12,7 @@
   const patients = ref<Patient[]>([
     {
       id: 1,
-      name: 'Ana García',
+      fullName: 'Ana García',
       email: 'ana.garcia@email.com',
       phone: '+1 (555) 123-4567',
       avatar:
@@ -21,7 +21,7 @@
     },
     {
       id: 2,
-      name: 'Carlos Rodriguez',
+      fullName: 'Carlos Rodriguez',
       email: 'carlos.rodriguez@email.com',
       phone: '+1 (555) 987-6543',
       avatar:
@@ -30,7 +30,7 @@
     },
     {
       id: 5,
-      name: 'Luisa Martínez',
+      fullName: 'Luisa Martínez',
       email: 'luisa.martinez@email.com',
       phone: '+1 (555) 456-7890',
       avatar:
@@ -39,7 +39,7 @@
     },
     {
       id: 4,
-      name: 'Javier Gómez',
+      fullName: 'Javier Gómez',
       email: 'javier.gomez@email.com',
       phone: '+1 (555) 111-2233',
       avatar:

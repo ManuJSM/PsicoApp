@@ -3,8 +3,9 @@
   import Step1 from './components/Step1/MainView.vue'
   import Step2 from './components/Step2/MainView.vue'
   import Step3 from './components/Step3/MainView.vue'
-  import { ref, computed, provide } from 'vue'
+  import { ref, computed, provide, onMounted, reactive } from 'vue'
   import { useRouter } from 'vue-router'
+  import { fetchMeDailyReg } from '@/api/SleepData/me.api'
   const step = ref(1)
   const percentage = computed(() => Math.floor((step.value / 3) * 100))
   const header = [
@@ -27,17 +28,27 @@
   }>()
   const fecha = new Date(props.date)
 
-  const registro: SleepReg = {
+  const registro = reactive<SleepReg>({
     fecha: fecha,
     bedtime: null,
     wakeup: null,
     observaciones: '',
     intervals: [],
     psicoComment: '',
-  }
+  })
+  const loading = ref<boolean>(false)
+  onMounted(async () => {
+    loading.value = true
+    const reg = await fetchMeDailyReg({ day: fecha })
+    if (reg !== null) {
+      Object.assign(registro, reg)
+    }
+    loading.value = false
+  })
+
   provide<SleepReg>('registro', registro)
 
-  const saveReg = () => {
+  const saveReg = async () => {
     router.back()
     //TODO guardarlo en BD
     console.log('Registro guardado')
@@ -79,7 +90,7 @@
         </div>
       </div>
     </div>
-    <div class="grid h-full min-h-0">
+    <div v-if="!loading" class="grid h-full min-h-0">
       <Step1 v-if="step === 1" @next="step++" />
       <Step2 v-if="step === 2" @next="step++" @back="step--" />
       <Step3 v-if="step === 3" @back="step--" @save="saveReg" />

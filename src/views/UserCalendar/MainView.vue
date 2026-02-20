@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import UserCalendar from './components/UserCalendar.vue'
   import VistaDiaria from './components/VistaDiaria/MainView.vue'
   import { useRouter } from 'vue-router'
+  import { fetchMeCalendar } from '@/api/SleepData/me.api'
+  import { type RegCalendar } from '@/types/metrics.types'
 
   const router = useRouter()
   const isDrawerOpen = ref<boolean>(false)
@@ -19,17 +21,13 @@
     },
   })
 
+  const calendar = ref<RegCalendar[]>([])
   const toggleDrawer = () => {
     isDrawerOpen.value = !isDrawerOpen.value
   }
-  const registros = ref([
-    { fecha: '2025-01-04T00:00:00.000Z', notification: true },
-    { fecha: '2025-01-12T00:00:00.000Z', notification: true },
-    { fecha: '2025-01-20T00:00:00.000Z', notification: true },
-    { fecha: '2025-01-25T00:00:00.000Z', notification: true },
-    { fecha: '2024-12-15T00:00:00.000Z', notification: true },
-    { fecha: '2024-11-03T00:00:00.000Z', notification: true },
-  ])
+  onMounted(async () => {
+    calendar.value = await fetchMeCalendar()
+  })
 </script>
 
 <template>
@@ -92,7 +90,7 @@
       ></div>
       <UserCalendar
         v-model="isDrawerOpen"
-        :registros="registros"
+        :registros="calendar"
         v-model:selected-date="selectDate"
       />
     </Teleport>

@@ -1,52 +1,40 @@
 <script setup lang="ts">
+  import { ref, watch } from 'vue'
   import IntervalList from './IntervalList.vue'
   import PacientFeed from './PacientFeed.vue'
   import PsicoFeed from './PsicoFeed.vue'
   import TimelineSection from './TimelineSection.vue'
-  import { SleepState, type Interval } from '@/types/sleepReg.types'
+  import { type SleepReg } from '@/types/sleepReg.types'
   import { useRouter } from 'vue-router'
+  import { fetchMeDailyReg } from '@/api/SleepData/me.api'
 
   const router = useRouter()
   const props = defineProps<{
     selectedDate: string
   }>()
+  const loading = ref<boolean>(false)
 
   const handleEdit = () => {
     router.push({ name: 'UserEditReg', params: { date: props.selectedDate } })
   }
-  const mockSleepIntervals: Interval[] = [
-    {
-      state: SleepState.INBED,
-      hours: 0,
-      minutes: 15,
-      startTime: new Date('2024-10-24T23:15:00'),
-      endTime: new Date('2024-10-24T23:30:00'),
+
+  const dayReg = ref<SleepReg | null>(null)
+  watch(
+    () => props.selectedDate,
+    async (newDate, oldDate) => {
+      loading.value = true
+      if (newDate !== oldDate) {
+        const data = await fetchMeDailyReg({ day: new Date(newDate) })
+        dayReg.value = data
+      }
+      loading.value = false
     },
-    {
-      state: SleepState.ASLEEP,
-      hours: 3,
-      minutes: 45,
-      startTime: new Date('2024-10-24T23:30:00'),
-      endTime: new Date('2024-10-25T03:15:00'),
-    },
-    {
-      state: SleepState.AWAKE,
-      hours: 0,
-      minutes: 10,
-      startTime: new Date('2024-10-25T03:15:00'),
-      endTime: new Date('2024-10-25T03:25:00'),
-    },
-    {
-      state: SleepState.ASLEEP,
-      hours: 3,
-      minutes: 45,
-      startTime: new Date('2024-10-25T03:25:00'),
-      endTime: new Date('2024-10-25T07:10:00'),
-    },
-  ]
+    { immediate: true }
+  )
 </script>
 <template>
   <div
+    v-if="!loading"
     class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 xl:px-20 md:overflow-y-auto pb-2 h-full content-center"
   >
     <!-- <MetricCard
@@ -96,18 +84,16 @@
 
     <div class="lg:col-span-8">
       <TimelineSection
-        :intervals="mockSleepIntervals"
-        :bedtime-date="mockSleepIntervals[0]?.startTime"
-        :wakeup-date="
-          mockSleepIntervals[mockSleepIntervals.length - 1]?.endTime
-        "
+        :intervals="dayReg?.intervals ?? []"
+        :bedtime-date="dayReg?.intervals[0]?.startTime"
+        :wakeup-date="dayReg?.intervals[dayReg.intervals.length - 1]?.endTime"
         :empty-message="'No hay datos de sueño registrados'"
         :footer-text="'El gráfico representa los estados técnicos registrados por el dispositivo médico durante el ciclo completo.'"
       />
     </div>
     <div class="lg:col-span-4 lg:row-span-2">
       <IntervalList
-        :intervals="mockSleepIntervals"
+        :intervals="dayReg?.intervals ?? []"
         empty-message="No hay intervalos para este día"
         @edit="handleEdit"
       />
@@ -115,20 +101,12 @@
     <div class="lg:col-span-4">
       <PsicoFeed
         doctor-avatar="https://media.tenor.com/n-AuQVkJZOkAAAAM/anime-crying.gif"
-        feedback="Proverbio chino:
-El mejor momento para plantar
-un árbol fue hace 20 años.
-El segundo mejor momento es
-ahora
-No pospongas las cosas.
-
-Si deseas éxito y crecimiento en
-el futuro, el mejor momento
-para actuar es ahora."
+        :feedback="dayReg?.psicoComment"
+        empty-message="Tu psicologo no te aprecia lo suficiente como para ponerte un comentario"
       />
     </div>
     <div class="lg:col-span-4">
-      <PacientFeed comment="barriga pocha" />
+      <PacientFeed :comment="dayReg?.observaciones" />
     </div>
   </div>
 </template>

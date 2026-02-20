@@ -9,7 +9,7 @@
   const emit = defineEmits(['back', 'save'])
   const editPatient = reactive<Patient>({
     id: -1,
-    name: '',
+    fullName: '',
     email: '',
     phone: '',
     status: Status.ACTIVE,
@@ -47,7 +47,7 @@
                 id="name"
                 label="Nombre Completo"
                 type="text"
-                v-model="editPatient.name"
+                v-model="editPatient.fullName"
                 required
               />
             </div>

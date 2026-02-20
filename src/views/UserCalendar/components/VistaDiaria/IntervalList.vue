@@ -1,10 +1,10 @@
 <!-- IntervalList.vue -->
 <template>
-  <div class="glass-card rounded-3xl p-6 flex flex-col min-h-0 h-full">
+  <div class="glass-card rounded-3xl p-6 flex flex-col gap-4 min-h-0 h-full">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-[#9dabb9] text-xs font-bold uppercase tracking-widest">
+        <h3 class="text-[#9dabb9] text-xs font-bold uppercase">
           Lista de Intervalos
         </h3>
         <p class="text-white/40 text-[10px] font-medium mt-1" v-if="!hasData">

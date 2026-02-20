@@ -31,7 +31,7 @@ export async function fetchDailyReg({
 const calendarEndpoint = '/sleep/calendar'
 
 export async function fetchCalendar({
-  userId = 2,
+  userId,
 }: {
   userId?: number
 }): Promise<RegCalendar[]> {

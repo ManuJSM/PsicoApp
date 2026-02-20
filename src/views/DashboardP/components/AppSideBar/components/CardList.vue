@@ -28,14 +28,14 @@
       <div class="flex items-center gap-4">
         <div
           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14"
-          :data-alt="`Profile picture of ${patient.name}`"
+          :data-alt="`Profile picture of ${patient.fullName}`"
           :style="{ backgroundImage: `url(${patient.avatar})` }"
         ></div>
         <div class="flex flex-col justify-center">
           <p
             class="text-slate-900 dark:text-white text-base font-medium leading-normal line-clamp-1"
           >
-            {{ patient.name }}
+            {{ patient.fullName }}
           </p>
           <p
             class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal line-clamp-2"

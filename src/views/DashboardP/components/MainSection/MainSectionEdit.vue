@@ -43,7 +43,7 @@
     <Transition name="modal" appear>
       <DeleteModal
         v-show="showDeleteModal"
-        :PacientName="props.patient.name"
+        :PacientName="props.patient.fullName"
         @delete="handleDelete"
         @back="showDeleteModal = false"
       />
@@ -59,7 +59,7 @@
         <h1
           class="text-gray-900 dark:text-white tracking-tight text-2xl md:text-4xl font-bold leading-tight mt-5 text-center"
         >
-          {{ editPatient.name }}
+          {{ editPatient.fullName }}
         </h1>
         <p
           class="text-gray-500 dark:text-gray-400 text-base md:text-lg font-medium leading-normal text-center mt-2"
@@ -85,7 +85,7 @@
                 id="name"
                 label="Nombre Completo"
                 type="text"
-                v-model="editPatient.name"
+                v-model="editPatient.fullName"
                 required
               />
             </div>
