@@ -86,12 +86,14 @@
   >
     <div class="flex items-center gap-4 text-white">
       <MenuButton @click="open" />
-      <HeaderLogo />
-      <h2
-        class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]"
-      >
-        {{ appName }}
-      </h2>
+      <RouterLink class="flex items-center gap-2" to="/">
+        <HeaderLogo />
+        <h2
+          class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]"
+        >
+          {{ appName }}
+        </h2>
+      </RouterLink>
     </div>
     <div class="flex flex-1 justify-end gap-4">
       <div>
@@ -113,11 +115,12 @@
           :notifications="notifications"
         />
       </div>
-      <div
+      <RouterLink
+        to="/myAccount"
         class="bg-center bg-no-repeat aspect-square size-10 bg-cover rounded-full"
         data-alt="Profile picture"
         :style="{ backgroundImage: `url(${avatar})` }"
-      ></div>
+      ></RouterLink>
     </div>
   </header>
   <AppNav />

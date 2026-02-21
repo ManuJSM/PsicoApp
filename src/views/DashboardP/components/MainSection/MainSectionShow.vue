@@ -124,13 +124,13 @@
     const segments = []
 
     if (avgAsleep > 0) {
-      segments.push({ value: avgAsleep, color: '#4f46e5', label: 'Asleep' })
+      segments.push({ value: avgAsleep, color: '#D946EF', label: 'Asleep' })
     }
     if (avgInBed > 0) {
-      segments.push({ value: avgInBed, color: '#d97706', label: 'InBed' })
+      segments.push({ value: avgInBed, color: '#F59E0B', label: 'InBed' })
     }
     if (avgAwake > 0) {
-      segments.push({ value: avgAwake, color: '#059669', label: 'Awake' })
+      segments.push({ value: avgAwake, color: '#4ADE80', label: 'Awake' })
     }
 
     donutChartData.value = segments
