@@ -151,7 +151,7 @@
   const intervals = ref<Interval[]>(registro.intervals)
   const bedtimeDate = ref(registro.bedtime as Date)
   const wakeupDate = ref(registro.wakeup as Date)
-  const observaciones = ref('')
+  const observaciones = ref(registro.observaciones)
 
   // Calcular ancho del intervalo
   const totalTiempoEnCama = computed(() => {
@@ -198,7 +198,7 @@
   }
 
   const guardarRegistro = () => {
-    registro.psicoComment = observaciones.value
+    registro.observaciones = observaciones.value
     emits('save')
   }
 </script>

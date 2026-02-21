@@ -14,17 +14,39 @@
     'Puedes usar los botones de ±15m para ajustes rápidos de precisión.',
     'También puedes hacer clic directamente en los números para seleccionarlos.',
   ]
-  const bedtime = ref<TimeValue>({
-    hour: 10,
-    minute: 30,
-    amPm: 'pm',
-  })
+  function dateToTimeValue(date: Date): TimeValue {
+    let hours = date.getHours()
+    const minutes = date.getMinutes()
 
-  const wakeup = ref<TimeValue>({
-    hour: 7,
-    minute: 15,
-    amPm: 'am',
-  })
+    const amPm: 'am' | 'pm' = hours >= 12 ? 'pm' : 'am'
+
+    // Convertir a formato 12 horas
+    hours = hours % 12
+    if (hours === 0) hours = 12
+
+    return {
+      hour: hours,
+      minute: minutes,
+      amPm,
+    }
+  }
+  const regBedtime = registro.bedtime
+    ? dateToTimeValue(registro.bedtime)
+    : {
+        hour: 10,
+        minute: 30,
+        amPm: 'pm' as const,
+      }
+  const regWakeup = registro.wakeup
+    ? dateToTimeValue(registro.wakeup)
+    : {
+        hour: 7,
+        minute: 15,
+        amPm: 'am' as const,
+      }
+
+  const bedtime = ref<TimeValue>(regBedtime)
+  const wakeup = ref<TimeValue>(regWakeup)
   const bedtimeDate = computed(() => {
     const hour24 = to24Hour(bedtime.value)
     const date = new Date(registro.fecha)

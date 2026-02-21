@@ -23,6 +23,24 @@ export async function fetchMeDailyReg({
   return fromRegDtoToReg(regValues[0] as SleepRegDto)
 }
 
+export async function createReg(registro: SleepReg): Promise<SleepReg> {
+  const regValue = await httpAuth<SleepRegDto>(`${regEndpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(registro),
+  })
+  return fromRegDtoToReg(regValue)
+}
+
+export async function updateReg(registro: SleepReg): Promise<SleepReg> {
+  const regValue = await httpAuth<SleepRegDto>(`${regEndpoint}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(registro),
+  })
+  return fromRegDtoToReg(regValue)
+}
+
 const calendarEndpoint = '/me/sleep/calendar'
 export async function fetchMeCalendar(): Promise<RegCalendar[]> {
   const regValues = await httpAuth<RegCalendar[]>(`${calendarEndpoint}`)

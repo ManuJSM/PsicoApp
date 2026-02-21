@@ -423,11 +423,18 @@
   })
 
   // Estado del nuevo intervalo (solo para añadir)
-  const newInterval = ref({
-    state: SleepState.INBED,
-    hours: 1,
-    minutes: 30,
-  })
+  const newInterval =
+    intervals.value.length !== 0
+      ? ref({
+          state: SleepState.INBED,
+          hours: 0,
+          minutes: 0,
+        })
+      : ref({
+          state: SleepState.INBED,
+          hours: 1,
+          minutes: 30,
+        })
   const editingInterval = ref({
     hours: 0,
     minutes: 0,

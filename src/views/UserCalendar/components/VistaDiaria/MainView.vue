@@ -96,6 +96,7 @@
         :intervals="dayReg?.intervals ?? []"
         empty-message="No hay intervalos para este día"
         @edit="handleEdit"
+        @add="handleEdit"
       />
     </div>
     <div class="lg:col-span-4">

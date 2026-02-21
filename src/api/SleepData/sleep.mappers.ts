@@ -22,12 +22,14 @@ function parseSleepState(value: string): SleepState {
 export function fromIntervalDtoToInterval(dto: IntervalDto): Interval {
   const startTime = new Date(dto.startTime)
   const endTime = new Date(dto.endTime)
-  const duration = new Date(endTime.getTime() - startTime.getTime())
+  const duration = endTime.getTime() - startTime.getTime()
+  const hours = Math.floor(duration / (1000 * 60 * 60))
+  const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
 
   return {
     state: parseSleepState(dto.state),
-    hours: duration.getHours(),
-    minutes: duration.getMinutes(),
+    hours,
+    minutes,
     startTime,
     endTime,
   }
@@ -35,6 +37,7 @@ export function fromIntervalDtoToInterval(dto: IntervalDto): Interval {
 
 export function fromRegDtoToReg(dto: SleepRegDto): SleepReg {
   return {
+    id: dto.id,
     fecha: new Date(dto.fecha),
     bedtime: new Date(dto.bedtime),
     wakeup: new Date(dto.wakeup),

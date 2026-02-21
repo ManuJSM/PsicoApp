@@ -18,6 +18,7 @@ export type Interval = {
 }
 
 export interface SleepReg {
+  id?: number
   fecha: Date
   bedtime: Date | null
   wakeup: Date | null
@@ -34,6 +35,7 @@ export type IntervalDto = {
   endTime: string
 }
 export interface SleepRegDto {
+  id: number
   fecha: string
   bedtime: string
   wakeup: string

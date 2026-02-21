@@ -5,7 +5,10 @@
   import Step3 from './components/Step3/MainView.vue'
   import { ref, computed, provide, onMounted, reactive } from 'vue'
   import { useRouter } from 'vue-router'
-  import { fetchMeDailyReg } from '@/api/SleepData/me.api'
+  import { createReg, fetchMeDailyReg, updateReg } from '@/api/SleepData/me.api'
+  import { useToast } from '@/composables/useToast'
+  import { ToastType } from '@/types/types'
+  import LoadSpinner from '../components/LoadSpinner.vue'
   const step = ref(1)
   const percentage = computed(() => Math.floor((step.value / 3) * 100))
   const header = [
@@ -27,6 +30,7 @@
     date: string
   }>()
   const fecha = new Date(props.date)
+  const isUpdate = ref<boolean>(true)
 
   const registro = reactive<SleepReg>({
     fecha: fecha,
@@ -42,16 +46,26 @@
     const reg = await fetchMeDailyReg({ day: fecha })
     if (reg !== null) {
       Object.assign(registro, reg)
+      isUpdate.value = true
     }
+    console.log(registro)
     loading.value = false
   })
+  const toast = useToast()
 
   provide<SleepReg>('registro', registro)
 
   const saveReg = async () => {
+    loading.value = true
+    let msg = 'Registro actualizado con exito'
+    if (isUpdate.value) {
+      await updateReg(registro)
+    } else {
+      await createReg(registro)
+      msg = 'Registro guardado con exito'
+    }
+    toast.setToast(ToastType.SUCCESS, msg)
     router.back()
-    //TODO guardarlo en BD
-    console.log('Registro guardado')
   }
 </script>
 <template>
@@ -95,5 +109,6 @@
       <Step2 v-if="step === 2" @next="step++" @back="step--" />
       <Step3 v-if="step === 3" @back="step--" @save="saveReg" />
     </div>
+    <LoadSpinner v-else />
   </main>
 </template>
