@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { onMounted, ref, watch } from 'vue'
   import IntervalList from './IntervalList.vue'
   import PacientFeed from './PacientFeed.vue'
   import PsicoFeed from './PsicoFeed.vue'
@@ -7,7 +7,9 @@
   import { type SleepReg } from '@/types/sleepReg.types'
   import { useRouter } from 'vue-router'
   import { fetchMeDailyReg } from '@/api/SleepData/me.api'
+  import { useMeStore } from '@/stores/me.store'
 
+  const meStore = useMeStore()
   const router = useRouter()
   const props = defineProps<{
     selectedDate: string
@@ -17,6 +19,9 @@
   const handleEdit = () => {
     router.push({ name: 'UserEditReg', params: { date: props.selectedDate } })
   }
+  onMounted(async () => {
+    await meStore.fetchMe()
+  })
 
   const dayReg = ref<SleepReg | null>(null)
   watch(
@@ -101,7 +106,8 @@
     </div>
     <div class="lg:col-span-4">
       <PsicoFeed
-        doctor-avatar="https://media.tenor.com/n-AuQVkJZOkAAAAM/anime-crying.gif"
+        :doctor-name="meStore.me?.psico?.fullName"
+        :doctor-avatar="meStore.me?.psico?.avatar"
         :feedback="dayReg?.psicoComment"
         empty-message="Tu psicologo no te aprecia lo suficiente como para ponerte un comentario"
       />

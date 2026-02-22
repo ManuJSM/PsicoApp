@@ -409,6 +409,7 @@
         ></div>
         <UserCalendar
           v-model="isOpenCalendar"
+          :key="Number(route.params.id)"
           :registros="calendarDays"
           v-model:selected-date="date"
         />

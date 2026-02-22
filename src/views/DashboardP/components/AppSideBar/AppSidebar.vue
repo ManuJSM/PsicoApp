@@ -16,8 +16,8 @@
     const currentFilter =
       filterButton.value === 'all'
         ? props.patients
-        : props.patients.filter(
-            (patient: Patient) => patient.status === filterButton.value
+        : props.patients.filter((patient: Patient) =>
+            filterButton.value === 'active' ? patient.active : !patient.active
           )
 
     if (!searchQuery.value) return currentFilter

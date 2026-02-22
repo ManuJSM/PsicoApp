@@ -2,7 +2,7 @@
   import BackButton from './components/BackButton.vue'
   import DeleteModal from './components/DeleteModal.vue'
   import FormInput from './components/FormInput.vue'
-  import { Status, type Patient } from '@/types/types'
+  import { type Patient } from '@/types/types'
   import { ref, computed, reactive, watch } from 'vue'
 
   const props = defineProps<{
@@ -17,10 +17,10 @@
   const editPatient = reactive<Patient>({
     ...props.patient,
   })
-  const isActive = computed<boolean>(() => editPatient.status === Status.ACTIVE)
+  const isActive = computed<boolean>(() => editPatient.active)
 
   const toggleStatus = () => {
-    editPatient.status = isActive.value ? Status.INACTIVE : Status.ACTIVE
+    editPatient.active = !isActive.value
   }
 
   const handleDelete = () => {
@@ -127,7 +127,7 @@
                       'text-sm font-medium uppercase',
                       isActive ? 'text-primary' : 'text-gray-500',
                     ]"
-                    >{{ editPatient.status }}</span
+                    >{{ editPatient.active }}</span
                   >
                   <button
                     :aria-checked="isActive"

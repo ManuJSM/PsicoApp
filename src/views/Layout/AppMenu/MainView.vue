@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import NotiCard from './components/NotiCard.vue'
   import type { Notification } from '@/types/types'
   import AppNav from './components/AppMenu/MainView.vue'
@@ -9,6 +9,7 @@
   import { useAsideMenu } from '@/composables/useAsideMenu'
   import { deleteAllArray } from '@/views/components/utils/utils'
   import { name } from '@/../package.json'
+  import { useMeStore } from '@/stores/me.store'
 
   const { open } = useAsideMenu()
 
@@ -19,7 +20,15 @@
   const appName = name.toUpperCase()
   // const avatar =
   //   'https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE'
-  const avatar = 'https://media.tenor.com/ZpFrNrE6WvcAAAAM/pepe.gif'
+
+  const meStore = useMeStore()
+  const avatar = ref<string>('')
+  onMounted(async () => {
+    await meStore.fetchMe()
+    avatar.value =
+      meStore.me?.avatar ||
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAhLF07NBPn2dCqJ0ay3UNdqC3Pye7J919BXFbFt9JbqCA099JXQll6wUcOG3ulXHBBEG5ZK7BojMC99RfGs7-Iei4nINtTBdqoIdRfNrJdEF-WFBLZ1rpqt13EigORRsUEJwi69yEsJmbFOYKg7au74Jm5WJpyRC2Y0Mn683aMldH02asvU9ODjbbNCP_WMrMTOjNjZsvKL2Rm978jH2gdM4_gxC6Ri-5oRl2LnxV5Yn4Et7oefWobfW6WiDbmnKOTJg8VzxZGFCE'
+  })
 
   const notifications = ref<Notification[]>([
     {

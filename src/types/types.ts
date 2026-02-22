@@ -1,8 +1,3 @@
-export enum Status {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-}
-
 export interface MenuItems {
   title: string
   icon: string
@@ -31,6 +26,12 @@ export interface Notification {
   read: boolean
 }
 export type User = Patient
+export type PsicoInfo = {
+  fullName: string
+  email: string
+  phone: string
+  avatar: string
+}
 
 export interface Patient {
   id: number
@@ -38,5 +39,6 @@ export interface Patient {
   email: string
   phone: string
   avatar: string
-  status: Status
+  active: boolean
+  psico?: PsicoInfo
 }

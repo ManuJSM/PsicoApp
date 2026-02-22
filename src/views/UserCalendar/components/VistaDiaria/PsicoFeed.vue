@@ -14,13 +14,15 @@
           <div
             class="w-full h-full rounded-xl bg-cover"
             :class="{ 'grayscale-[0.5]': !hasFeedback }"
-            :style="{ backgroundImage: `url('${doctorAvatar}')` }"
+            :style="{
+              backgroundImage: `url('${hasFeedback ? doctorAvatar : 'https://media.tenor.com/n-AuQVkJZOkAAAAM/anime-crying.gif'}')`,
+            }"
           ></div>
         </div>
       </div>
 
       <div>
-        <p class="text-white font-bold text-base">{{ doctorName }}</p>
+        <p class="text-white font-bold text-base">Dr. {{ doctorName }}</p>
         <p
           class="text-[10px] font-black uppercase tracking-widest"
           :class="hasFeedback ? 'text-primary' : 'text-[#9dabb9]'"
@@ -76,9 +78,8 @@
   }
 
   const props = withDefaults(defineProps<DoctorFeedbackProps>(), {
-    doctorName: 'Dra. Elena Ruiz',
-    doctorAvatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAKzonXTZDxnTOTfsw26bHQJ1n_BSDIsSb1BxvkUVGQG1LSQoVbTIWWkoIE0JkM8R3A3BnPByzQnyFVCbiBsR7QrijZQQOJ6Y1om2c7s_haTypzbcM2eJTNGcWSxDoAnGHCbJFhRDCekFgL4mokugMhhoBvRz-rDv9S-kQRCV9jOEwXR7RfOUJgKB9DDeg_JHoCfDCcjw0M6dIygYrtMBDfoc92msBfpPqvhuWScaGwHpfpJ46r8jIwxrRg-13jq3Mz0RYe5euocfI',
+    doctorName: '',
+    doctorAvatar: 'https://media.tenor.com/n-AuQVkJZOkAAAAM/anime-crying.gif',
     feedback: null,
     emptyMessage:
       'Aún no has registrado tu sueño de anoche. ¡Cuéntame cómo has descansado para poder ayudarte!',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import BackButton from './components/BackButton.vue'
   import { reactive } from 'vue'
-  import { type Patient, Status } from '@/types/types'
+  import { type Patient } from '@/types/types'
   import FormInput from './components/FormInput.vue'
 
   const nonAvatar =
@@ -12,7 +12,7 @@
     fullName: '',
     email: '',
     phone: '',
-    status: Status.ACTIVE,
+    active: true,
     avatar: nonAvatar,
   })
 </script>

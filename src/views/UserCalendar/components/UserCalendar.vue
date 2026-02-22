@@ -182,7 +182,7 @@
                 !day.hasRegistro && !day.isToday,
               'bg-primary border-primary': day.isToday,
               'hover:bg-white/10': !day.isToday,
-              'bg-[#00D2FF]': day.fecha === selectedDate,
+              'bg-state-inbed border-0 ': day.fecha === selectedDate,
             }"
             @click="selectDate(day.fecha)"
           >
@@ -191,6 +191,7 @@
                 'text-white': day.isToday,
                 'text-primary': !day.isToday && day.hasRegistro,
                 'text-gray-500': !day.isToday && !day.hasRegistro,
+                'text-white/90': day.fecha === selectedDate,
               }"
             >
               {{ day.day }}

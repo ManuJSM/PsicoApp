@@ -7,7 +7,7 @@
   onMounted(async () => {
     meStore.reset()
     await meStore.fetchMe()
-    console.log(meStore.me?.fullName)
+    console.log(meStore.me)
   })
 </script>
 <template>
