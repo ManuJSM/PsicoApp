@@ -40,3 +40,17 @@ export async function fetchCalendar({
   )
   return regValues
 }
+
+export async function updatePsicoComment({
+  regId,
+  psicoComment,
+}: {
+  regId: number
+  psicoComment: string
+}): Promise<void> {
+  await httpAuth(`${regEndpoint}/${regId}/psico-comment`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ psicoComment }),
+  })
+}

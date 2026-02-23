@@ -3,6 +3,7 @@ import type { RegCalendar } from '@/types/metrics.types'
 import { httpAuth } from '../http/httpAuth'
 import { fromRegDtoToReg } from './sleep.mappers'
 import { formatDate } from './sleepReg.api'
+import type { Patient } from '@/types/types'
 
 const queryDate = (day: Date) => {
   return `?start=${formatDate(day)}&end=${formatDate(day)}`
@@ -45,4 +46,10 @@ const calendarEndpoint = '/me/sleep/calendar'
 export async function fetchMeCalendar(): Promise<RegCalendar[]> {
   const regValues = await httpAuth<RegCalendar[]>(`${calendarEndpoint}`)
   return regValues
+}
+
+const patientsEndpoint = '/me/patients'
+export async function fetchMePatients(): Promise<Patient[]> {
+  const patients = await httpAuth<Patient[]>(`${patientsEndpoint}`)
+  return patients
 }

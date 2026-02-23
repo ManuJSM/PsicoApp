@@ -47,7 +47,7 @@
               >Eficiencia Total</span
             >
             <div class="flex items-end gap-2">
-              <span class="text-3xl font-black text-white"
+              <span class="text-2xl font-black text-white"
                 >{{ eficiencia }}%</span
               >
 
@@ -66,7 +66,7 @@
               >Tiempo Real</span
             >
             <div class="flex items-end gap-2">
-              <span class="text-3xl font-black text-white">{{
+              <span class="text-2xl font-black text-white">{{
                 formatDuration(totalTiempoEnCama)
               }}</span>
             </div>

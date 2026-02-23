@@ -1,14 +1,13 @@
 <script setup lang="ts">
   import BackButton from './components/BackButton.vue'
   import { reactive } from 'vue'
-  import { type Patient } from '@/types/types'
+  import { type CreatePatient } from '@/types/types'
   import FormInput from './components/FormInput.vue'
 
   const nonAvatar =
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAWoHqaA7dq_qhMrfVmh63nndpIKFwxN75_b7OljfUVc56ky7dYjCTH85UY1FN9IqLr1VMVT54YbWCcz4hzQ3gO5z7rgEb8yhg0aR332ljniRntCHJoGlUYsWE2Z55ORRoOa7_27DvnS0paNvmK_ZJmX-_Wu1m3U0wfXlM8IoqefMR7_wqb6Ww0fY7Il2D_AccwGea5zYPooCtxmVAyGW70QunAk7r35-7XSIHxQEnC-Kh3VV7_k4pYXzOY1y4XbL2EzSWJn9kE-rk'
   const emit = defineEmits(['back', 'save'])
-  const editPatient = reactive<Patient>({
-    id: -1,
+  const editPatient = reactive<CreatePatient>({
     fullName: '',
     email: '',
     phone: '',
@@ -18,10 +17,12 @@
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
+    class="flex flex-col w-full bg-background-light dark:bg-background-dark min-h-0 h-full"
   >
     <BackButton @click="$emit('back')" label="Cerrar" />
-    <div class="max-w-2xl md:self-center overflow-y-auto">
+    <div
+      class="w-full flex flex-col md:flex-row items-center justify-around overflow-y-auto h-full"
+    >
       <section class="flex flex-col items-center mb-5">
         <div
           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
@@ -29,7 +30,7 @@
           :style="{ backgroundImage: `url(${editPatient.avatar})` }"
         ></div>
       </section>
-      <div class="p-6 space-y-6">
+      <div class="p-4 space-y-6">
         <div
           class="bg-white dark:bg-card-dark p-5 sm:p-6 md:p-10 rounded-2xl border border-gray-100 dark:border-gray-800"
         >
@@ -71,26 +72,26 @@
             </div>
           </form>
         </div>
-        <div
-          class="mt-8 pt-8 justify-center items-center border-t border-gray-200 dark:border-gray-700/50 flex flex-col md:flex-row md:items-start gap-6"
+      </div>
+    </div>
+    <div
+      class="p-4 justify-center items-center border-t border-gray-200 dark:border-gray-700/50 flex flex-col md:flex-row md:items-start gap-6"
+    >
+      <div
+        class="flex mb-2 flex-col sm:flex-row gap-4 w-full md:w-auto order-first md:order-last"
+      >
+        <button
+          class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
+          @click="emit('save', editPatient)"
         >
-          <div
-            class="flex mb-2 flex-col sm:flex-row gap-4 w-full md:w-auto order-first md:order-last"
-          >
-            <button
-              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
-              @click="emit('save', editPatient)"
-            >
-              Añadir Paciente
-            </button>
-            <button
-              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
-              @click="emit('back')"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
+          Añadir Paciente
+        </button>
+        <button
+          class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
+          @click="emit('back')"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   </section>

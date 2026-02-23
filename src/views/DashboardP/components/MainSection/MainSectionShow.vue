@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import BackButton from './components/BackButton.vue'
-  import { type Patient } from '@/types/types'
+  import { ToastType, type Patient } from '@/types/types'
   import { computed, ref, watch } from 'vue'
 
   import MetricCard, { type MetricCardProps } from './components/MetricCard.vue'
@@ -23,10 +23,16 @@
     getYearRange,
     type DateRange,
   } from './utils/date.utils'
-  import { fetchCalendar, fetchDailyReg } from '@/api/SleepData/sleepReg.api'
+  import {
+    fetchCalendar,
+    fetchDailyReg,
+    updatePsicoComment,
+  } from '@/api/SleepData/sleepReg.api'
   import { useRoute } from 'vue-router'
   import { fetchSleepData, fetchMetrics } from '@/api/SleepData/metricData.api'
   import UserCalendar from '@/views/UserCalendar/components/UserCalendar.vue'
+  import { useToast } from '@/composables/useToast'
+  const toast = useToast()
 
   const sleepChartData = ref<SleepLineChartProps>({
     chartData: [],
@@ -292,6 +298,17 @@
   }
   const calendarDays = ref<RegCalendar[]>([])
 
+  const saveObservation = async (observation: string) => {
+    if (!dayReg.value) return
+    await updatePsicoComment({
+      regId: dayReg.value.id as number,
+      psicoComment: observation,
+    })
+    toast.setToast(ToastType.SUCCESS, 'Observación guardada con exito')
+
+    dayReg.value.psicoComment = observation
+  }
+
   watch(
     [selectedView, selectedDate, () => Number(route.params.id)],
     async ([newView, newDate, newId], [oldView, oldDate, oldId]) => {
@@ -330,9 +347,40 @@
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
               {{ patient.fullName }}
             </h1>
-            <p class="text-slate-600 dark:text-slate-400 mt-1">
-              {{ patient.email }} • {{ patient.phone }}
-            </p>
+
+            <div
+              class="flex flex-wrap items-center gap-6 mt-3 text-slate-600 dark:text-slate-400"
+            >
+              <!-- Email -->
+              <div class="flex items-center gap-2">
+                <span
+                  class="material-symbols-outlined text-primary-500 text-xl"
+                >
+                  mail
+                </span>
+                <a
+                  href="mailto:{{ patient.email }}"
+                  class="hover:text-primary-600 transition-colors"
+                >
+                  {{ patient.email }}
+                </a>
+              </div>
+
+              <!-- Phone -->
+              <div class="flex items-center gap-2">
+                <span
+                  class="material-symbols-outlined text-primary-500 text-xl"
+                >
+                  call
+                </span>
+                <a
+                  href="tel:{{ patient.phone }}"
+                  class="hover:text-primary-600 transition-colors"
+                >
+                  {{ patient.phone }}
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         <button
@@ -396,7 +444,11 @@
           <DetailSleep class="flex-1" :date="selectedDate" :dayReg="dayReg" />
         </div> -->
         <div class="grid h-full min-h-0" v-else>
-          <DetailSleep :date="selectedDate" :dayReg="dayReg" />
+          <DetailSleep
+            :date="selectedDate"
+            :dayReg="dayReg"
+            @update:observations="saveObservation"
+          />
         </div>
       </section>
       <Teleport to="body">

@@ -32,6 +32,7 @@ export type PsicoInfo = {
   phone: string
   avatar: string
 }
+export type CreatePatient = Omit<Patient, 'id'>
 
 export interface Patient {
   id: number

@@ -37,7 +37,7 @@
 </script>
 <template>
   <section
-    class="md:col-span-2 xl:col-span-3 flex flex-col bg-background-light dark:bg-background-dark h-full"
+    class="flex w-full overflow-y-auto flex-col bg-background-light dark:bg-background-dark min-h-0 h-full"
   >
     <BackButton @click="emit('back')" />
     <Transition name="modal" appear>
@@ -48,7 +48,9 @@
         @back="showDeleteModal = false"
       />
     </Transition>
-    <div class="pt-2 md:self-center overflow-y-auto scrollbar-hide max-w-2xl">
+    <div
+      class="flex md:flex-row flex-col justify-around items-center w-full h-full"
+    >
       <section class="flex flex-col items-center mb-10">
         <div
           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-28 ring-4 ring-white dark:ring-gray-800 shadow-lg transition-all duration-300"
@@ -67,7 +69,7 @@
           {{ editPatient.email }}
         </p>
       </section>
-      <div class="p-6 space-y-6">
+      <div class="p-4 space-y-6">
         <div
           class="bg-white dark:bg-gray-800/50 p-5 sm:p-6 md:p-10 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800"
         >
@@ -124,10 +126,10 @@
                 <div class="flex items-center gap-3">
                   <span
                     :class="[
-                      'text-sm font-medium uppercase',
+                      'text-sm font-medium ',
                       isActive ? 'text-primary' : 'text-gray-500',
                     ]"
-                    >{{ editPatient.active }}</span
+                    >{{ isActive ? 'Activo' : 'Inactivo' }}</span
                   >
                   <button
                     :aria-checked="isActive"
@@ -153,37 +155,37 @@
             </div>
           </div>
         </div>
-        <div
-          class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700/50 flex flex-col md:flex-row md:items-start justify-between gap-6"
+      </div>
+    </div>
+    <div
+      class="p-4 border-t border-gray-200 dark:border-gray-700/50 flex flex-col md:flex-row md:items-start justify-between gap-6"
+    >
+      <div
+        class="w-full md:w-auto order-last md:order-first flex flex-col gap-3"
+      >
+        <button
+          class="w-full md:w-auto flex cursor-pointer items-center justify-center gap-2.5 rounded-xl min-h-[52px] px-6 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-base font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-all duration-200 border border-red-100 dark:border-red-900/30 touch-manipulation whitespace-nowrap"
+          @click="showDeleteModal = true"
         >
-          <div
-            class="w-full md:w-auto order-last md:order-first flex flex-col gap-3"
-          >
-            <button
-              class="w-full md:w-auto flex cursor-pointer items-center justify-center gap-2.5 rounded-xl min-h-[52px] px-6 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-base font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-all duration-200 border border-red-100 dark:border-red-900/30 touch-manipulation whitespace-nowrap"
-              @click="showDeleteModal = true"
-            >
-              <span class="material-symbols-outlined">delete_forever</span>
-              Borrar Paciente
-            </button>
-          </div>
-          <div
-            class="flex mb-2 flex-col sm:flex-row gap-4 w-full md:w-auto order-first md:order-last"
-          >
-            <button
-              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
-              @click="emit('save', editPatient)"
-            >
-              Guardar Cambios
-            </button>
-            <button
-              class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
-              @click="emit('back')"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
+          <span class="material-symbols-outlined">delete_forever</span>
+          Borrar Paciente
+        </button>
+      </div>
+      <div
+        class="flex mb-2 flex-col sm:flex-row gap-4 w-full md:w-auto order-first md:order-last"
+      >
+        <button
+          class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-primary text-white text-base font-semibold hover:bg-primary/90 transition-all duration-200 touch-manipulation shadow-md shadow-primary/25 whitespace-nowrap"
+          @click="emit('save', editPatient)"
+        >
+          Guardar Cambios
+        </button>
+        <button
+          class="w-full sm:w-auto flex cursor-pointer items-center justify-center overflow-hidden rounded-xl min-h-[52px] px-8 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-base font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 touch-manipulation shadow-sm whitespace-nowrap"
+          @click="emit('back')"
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   </section>
