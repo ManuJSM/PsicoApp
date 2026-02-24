@@ -7,14 +7,14 @@
   import DateMenu from './components/DateMenu.vue'
   import SleepChart, {
     type SleepLineChartProps,
-  } from '@/views/MiCuenta/components/SleepChart.vue'
+  } from '@/views/components/Metrics/SleepChart.vue'
   import DetailSleep from './components/DetailSleep.vue'
   import { DashboardViews } from '@/types/dashboard.types'
   import { type SleepReg } from '@/types/sleepReg.types'
   import { type Metrics, type RegCalendar } from '@/types/metrics.types'
   import DonutChart, {
     type DonutSegment,
-  } from '@/views/MiCuenta/components/DonutChart.vue'
+  } from '@/views/components/Metrics/DonutChart.vue'
   import {
     formatDateRange,
     formatDay,
@@ -300,13 +300,16 @@
 
   const saveObservation = async (observation: string) => {
     if (!dayReg.value) return
-    await updatePsicoComment({
+    const data = await updatePsicoComment({
       regId: dayReg.value.id as number,
       psicoComment: observation,
     })
-    toast.setToast(ToastType.SUCCESS, 'Observación guardada con exito')
-
-    dayReg.value.psicoComment = observation
+    if (data.success) {
+      toast.setToast(ToastType.SUCCESS, 'Observación guardada con exito')
+      dayReg.value.psicoComment = observation
+    } else {
+      toast.setToast(ToastType.ERROR, 'Error al guardar la observación')
+    }
   }
 
   watch(
