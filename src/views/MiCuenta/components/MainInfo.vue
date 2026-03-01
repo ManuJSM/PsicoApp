@@ -1,156 +1,135 @@
-<!-- components/UserPersonalInfo.vue -->
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import type { User } from '@/types/types'
+  import { ref, watch } from 'vue'
+  import type { UpdateUser } from '@/types/types'
 
-  defineProps<{
-    modelValue: User
+  const props = defineProps<{
+    modelValue: UpdateUser
   }>()
 
   const emit = defineEmits<{
-    (e: 'update:modelValue', value: User): void
+    (e: 'update:modelValue', value: UpdateUser): void
     (e: 'save'): void
     (e: 'cancel'): void
   }>()
 
   const isEditing = ref(false)
+  const formData = ref<UpdateUser>({ ...props.modelValue })
 
-  const toggleEdit = () => {
-    isEditing.value = !isEditing.value
-    if (!isEditing.value) {
-      emit('cancel')
-    }
+  // Sincronización con el padre si cambian los datos externamente
+  watch(
+    () => props.modelValue,
+    newVal => {
+      formData.value = { ...newVal }
+    },
+    { deep: true }
+  )
+
+  const cancel = () => {
+    isEditing.value = false
+    formData.value = { ...props.modelValue }
+    emit('cancel')
   }
 
   const saveChanges = () => {
     isEditing.value = false
+    emit('update:modelValue', formData.value)
     emit('save')
   }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <!-- Información Personal y de Contacto -->
+  <div
+    class="bg-card-dark rounded-2xl w-full border border-border-dark/30 shadow-xl overflow-hidden"
+  >
     <div
-      class="bg-linear-to-br from-slate-800/40 to-slate-800/20 rounded-2xl backdrop-blur-sm border border-slate-700/30 shadow-xl"
+      class="flex items-center justify-between px-6 py-5 border-b border-border-dark/30 bg-slate-800/20"
     >
-      <div
-        class="flex items-center justify-between px-6 py-5 border-b border-slate-700/30"
+      <div class="flex items-center gap-3">
+        <div class="h-5 w-1 bg-primary rounded-full"></div>
+        <h2
+          class="text-white text-base sm:text-lg font-semibold tracking-tight"
+        >
+          Información Personal
+        </h2>
+      </div>
+
+      <button
+        @click="isEditing ? cancel() : (isEditing = true)"
+        type="button"
+        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        :class="
+          isEditing
+            ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            : 'bg-primary/10 text-primary hover:bg-primary/20'
+        "
       >
-        <div class="flex items-center gap-3">
-          <div class="h-6 w-1 bg-primary rounded-full"></div>
-          <h2 class="text-white text-lg sm:text-xl font-bold">
-            Información Personal
-          </h2>
-        </div>
-        <button
-          @click="toggleEdit"
-          class="flex items-center justify-center rounded-xl h-9 px-4 gap-2 bg-slate-700/50 text-white text-sm font-medium hover:bg-slate-600 transition-all duration-300 hover:scale-105"
+        <span class="material-symbols-outlined text-sm">
+          {{ isEditing ? 'close' : 'edit' }}
+        </span>
+        {{ isEditing ? 'Cancelar' : 'Editar' }}
+      </button>
+    </div>
+
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <div
+        v-for="field in [
+          {
+            id: 'fullName',
+            label: 'Nombre Completo',
+            icon: 'badge',
+            type: 'text',
+          },
+          { id: 'email', label: 'Email', icon: 'email', type: 'email' },
+          {
+            id: 'phone',
+            label: 'Teléfono Profesional',
+            icon: 'phone',
+            type: 'tel',
+          },
+        ]"
+        :key="field.id"
+        :class="field.id === 'phone' ? 'md:col-span-2' : ''"
+        class="space-y-2"
+      >
+        <label
+          class="text-slate-400 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
         >
-          <span class="material-symbols-outlined text-base">{{
-            isEditing ? 'close' : 'edit'
+          <span class="material-symbols-outlined text-sm">{{
+            field.icon
           }}</span>
-          <span class="truncate">{{ isEditing ? 'Cancelar' : 'Editar' }}</span>
-        </button>
-      </div>
+          {{ field.label }}
+        </label>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 p-6">
-        <!-- Nombre Completo -->
-        <div
-          class="flex flex-col py-3 border-b border-slate-700/30 md:border-b-0"
-        >
-          <p
-            class="text-slate-400 text-sm font-medium flex items-center gap-1 pb-2"
-          >
-            <span class="material-symbols-outlined text-xs">badge</span>
-            Nombre Completo
-          </p>
-          <div v-if="!isEditing" class="text-white text-base font-medium">
-            {{ modelValue.fullName }}
-          </div>
+        <div class="h-10 flex items-center">
           <input
-            v-else
-            type="text"
-            :value="modelValue.fullName"
-            @input="
-              $emit('update:modelValue', {
-                ...modelValue,
-                fullName: ($event.target as HTMLInputElement).value,
-              })
-            "
-            class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary w-full transition-all duration-300"
-            placeholder="Nombre completo"
+            v-if="isEditing"
+            v-model="formData[field.id as keyof UpdateUser]"
+            :type="field.type"
+            class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow"
           />
-        </div>
-
-        <!-- Email -->
-        <div class="flex flex-col py-3 border-b border-slate-700/30">
-          <p
-            class="text-slate-400 text-sm font-medium flex items-center gap-1 pb-2"
-          >
-            <span class="material-symbols-outlined text-xs">email</span>
-            Email
-          </p>
-          <div v-if="!isEditing" class="text-white text-base font-medium">
-            {{ modelValue.email }}
+          <div v-else class="text-white text-sm font-medium px-1 truncate">
+            {{ props.modelValue[field.id as keyof UpdateUser] || '—' }}
           </div>
-          <input
-            v-else
-            type="email"
-            :value="modelValue.email"
-            @input="
-              $emit('update:modelValue', {
-                ...modelValue,
-                email: ($event.target as HTMLInputElement).value,
-              })
-            "
-            class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary w-full transition-all duration-300"
-            placeholder="correo@ejemplo.com"
-          />
-        </div>
-
-        <!-- Teléfono -->
-        <div class="flex flex-col py-3 md:col-span-2">
-          <p
-            class="text-slate-400 text-sm font-medium flex items-center gap-1 pb-2"
-          >
-            <span class="material-symbols-outlined text-xs">phone</span>
-            Teléfono Profesional
-          </p>
-          <div v-if="!isEditing" class="text-white text-base font-medium">
-            {{ modelValue.phone }}
-          </div>
-          <input
-            v-else
-            type="tel"
-            :value="modelValue.phone"
-            @input="
-              $emit('update:modelValue', {
-                ...modelValue,
-                phone: ($event.target as HTMLInputElement).value,
-              })
-            "
-            class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary w-full transition-all duration-300"
-            placeholder="+34 123 456 789"
-          />
         </div>
       </div>
+    </div>
 
-      <!-- Botones de acción en modo edición -->
-      <div v-if="isEditing" class="px-6 pb-6 pt-2 flex justify-end gap-3">
-        <button
-          @click="toggleEdit"
-          class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-600 transition-all duration-300"
-        >
-          Cancelar
-        </button>
-        <button
-          @click="saveChanges"
-          class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-all duration-300"
-        >
-          Guardar cambios
-        </button>
-      </div>
+    <div
+      v-if="isEditing"
+      class="px-6 py-4 bg-slate-900/40 border-t border-border-dark/20 flex justify-end gap-3"
+    >
+      <button
+        @click="cancel"
+        class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors"
+      >
+        Descartar
+      </button>
+      <button
+        @click="saveChanges"
+        class="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/10"
+      >
+        Guardar cambios
+      </button>
     </div>
   </div>
 </template>

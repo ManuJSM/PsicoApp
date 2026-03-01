@@ -4,7 +4,7 @@
 </script>
 <template>
   <main
-    class="flex flex-col flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 w-full mx-auto lg:bg-transparent md:px-20"
+    class="flex flex-col flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 mx-auto lg:bg-transparent md:px-20 md:overflow-y-auto"
   >
     <div class="flex items-center flex-col gap-1 lg:gap-2">
       <h1
@@ -18,7 +18,9 @@
         Accede a tus herramientas de salud y seguimiento.
       </p>
     </div>
-    <div class="grid lg:grid lg:grid-cols-12 lg:gap-8 gap-6">
+    <div
+      class="grid content-center h-full lg:grid lg:grid-cols-12 lg:gap-8 gap-6"
+    >
       <SleepC />
       <div
         class="lg:col-span-7 xl:col-span-8 mb-2 flex flex-col gap-3 lg:gap-6"

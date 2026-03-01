@@ -12,7 +12,7 @@
           :class="hasFeedback ? 'border-primary/30' : 'border-primary/20'"
         >
           <div
-            class="w-full h-full rounded-xl bg-cover"
+            class="w-full h-full rounded-xl bg-cover bg-no-repeat bg-center"
             :class="{ 'grayscale-[0.5]': !hasFeedback }"
             :style="{
               backgroundImage: `url('${hasFeedback ? doctorAvatar : 'https://media.tenor.com/n-AuQVkJZOkAAAAM/anime-crying.gif'}')`,

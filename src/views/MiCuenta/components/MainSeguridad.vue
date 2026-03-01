@@ -1,14 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
 
-  // Estado para los acordeones
-  const openSections = ref({
-    password: false,
-    twoFactor: false,
-    activity: false,
-    devices: false,
-  })
-
   // Estado para el formulario de cambio de contraseña
   const passwordForm = ref({
     currentPassword: '',
@@ -19,28 +11,19 @@
   // Estado para 2FA
   const twoFactorEnabled = ref(true)
 
-  // Función para alternar secciones
-  const toggleSection = (section: keyof typeof openSections.value) => {
-    openSections.value[section] = !openSections.value[section]
-  }
-
-  // Función para cambiar contraseña
   const handlePasswordChange = () => {
     if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
       alert('Las contraseñas no coinciden')
       return
     }
     console.log('Cambiando contraseña...', passwordForm.value)
-    // Aquí iría la lógica de cambio de contraseña
     passwordForm.value = {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     }
-    openSections.value.password = false
   }
 
-  // Función para desactivar 2FA
   const handleDisable2FA = () => {
     if (
       confirm(
@@ -48,12 +31,9 @@
       )
     ) {
       twoFactorEnabled.value = false
-      openSections.value.twoFactor = false
-      console.log('2FA desactivado')
     }
   }
 
-  // Función para cerrar sesión en otros dispositivos
   const handleLogoutOthers = () => {
     if (
       confirm(
@@ -61,462 +41,241 @@
       )
     ) {
       console.log('Cerrando sesión en otros dispositivos...')
-      openSections.value.devices = false
     }
   }
 </script>
 
 <template>
-  <section class="bg-slate-800/20 rounded-xl mt-6">
-    <div class="divide-y divide-slate-700/50">
-      <!-- Sección Cambiar Contraseña (Acordeón) -->
-      <div>
-        <button
-          class="flex w-full items-center justify-between p-4 sm:p-6 hover:bg-slate-700/20 transition-colors duration-200 rounded-t-xl"
-          type="button"
-          @click="toggleSection('password')"
-        >
-          <div class="flex items-center gap-4">
-            <span class="material-symbols-outlined text-slate-300">lock</span>
-            <div>
-              <p
-                class="text-white text-base font-medium leading-normal text-left"
-              >
-                Cambiar contraseña
-              </p>
-            </div>
-          </div>
-          <span
-            class="material-symbols-outlined text-slate-400 transition-transform duration-300 ease-in-out"
-            :class="{
-              'rotate-180': openSections.password,
-            }"
-          >
-            expand_more
-          </span>
-        </button>
-
-        <!-- Contenido del acordeón de contraseña con transición Tailwind -->
-        <div
-          class="overflow-hidden transition-all duration-300 ease-in-out"
-          :class="
-            openSections.password ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          "
-        >
-          <div class="px-4 sm:px-6 pb-6 pt-4 border-t border-slate-700/50">
-            <div class="space-y-4">
-              <div>
-                <label
-                  class="text-slate-300 text-sm font-medium block"
-                  for="current-password"
-                >
-                  Contraseña Actual
-                </label>
-                <input
-                  class="block w-full mt-1 bg-slate-700/50 border border-slate-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  id="current-password"
-                  type="password"
-                  v-model="passwordForm.currentPassword"
-                  placeholder="••••••••"
-                />
-              </div>
-              <div>
-                <label
-                  class="text-slate-300 text-sm font-medium block"
-                  for="new-password"
-                >
-                  Nueva Contraseña
-                </label>
-                <input
-                  class="block w-full mt-1 bg-slate-700/50 border border-slate-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  id="new-password"
-                  type="password"
-                  v-model="passwordForm.newPassword"
-                  placeholder="••••••••"
-                />
-                <p class="text-slate-400 text-xs mt-1">
-                  Mínimo 8 caracteres, incluye mayúscula y número
-                </p>
-              </div>
-              <div>
-                <label
-                  class="text-slate-300 text-sm font-medium block"
-                  for="confirm-password"
-                >
-                  Confirmar Nueva Contraseña
-                </label>
-                <input
-                  class="block w-full mt-1 bg-slate-700/50 border border-slate-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                  id="confirm-password"
-                  type="password"
-                  v-model="passwordForm.confirmPassword"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-3">
-              <button
-                @click="openSections.password = false"
-                class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-700 text-white text-sm font-bold hover:bg-slate-600 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                @click="handlePasswordChange"
-                class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors"
-              >
-                Guardar Cambios
-              </button>
-            </div>
-          </div>
-        </div>
+  <div class="space-y-6 max-w-4xl mx-auto pb-10">
+    <div
+      class="bg-card-dark rounded-2xl border border-border-dark/30 shadow-xl overflow-hidden"
+    >
+      <div
+        class="px-6 py-5 border-b border-border-dark/30 bg-slate-800/20 flex items-center gap-3"
+      >
+        <span class="material-symbols-outlined text-primary text-xl">lock</span>
+        <h2 class="text-white text-lg font-bold">Cambiar contraseña</h2>
       </div>
 
-      <!-- Autenticación de dos factores (Acordeón) -->
-      <div>
-        <button
-          class="flex w-full items-center justify-between p-4 sm:p-6 hover:bg-slate-700/20 transition-colors duration-200"
-          type="button"
-          @click="toggleSection('twoFactor')"
-        >
-          <div class="flex items-center gap-4">
-            <span class="material-symbols-outlined text-slate-300"
-              >verified_user</span
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label
+              class="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-2"
+              >Contraseña Actual</label
             >
-            <div>
-              <p
-                class="text-white text-base font-medium leading-normal text-left"
-              >
-                Autenticación de dos factores
-              </p>
-              <p
-                class="text-slate-400 text-sm font-normal leading-normal text-left"
-              >
-                Añade una capa extra de seguridad a tu cuenta.
-                <span class="text-green-400 font-medium" v-if="twoFactorEnabled"
-                  >Activado</span
-                >
-                <span class="text-slate-400 font-medium" v-else
-                  >Desactivado</span
-                >
-              </p>
-            </div>
+            <input
+              v-model="passwordForm.currentPassword"
+              type="password"
+              placeholder="••••••••"
+              class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            />
           </div>
-          <span
-            class="material-symbols-outlined text-slate-400 transition-transform duration-300 ease-in-out"
-            :class="{
-              'rotate-180': openSections.twoFactor,
-            }"
+          <div>
+            <label
+              class="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-2"
+              >Nueva Contraseña</label
+            >
+            <input
+              v-model="passwordForm.newPassword"
+              type="password"
+              placeholder="••••••••"
+              class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            />
+            <p class="text-slate-500 text-[11px] mt-2 italic">
+              Mínimo 8 caracteres, incluye mayúscula y número
+            </p>
+          </div>
+          <div>
+            <label
+              class="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-2"
+              >Confirmar Nueva Contraseña</label
+            >
+            <input
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            />
+          </div>
+        </div>
+        <div class="mt-8 flex justify-end">
+          <button
+            @click="handlePasswordChange"
+            class="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/10"
           >
-            expand_more
-          </span>
-        </button>
+            Actualizar Contraseña
+          </button>
+        </div>
+      </div>
+    </div>
 
-        <!-- Contenido del acordeón de 2FA con transición Tailwind -->
-        <div
-          class="overflow-hidden transition-all duration-300 ease-in-out"
+    <div
+      class="bg-card-dark rounded-2xl border border-border-dark/30 shadow-xl overflow-hidden"
+    >
+      <div
+        class="px-6 py-5 border-b border-border-dark/30 bg-slate-800/20 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary text-xl"
+            >verified_user</span
+          >
+          <h2 class="text-white text-lg font-bold">
+            Autenticación de dos factores
+          </h2>
+        </div>
+        <span
           :class="
-            openSections.twoFactor
-              ? 'max-h-96 opacity-100'
-              : 'max-h-0 opacity-0'
+            twoFactorEnabled
+              ? 'bg-green-500/10 text-green-400 border-green-500/20'
+              : 'bg-slate-700 text-slate-400 border-slate-600'
           "
+          class="text-[10px] uppercase font-bold px-2 py-1 rounded border"
         >
-          <div class="px-4 sm:px-6 pb-6 pt-4 border-t border-slate-700/50">
-            <div class="bg-slate-700/30 rounded-lg p-4 mb-4">
-              <div class="flex items-start gap-3">
-                <span class="material-symbols-outlined text-primary"
-                  >security</span
-                >
-                <div>
-                  <p class="text-white text-sm font-medium">¿Cómo funciona?</p>
-                  <p class="text-slate-400 text-xs mt-1">
-                    La autenticación de dos factores añade una capa extra de
-                    seguridad. Además de tu contraseña, necesitarás un código de
-                    verificación de tu teléfono.
-                  </p>
-                </div>
-              </div>
-            </div>
+          {{ twoFactorEnabled ? 'Protegido' : 'No configurado' }}
+        </span>
+      </div>
 
-            <div v-if="twoFactorEnabled" class="space-y-4">
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
+      <div class="p-6">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
+          <div class="flex-1 space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              La autenticación de dos factores añade una capa extra de
+              seguridad. Además de tu contraseña, necesitarás un código de
+              verificación.
+            </p>
+
+            <div
+              v-if="twoFactorEnabled"
+              class="bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center"
+                >
                   <span class="material-symbols-outlined text-green-400"
                     >check_circle</span
                   >
-                  <div>
-                    <p class="text-white text-sm font-medium">2FA activado</p>
-                    <p class="text-slate-400 text-xs">
-                      Número de teléfono verificado: +34 *** *** 789
-                    </p>
-                  </div>
                 </div>
-                <button class="text-sm text-primary hover:underline">
-                  Cambiar
-                </button>
+                <div>
+                  <p class="text-white text-sm font-medium">
+                    Método activo: SMS
+                  </p>
+                  <p class="text-slate-500 text-xs">+34 *** *** 789</p>
+                </div>
               </div>
-
-              <div class="flex justify-end">
-                <button
-                  @click="handleDisable2FA"
-                  class="px-4 py-2 rounded-lg bg-red-600/20 text-red-400 text-sm font-medium hover:bg-red-600/30 transition-colors border border-red-600/30"
-                >
-                  Desactivar 2FA
-                </button>
-              </div>
-            </div>
-
-            <div v-else class="space-y-4">
-              <p class="text-slate-300 text-sm">
-                Para activar la autenticación de dos factores, sigue estos
-                pasos:
-              </p>
-              <ol
-                class="list-decimal list-inside text-slate-400 text-sm space-y-2"
-              >
-                <li>
-                  Descarga una app de autenticación (Google Authenticator,
-                  Authy, etc.)
-                </li>
-                <li>Escanea el código QR que aparecerá</li>
-                <li>Ingresa el código de verificación</li>
-              </ol>
-              <button
-                class="mt-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/80 transition-colors"
-              >
-                Configurar 2FA
+              <button class="text-xs text-primary font-bold hover:underline">
+                Cambiar
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Actividad de la cuenta (Acordeón) -->
-      <div>
-        <button
-          class="flex w-full items-center justify-between p-4 sm:p-6 hover:bg-slate-700/20 transition-colors duration-200"
-          type="button"
-          @click="toggleSection('activity')"
-        >
-          <div class="flex items-center gap-4">
-            <span class="material-symbols-outlined text-slate-300"
-              >history</span
+          <div class="w-full md:w-auto">
+            <button
+              v-if="twoFactorEnabled"
+              @click="handleDisable2FA"
+              class="w-full px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/10 transition-colors"
             >
-            <div>
-              <p
-                class="text-white text-base font-medium leading-normal text-left"
-              >
-                Actividad de la cuenta
-              </p>
-              <p
-                class="text-slate-400 text-sm font-normal leading-normal text-left"
-              >
-                Revisa los inicios de sesión recientes y la actividad de tu
-                cuenta.
-              </p>
-            </div>
-          </div>
-          <span
-            class="material-symbols-outlined text-slate-400 transition-transform duration-300 ease-in-out"
-            :class="{
-              'rotate-180': openSections.activity,
-            }"
-          >
-            expand_more
-          </span>
-        </button>
-
-        <!-- Contenido del acordeón de actividad con transición Tailwind -->
-        <div
-          class="overflow-hidden transition-all duration-300 ease-in-out"
-          :class="
-            openSections.activity ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          "
-        >
-          <div class="px-4 sm:px-6 pb-6 pt-4 border-t border-slate-700/50">
-            <div class="space-y-4">
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-primary"
-                    >laptop</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">
-                      Inicio de sesión actual
-                    </p>
-                    <p class="text-slate-400 text-xs">
-                      Madrid, España · Chrome en Windows
-                    </p>
-                  </div>
-                </div>
-                <span class="text-xs text-green-400">Activo ahora</span>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400"
-                    >phone_iphone</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">iPhone 14 Pro</p>
-                    <p class="text-slate-400 text-xs">
-                      Barcelona, España · Hace 2 días
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400"
-                    >laptop</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">MacBook Pro</p>
-                    <p class="text-slate-400 text-xs">
-                      Valencia, España · Hace 5 días
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button class="text-primary text-sm hover:underline mt-2 block">
-                Ver toda la actividad
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dispositivos conectados (Acordeón) -->
-      <div>
-        <button
-          class="flex w-full items-center justify-between p-4 sm:p-6 hover:bg-slate-700/20 transition-colors duration-200 rounded-b-xl"
-          type="button"
-          @click="toggleSection('devices')"
-        >
-          <div class="flex items-center gap-4">
-            <span class="material-symbols-outlined text-slate-300"
-              >devices</span
+              Desactivar 2FA
+            </button>
+            <button
+              v-else
+              class="w-full px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90"
             >
-            <div>
-              <p
-                class="text-white text-base font-medium leading-normal text-left"
-              >
-                Dispositivos conectados
-              </p>
-              <p
-                class="text-slate-400 text-sm font-normal leading-normal text-left"
-              >
-                Gestiona y cierra la sesión en los dispositivos conectados a tu
-                cuenta.
-              </p>
-            </div>
-          </div>
-          <span
-            class="material-symbols-outlined text-slate-400 transition-transform duration-300 ease-in-out"
-            :class="{
-              'rotate-180': openSections.devices,
-            }"
-          >
-            expand_more
-          </span>
-        </button>
-
-        <!-- Contenido del acordeón de dispositivos con transición Tailwind -->
-        <div
-          class="overflow-hidden transition-all duration-300 ease-in-out"
-          :class="
-            openSections.devices ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          "
-        >
-          <div class="px-4 sm:px-6 pb-6 pt-4 border-t border-slate-700/50">
-            <div class="space-y-4">
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-green-400"
-                    >laptop</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">
-                      Este dispositivo
-                    </p>
-                    <p class="text-slate-400 text-xs">
-                      Chrome · Windows · Madrid
-                    </p>
-                  </div>
-                </div>
-                <span
-                  class="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full"
-                  >Actual</span
-                >
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400"
-                    >phone_iphone</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">iPhone 14 Pro</p>
-                    <p class="text-slate-400 text-xs">
-                      iOS 17 · Último acceso: hace 2 días
-                    </p>
-                  </div>
-                </div>
-                <button class="text-sm text-red-400 hover:text-red-300">
-                  <span class="material-symbols-outlined text-base"
-                    >logout</span
-                  >
-                </button>
-              </div>
-
-              <div
-                class="flex items-center justify-between p-3 bg-slate-700/20 rounded-lg"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-slate-400"
-                    >laptop</span
-                  >
-                  <div>
-                    <p class="text-white text-sm font-medium">MacBook Pro</p>
-                    <p class="text-slate-400 text-xs">
-                      Safari · Último acceso: hace 5 días
-                    </p>
-                  </div>
-                </div>
-                <button class="text-sm text-red-400 hover:text-red-300">
-                  <span class="material-symbols-outlined text-base"
-                    >logout</span
-                  >
-                </button>
-              </div>
-
-              <div class="flex justify-end mt-4">
-                <button
-                  @click="handleLogoutOthers"
-                  class="px-4 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-600 transition-colors"
-                >
-                  Cerrar sesión en otros dispositivos
-                </button>
-              </div>
-            </div>
+              Configurar Seguridad
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </section>
+
+    <div
+      class="bg-card-dark rounded-2xl border border-border-dark/30 shadow-xl overflow-hidden"
+    >
+      <div
+        class="px-6 py-5 border-b border-border-dark/30 bg-slate-800/20 flex items-center gap-3"
+      >
+        <span class="material-symbols-outlined text-primary text-xl"
+          >devices</span
+        >
+        <h2 class="text-white text-lg font-bold">Dispositivos conectados</h2>
+      </div>
+
+      <div class="p-0">
+        <div class="divide-y divide-border-dark/20">
+          <div
+            class="px-6 py-4 flex items-center justify-between hover:bg-slate-800/10 transition-colors"
+          >
+            <div class="flex items-center gap-4">
+              <span class="material-symbols-outlined text-slate-400"
+                >laptop</span
+              >
+              <div>
+                <div class="flex items-center gap-2">
+                  <p class="text-white text-sm font-medium">
+                    Chrome en Windows
+                  </p>
+                  <span
+                    class="text-[9px] bg-primary text-white px-1.5 py-0.5 rounded font-bold uppercase"
+                    >Actual</span
+                  >
+                </div>
+                <p class="text-slate-500 text-xs">
+                  Madrid, España · Activo ahora
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-for="dev in [
+              {
+                name: 'iPhone 14 Pro',
+                loc: 'Barcelona',
+                time: 'hace 2 días',
+                icon: 'phone_iphone',
+              },
+              {
+                name: 'MacBook Pro',
+                loc: 'Valencia',
+                time: 'hace 5 días',
+                icon: 'laptop',
+              },
+            ]"
+            :key="dev.name"
+            class="px-6 py-4 flex items-center justify-between group"
+          >
+            <div class="flex items-center gap-4">
+              <span
+                class="material-symbols-outlined text-slate-500 group-hover:text-slate-400 transition-colors"
+                >{{ dev.icon }}</span
+              >
+              <div>
+                <p class="text-white text-sm font-medium">{{ dev.name }}</p>
+                <p class="text-slate-500 text-xs">
+                  {{ dev.loc }}, España · {{ dev.time }}
+                </p>
+              </div>
+            </div>
+            <button
+              class="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+            >
+              <span class="material-symbols-outlined text-lg">logout</span>
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="p-6 bg-slate-800/10 border-t border-border-dark/30 flex justify-end"
+        >
+          <button
+            @click="handleLogoutOthers"
+            class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider"
+          >
+            Cerrar todas las demás sesiones
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

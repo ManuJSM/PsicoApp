@@ -1,5 +1,7 @@
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 content-center md:gap-8">
+  <div
+    class="grid grid-cols-1 xl:w-7xl lg:grid-cols-12 gap-4 content-center md:gap-8"
+  >
     <div class="lg:col-span-7 flex flex-col gap-2">
       <div
         class="bg-card-dark border border-border-dark rounded-xl p-6 shadow-sm flex flex-col gap-2"

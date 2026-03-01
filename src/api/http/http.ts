@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/auth.store.ts'
 import { AuthenticationError, AuthorizationError } from '@/types/errors.types'
 import type { HttpOptions } from '@/types/types'
 
-const apiUrl = 'http://192.168.1.24:80/api'
+const apiUrl = import.meta.env.VITE_API_URL
 
 export async function http<T>(
   endpoint: string,

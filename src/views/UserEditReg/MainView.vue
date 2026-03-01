@@ -78,9 +78,11 @@
 </script>
 <template>
   <main
-    class="flex-1 min-h-0 h-full p-4 xl:px-20 sm:px-6 lg:px-8 flex flex-col gap-4 md:overflow-y-auto"
+    class="flex-1 min-h-0 items-center h-full p-4 md:px-20 sm:px-6 lg:px-8 flex flex-col gap-4 md:overflow-y-auto"
   >
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div
+      class="flex flex-col self-start w-full md:flex-row md:items-end justify-between gap-6"
+    >
       <div class="flex flex-col gap-1">
         <div
           class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em]"
@@ -112,7 +114,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!loading" class="grid h-full min-h-0">
+    <div v-if="!loading" class="grid max-w-7xl h-full min-h-0">
       <Step1 v-if="step === 1" @next="step++" />
       <Step2 v-if="step === 2" @next="step++" @back="step--" />
       <Step3 v-if="step === 3" @back="step--" @save="saveReg" />

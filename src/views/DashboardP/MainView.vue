@@ -2,17 +2,18 @@
   import { computed, ref } from 'vue'
   import { type Patient, ToastType } from '@/types/types'
   import SideBar from './components/AppSideBar/AppSidebar.vue'
-  import MainSectionShow from './components/MainSection/MainSectionShow.vue'
+  import MainSectionShow from './components/SleepCalendar/MainView.vue'
   import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
   import MainSectionEdit from './components/MainSection/MainSectionEdit.vue'
   import { useToast } from '@/composables/useToast'
   import { useRouter } from 'vue-router'
   import { onMounted } from 'vue'
-  import { DASHBOARD_P } from '@/router/psico.route'
+  import { DASHBOARD_P_ROOT } from '@/router/psico.route'
   import { fetchMePatients } from '@/api/SleepData/me.api'
   const patients = ref<Patient[]>([])
   const props = defineProps<{
     //viene de la url
+    currentTab?: 'sleepCalendar' | 'add' | 'edit'
     id?: string
   }>()
   onMounted(async () => {
@@ -35,12 +36,12 @@
     currentView.value = 'show'
   }
   const handleExit = () => {
-    router.push({ name: DASHBOARD_P })
+    router.push({ name: DASHBOARD_P_ROOT })
   }
 
   const handleAdd = (patient: Patient) => {
     patients.value.push(patient)
-    router.push({ name: DASHBOARD_P, params: { id: String(patient.id) } })
+    router.push({ name: DASHBOARD_P_ROOT, params: { id: String(patient.id) } })
     currentView.value = 'show'
     setToast(ToastType.SUCCESS, 'Paciente añadido correctamente')
   }

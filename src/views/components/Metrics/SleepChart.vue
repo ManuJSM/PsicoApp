@@ -124,18 +124,14 @@
 </template>
 
 <script setup lang="ts">
+  import type { CharPoint } from '@/types/metrics.types'
   import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-
-  export interface SleepData {
-    date: string
-    value: number
-  }
 
   export interface SleepLineChartProps {
     averageTimeAsleep: string
     changePercent?: number
     title?: string
-    chartData: SleepData[]
+    chartData: CharPoint[]
     period: 'day' | 'month' | 'year' | 'week'
     chartColor?: string
     displayCount?: number

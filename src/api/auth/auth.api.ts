@@ -25,3 +25,10 @@ export async function refresh(): Promise<LoginResponse> {
     auth: false,
   })
 }
+
+export async function logoutAPI(): Promise<void> {
+  return http<void>('/auth/logout', {
+    method: 'POST',
+    credentials: 'include',
+  })
+}

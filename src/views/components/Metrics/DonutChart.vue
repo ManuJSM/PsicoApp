@@ -2,7 +2,6 @@
   <div
     class="dark:bg-card-dark border dark:border-border-dark rounded-xl p-4 flex flex-col"
   >
-    <!-- Header -->
     <div class="flex justify-center items-center mb-4">
       <div>
         <h3 class="font-bold text-slate-300 text-base mb-0.5">{{ title }}</h3>
@@ -10,43 +9,26 @@
       </div>
     </div>
 
-    <!-- Content -->
     <div class="flex flex-col md:flex-row items-center md:items-stretch gap-4">
-      <!-- Donut -->
       <div class="flex-1 flex items-center justify-center">
-        <div class="relative w-full aspect-square">
-          <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-            <!-- fondo -->
-            <circle
-              cx="50"
-              cy="50"
-              :r="radius"
-              fill="transparent"
-              stroke="#262c33"
-              stroke-width="10"
-            />
-
-            <!-- segmentos (siempre renderizados pero invisibles cuando no hay datos) -->
-            <circle
-              v-for="(segment, index) in renderedSegments"
+        <div class="relative w-full max-w-[220px] aspect-square">
+          <svg
+            viewBox="0 0 100 100"
+            class="w-full h-full -rotate-90"
+            shape-rendering="geometricPrecision"
+          >
+            <path
+              v-for="(segment, index) in pathSegments"
               :key="index"
-              cx="50"
-              cy="50"
-              :r="radius"
-              fill="transparent"
-              :stroke="segment.color"
-              stroke-width="10"
-              stroke-linecap="butt"
-              :stroke-dasharray="segment.dashArray"
-              :stroke-dashoffset="segment.offset"
+              :d="segment.d"
+              :fill="segment.color"
               :class="[
-                'transition-all duration-700 ease-out',
+                'transition-opacity duration-300',
                 { 'opacity-0': !hasSegments },
               ]"
             />
           </svg>
 
-          <!-- center -->
           <div
             class="absolute inset-0 flex flex-col items-center justify-center text-center px-2"
           >
@@ -55,14 +37,15 @@
             >
               {{ centerSubtitle }}
             </span>
-            <span class="text-xl font-black text-white leading-none">
+            <span
+              class="text-xl font-black text-white leading-none tabular-nums"
+            >
               {{ formatDuration(totalValue) }}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Legend lateral -->
       <div
         v-if="showLegend && hasSegments"
         class="flex-1 flex md:flex-col justify-center gap-4"
@@ -74,21 +57,15 @@
         >
           <div class="flex gap-1 justify-start items-baseline">
             <div
-              class="w-2 h-2 rounded-full"
+              class="w-2 h-2 rounded-full shrink-0"
               :style="{ backgroundColor: segment.color }"
             />
             <span class="text-sm text-slate-300">{{ segment.label }}</span>
           </div>
-          <span class="text-sm text-slate-400">{{ segment.percentage }}%</span>
+          <span class="text-sm text-slate-400 tabular-nums"
+            >{{ segment.percentage }}%</span
+          >
         </div>
-      </div>
-
-      <!-- Mensaje cuando no hay datos -->
-      <div
-        v-else-if="showLegend"
-        class="flex-1 flex items-center justify-center text-slate-500 text-sm"
-      >
-        No hay datos disponibles
       </div>
     </div>
   </div>
@@ -101,7 +78,6 @@
     value: number
     color: string
     label: string
-    percentage?: number
   }
 
   export interface DonutChartProps {
@@ -111,7 +87,6 @@
     centerSubtitle?: string
     centerValue?: number
     showLegend?: boolean
-    animate?: boolean
     animationDuration?: number
   }
 
@@ -122,32 +97,24 @@
     centerSubtitle: 'Total',
     centerValue: 0,
     showLegend: true,
-    animate: true,
-    animationDuration: 700,
+    animationDuration: 600, // Sincronizado a 600ms
   })
 
-  defineEmits(['analytics-click'])
-
+  // RESTAURADOS VALORES ORIGINALES
+  const radius = 45
+  const strokeWidth = 10
+  const gapDegrees = 3
   const animatedProgress = ref(0)
-  const isReady = ref(false)
-
-  const radius = 40
-  const circumference = 2 * Math.PI * radius
 
   const hasSegments = computed(() => props.segments.length > 0)
-
   const totalValue = computed(() => {
     if (props.centerValue > 0) return props.centerValue
-    if (!hasSegments.value) return 0
-    return props.segments.reduce((s, seg) => s + seg.value, 0)
+    return props.segments.reduce((s, seg) => s + seg.value, 0) || 0
   })
 
   const preparedSegments = computed(() => {
-    if (!hasSegments.value) return []
-
     const total = totalValue.value || 1
     let acc = 0
-
     return props.segments.map((s, i) => {
       const raw = Math.round((s.value / total) * 100)
       const pct = i === props.segments.length - 1 ? Math.max(0, 100 - acc) : raw
@@ -156,106 +123,178 @@
     })
   })
 
-  const GAP = 2 // Reducido para que sea menos notable
+  function polarToCartesian(
+    cx: number,
+    cy: number,
+    r: number,
+    angleDeg: number
+  ) {
+    const angleRad = (angleDeg * Math.PI) / 180.0
+    return { x: cx + r * Math.cos(angleRad), y: cy + r * Math.sin(angleRad) }
+  }
 
-  const renderedSegments = computed(() => {
-    if (!hasSegments.value || preparedSegments.value.length === 0) {
-      // Retornar un array con un segmento invisible en lugar de vacío
+  function describeArc(
+    x: number,
+    y: number,
+    rOut: number,
+    rIn: number,
+    startA: number,
+    endA: number
+  ) {
+    if (endA - startA >= 359.9) {
+      const s = polarToCartesian(x, y, rOut, 0)
+      const e = polarToCartesian(x, y, rOut, 180)
+      const sIn = polarToCartesian(x, y, rIn, 0)
+      const eIn = polarToCartesian(x, y, rIn, 180)
       return [
-        {
-          color: 'transparent',
-          dashArray: `0 ${circumference}`,
-          offset: 0,
-          value: 0,
-        },
-      ]
+        `M`,
+        s.x,
+        s.y,
+        `A`,
+        rOut,
+        rOut,
+        0,
+        1,
+        1,
+        e.x,
+        e.y,
+        `A`,
+        rOut,
+        rOut,
+        0,
+        1,
+        1,
+        s.x,
+        s.y,
+        `M`,
+        sIn.x,
+        sIn.y,
+        `A`,
+        rIn,
+        rIn,
+        0,
+        1,
+        0,
+        eIn.x,
+        eIn.y,
+        `A`,
+        rIn,
+        rIn,
+        0,
+        1,
+        0,
+        sIn.x,
+        sIn.y,
+        `Z`,
+      ].join(' ')
+    }
+    const sO = polarToCartesian(x, y, rOut, endA)
+    const eO = polarToCartesian(x, y, rOut, startA)
+    const sI = polarToCartesian(x, y, rIn, endA)
+    const eI = polarToCartesian(x, y, rIn, startA)
+    const largeArc = endA - startA <= 180 ? '0' : '1'
+    return [
+      `M`,
+      sO.x,
+      sO.y,
+      `A`,
+      rOut,
+      rOut,
+      0,
+      largeArc,
+      0,
+      eO.x,
+      eO.y,
+      `L`,
+      eI.x,
+      eI.y,
+      `A`,
+      rIn,
+      rIn,
+      0,
+      largeArc,
+      1,
+      sI.x,
+      sI.y,
+      `Z`,
+    ].join(' ')
+  }
+
+  const pathSegments = computed(() => {
+    if (!hasSegments.value) return []
+
+    const total = totalValue.value || 1
+    const minDegrees = 8 // Un 1% ahora se verá como un ~3.5% para que sea visible
+
+    // 1. Calculamos los grados "teóricos"
+    let segmentsWithDegrees = props.segments.map(seg => ({
+      ...seg,
+      degrees: (seg.value / total) * 360,
+    }))
+
+    // 2. REDISTRIBUCIÓN: Si hay segmentos diminutos, les damos el minDegrees
+    // y le quitamos la diferencia a los segmentos más grandes para no explotar los 360°
+    const smallSegments = segmentsWithDegrees.filter(
+      s => s.degrees < minDegrees
+    )
+    const largeSegments = segmentsWithDegrees.filter(
+      s => s.degrees >= minDegrees
+    )
+
+    if (smallSegments.length > 0 && largeSegments.length > 0) {
+      let extraNeeded = 0
+      smallSegments.forEach(s => {
+        extraNeeded += minDegrees - s.degrees
+        s.degrees = minDegrees
+      })
+
+      // Repartimos la "deuda" de grados entre los grandes proporcionalmente
+      const totalLargeDegrees = largeSegments.reduce(
+        (acc, s) => acc + s.degrees,
+        0
+      )
+      largeSegments.forEach(s => {
+        s.degrees -= extraNeeded * (s.degrees / totalLargeDegrees)
+      })
     }
 
-    let offset = 0
-    const segmentsWithGap = preparedSegments.value.filter(s => s.percentage > 0)
-    const totalGap = GAP * segmentsWithGap.length
+    // 3. Dibujamos con los grados ya normalizados
+    let currentAngle = 0
+    return segmentsWithDegrees.map(seg => {
+      const startA = currentAngle + gapDegrees / 2
+      // El sweep es el dibujo animado
+      const fullSweep = Math.max(0, seg.degrees - gapDegrees)
+      const endA = startA + fullSweep * animatedProgress.value
 
-    return segmentsWithGap.map((seg, index) => {
-      const full = (seg.percentage! / 100) * (circumference - totalGap)
-      const length = Math.max(0, full * animatedProgress.value)
+      const d =
+        endA > startA
+          ? describeArc(50, 50, radius, radius - strokeWidth, startA, endA)
+          : ''
 
-      // Calcular offset considerando el gap acumulado
-      if (index > 0) {
-        const segment = segmentsWithGap[index - 1] as DonutSegment
-        const prevLength =
-          (segment.percentage! / 100) * (circumference - totalGap)
-        offset += prevLength + GAP
-      }
-
-      return {
-        ...seg,
-        length,
-        dashArray: `${length} ${circumference}`,
-        offset: -offset,
-      }
+      currentAngle += seg.degrees
+      return { color: seg.color, d }
     })
   })
+  const resetAndStartAnimation = async () => {
+    animatedProgress.value = 0
+    await nextTick()
+    const start = performance.now()
+    const step = (t: number) => {
+      const p = Math.min((t - start) / props.animationDuration, 1)
+      animatedProgress.value = 1 - Math.pow(1 - p, 3)
+      if (p < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }
 
-  const formatDuration = (minutes: number) => {
-    const h = Math.floor(minutes / 60)
-    const m = minutes % 60
+  const formatDuration = (min: number) => {
+    const h = Math.floor(min / 60)
+    const m = Math.round(min % 60)
     if (!h) return `${m}m`
     if (!m) return `${h}h`
     return `${h}h ${m}m`
   }
 
-  const resetAndStartAnimation = async () => {
-    // Resetear progreso
-    animatedProgress.value = 0
-    isReady.value = false
-
-    // Esperar al próximo tick para asegurar que el DOM se actualice
-    await nextTick()
-
-    if (!props.animate || !hasSegments.value) {
-      animatedProgress.value = 1
-      isReady.value = true
-      return
-    }
-
-    const start = performance.now()
-    const d = props.animationDuration
-
-    const step = (t: number) => {
-      const p = Math.min((t - start) / d, 1)
-      animatedProgress.value = 1 - Math.pow(1 - p, 3)
-
-      if (p >= 1) {
-        isReady.value = true
-      }
-
-      if (p < 1) {
-        requestAnimationFrame(step)
-      }
-    }
-
-    requestAnimationFrame(step)
-  }
-
-  // Iniciar animación cuando el componente se monta
-  onMounted(() => {
-    resetAndStartAnimation()
-  })
-
-  // Reiniciar animación cuando cambian los segmentos
-  watch(
-    () => props.segments,
-    () => {
-      resetAndStartAnimation()
-    },
-    { deep: true }
-  )
-
-  // También reiniciar cuando cambia centerValue
-  watch(
-    () => props.centerValue,
-    () => {
-      resetAndStartAnimation()
-    }
-  )
+  onMounted(resetAndStartAnimation)
+  watch(() => props.segments, resetAndStartAnimation, { deep: true })
 </script>

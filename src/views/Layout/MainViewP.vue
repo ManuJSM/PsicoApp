@@ -2,11 +2,12 @@
   import AppMenu from './AppMenu/MainView.vue'
   import type { MenuItems } from '@/types/types'
   import { provide } from 'vue'
+  import { DASHBOARD_P_ROOT } from '@/router/psico.route'
   const menuItems: MenuItems[] = [
     {
       title: 'Pacientes',
       icon: 'groups',
-      routeName: 'DashboardP',
+      routeName: DASHBOARD_P_ROOT,
     },
     {
       title: 'Mi Perfil',

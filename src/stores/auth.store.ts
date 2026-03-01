@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { loginAPI, refresh } from '@/api/auth/auth.api'
+import { loginAPI, logoutAPI, refresh } from '@/api/auth/auth.api'
 import { AuthenticationError } from '@/types/errors.types'
 import { ref } from 'vue'
 import { Role } from '@/types/types'
@@ -54,7 +54,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function logout() {
+  async function logout() {
+    await logoutAPI()
     accessToken.value = null
     role.value = null
     isLoggedIn.value = false

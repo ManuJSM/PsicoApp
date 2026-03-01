@@ -47,6 +47,33 @@ export async function fetchMeCalendar(): Promise<RegCalendar[]> {
   const regValues = await httpAuth<RegCalendar[]>(`${calendarEndpoint}`)
   return regValues
 }
+const updateProfileEndpoint = '/me/profile'
+export async function updateProfile({
+  fullName,
+  email,
+  phone,
+  avatar,
+}: {
+  fullName?: string
+  email?: string
+  phone?: string
+  avatar?: string
+}): Promise<boolean> {
+  const updated = await httpAuth<{ success: boolean }>(
+    `${updateProfileEndpoint}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        avatar: avatar,
+      }),
+    }
+  )
+  return updated.success
+}
 
 const patientsEndpoint = '/me/patients'
 export async function fetchMePatients(): Promise<Patient[]> {

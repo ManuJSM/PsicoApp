@@ -35,8 +35,16 @@ export enum CharDataType {
   AWAKE = 'awake',
   LATENCY = 'latency',
 }
-
+export interface SleepChartData {
+  chartData: CharPoint[]
+  type: 'Media Dormido' | 'Media Despierto' | 'Media En Cama'
+  trend: number
+  title: string
+  avg: string
+  chartColor: string
+}
 export interface CharPoint {
+  label: string
   date: string
   value: number
 }

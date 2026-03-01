@@ -225,6 +225,7 @@
   import { SleepState, type SleepReg } from '@/types/sleepReg.types'
   import { getStateClass } from '@/views/UserEditReg/utils/css.util'
   import SleepTimeline from '@/views/UserEditReg/components/Step3/components/SleepTimeline.vue'
+  import { formatDisplayDate } from '../../../../../utils/date.utils'
 
   interface Props {
     dayReg: SleepReg | null
@@ -274,16 +275,6 @@
     } else {
       return `${hours}h ${minutes}m`
     }
-  }
-
-  const formatDisplayDate = (date: Date) => {
-    if (!date) return ''
-    return new Date(date).toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
   }
 
   const addObservation = () => {

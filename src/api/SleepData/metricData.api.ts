@@ -2,7 +2,7 @@ import { httpAuth } from '../http/httpAuth'
 import { formatDate } from './sleepReg.api'
 import type { CharData, Metrics } from '@/types/metrics.types'
 
-const regEndpoint = '/sleep/metrics'
+const metricsEndpoint = '/sleep/metrics'
 const queryDate = (start: Date, end: Date) => {
   return `?start=${formatDate(start)}&end=${formatDate(end)}`
 }
@@ -21,7 +21,19 @@ export async function fetchMetrics({
   end: Date
 }): Promise<Metrics> {
   const metrics = await httpAuth<Metrics>(
-    `${regEndpoint}/${userId}${queryDate(start, end)}`
+    `${metricsEndpoint}/${userId}${queryDate(start, end)}`
+  )
+  return metrics
+}
+export async function fetchMeMetrics({
+  start,
+  end,
+}: {
+  start: Date
+  end: Date
+}): Promise<Metrics> {
+  const metrics = await httpAuth<Metrics>(
+    `/me/${metricsEndpoint}${queryDate(start, end)}`
   )
   return metrics
 }
@@ -41,6 +53,24 @@ export async function fetchSleepData({
 }): Promise<CharData> {
   const data = await httpAuth<CharData>(
     `${chartEndpoint}/${userId}/${queryDate(start, end)}${queryType(type, groupBy)}`
+  )
+
+  return data
+}
+
+export async function fetchMeSleepData({
+  start,
+  end,
+  type,
+  groupBy,
+}: {
+  start: Date
+  end: Date
+  type: string
+  groupBy: string
+}): Promise<CharData> {
+  const data = await httpAuth<CharData>(
+    `/me/${chartEndpoint}${queryDate(start, end)}${queryType(type, groupBy)}`
   )
 
   return data

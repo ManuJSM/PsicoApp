@@ -2,40 +2,74 @@
   import { onMounted, ref } from 'vue'
   import { useMeStore } from '@/stores/me.store'
   import MainSeguridad from './components/MainSeguridad.vue'
-  import type { User } from '@/types/types'
+  import { ToastType, type UpdateUser, type User } from '@/types/types'
   import MainInfo from './components/MainInfo.vue'
+  import { updateProfile } from '@/api/SleepData/me.api'
+  import { useToast } from '@/composables/useToast'
+  import { useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/auth.store'
 
   const meStore = useMeStore()
   const activeTab = ref<'personal' | 'security'>('personal')
   const showPhotoModal = ref(false)
+  const toast = useToast()
 
-  const userCopy = ref<User>()
+  const userCopy = ref<UpdateUser>({
+    fullName: '',
+    email: '',
+    phone: '',
+    avatar: '',
+  })
 
   onMounted(async () => {
     await meStore.fetchMe()
     if (meStore.me) {
-      userCopy.value = { ...meStore.me }
+      const { avatar, fullName, email, phone } = meStore.me
+      userCopy.value = { fullName, email, phone, avatar }
     }
   })
+  const router = useRouter()
+  const authStore = useAuthStore()
+  const handleLogout = async () => {
+    await authStore.logout()
+    router.push('/')
+  }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log('Guardando usuario:', userCopy.value)
+    const updated = await updateProfile({
+      fullName: userCopy.value?.fullName,
+      email: userCopy.value?.email,
+      phone: userCopy.value?.phone,
+      avatar: userCopy.value?.avatar,
+    })
+    if (updated) {
+      meStore.reset()
+      await meStore.fetchMe()
+      toast.setToast(ToastType.SUCCESS, 'Perfil actualizado correctamente')
+    } else {
+      toast.setToast(ToastType.ERROR, 'Error al actualizar el perfil')
+      handleCancel()
+    }
+
+    console.log(updated)
     // meStore.updateUser(userCopy.value)
   }
 
   const handleCancel = () => {
     if (meStore.me) {
-      userCopy.value = { ...meStore.me }
+      const { avatar, fullName, email, phone } = meStore.me
+      userCopy.value = { fullName, email, phone, avatar }
     }
   }
 
-  const handlePhotoChange = (action: 'upload' | 'delete') => {
-    if (action === 'delete' && userCopy.value) {
-      userCopy.value.avatar = ''
-    } else if (action === 'upload') {
-      // Aquí iría la lógica de subir archivo
-      console.log('Subir nueva foto')
+  const handlePhotoChange = async (action: 'upload' | 'delete') => {
+    if (action === 'delete') {
+      userCopy.value.avatar =
+        'https://ui-avatars.com/api/?name=' +
+        encodeURIComponent(userCopy.value.fullName)
     }
+    handleSave()
     showPhotoModal.value = false
   }
 </script>
@@ -89,17 +123,6 @@
                 {{ meStore.me?.email }}
               </p>
             </div>
-
-            <!-- Botón cambiar foto en sidebar -->
-            <button
-              @click="showPhotoModal = true"
-              class="flex items-center justify-center rounded-lg h-9 px-4 bg-linear-to-r from-slate-700 to-slate-600 text-white text-xs font-medium hover:from-slate-600 hover:to-slate-500 transition-all duration-300 mt-2 shadow-lg cursor-pointer"
-            >
-              <span class="material-symbols-outlined text-base mr-2"
-                >photo_camera</span
-              >
-              <span class="truncate">Actualizar foto</span>
-            </button>
           </div>
 
           <!-- Navegación sidebar -->
@@ -140,23 +163,41 @@
             </a>
           </nav>
         </div>
+
+        <!-- Botón de logout al final del sidebar -->
+        <div class="mt-auto pt-6 border-t border-slate-700/30">
+          <button
+            @click="handleLogout"
+            class="flex cursor-pointer items-center justify-between w-full rounded-xl px-4 py-3 bg-red-900/20 dark:bg-red-900/30 border border-red-500/30 text-slate-300 hover:text-white transition-all duration-300 group"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="material-symbols-outlined text-red-300 dark:text-red-400 group-hover:text-red-600 transition-colors"
+              >
+                logout
+              </span>
+              <span
+                class="font-medium group-hover:text-red-600 transition-colors text-red-300 dark:text-red-400"
+                >Cerrar sesión</span
+              >
+            </div>
+          </button>
+        </div>
       </aside>
 
-      <main class="flex-1 px-4 sm:px-8 py-6 overflow-y-auto">
+      <main class="flex-1 px-4 sm:px-8 py-6 h-full min-h-0 overflow-y-auto">
         <div
-          class="layout-content-container flex flex-col w-full max-w-3xl mx-auto"
+          class="layout-content-container flex flex-col gap-2 w-full max-w-3xl mx-auto h-full min-h-0"
         >
           <!-- Header para móvil/tablet -->
-          <div class="block md:hidden mb-6">
-            <div
-              class="flex flex-col gap-4 p-4 bg-linear-to-r from-primary/10 to-transparent rounded-2xl"
-            >
+          <div class="md:hidden mb-6">
+            <div class="flex flex-col gap-4 p-4 bg-slate-800/80 rounded-2xl">
               <p
                 class="text-white text-3xl sm:text-4xl font-black leading-tight"
               >
                 Mi Perfil
               </p>
-              <div class="border-b border-slate-700">
+              <div class="border-b border-slate-700/30">
                 <nav class="-mb-px flex space-x-8">
                   <a
                     href="#"
@@ -187,10 +228,13 @@
             </div>
           </div>
 
-          <div v-if="activeTab === 'personal' && userCopy">
+          <div
+            class="h-full min-h-0"
+            v-if="activeTab === 'personal' && userCopy"
+          >
             <!-- Sección de foto para móvil -->
             <div
-              class="flex p-6 @container mt-2 md:hidden bg-slate-800/30 rounded-2xl backdrop-blur-sm"
+              class="flex p-6 @container mb-4 md:hidden bg-card-dark rounded-2xl backdrop-blur-sm"
             >
               <div class="flex w-full flex-col gap-4 items-center">
                 <div class="flex gap-6 flex-col items-center">
@@ -239,52 +283,80 @@
                   >
                   <span class="truncate">Cambiar foto de perfil</span>
                 </button>
+                <div class="mt-auto pt-6 border-t w-full border-slate-700/30">
+                  <button
+                    @click="handleLogout"
+                    class="flex justify-center cursor-pointer items-center w-full rounded-xl px-4 py-3 bg-red-900/20 dark:bg-red-900/30 border border-red-500/30 text-slate-300 hover:text-white transition-all duration-300 group"
+                  >
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="material-symbols-outlined text-red-300 dark:text-red-400 group-hover:text-red-600 transition-colors"
+                      >
+                        logout
+                      </span>
+                      <span
+                        class="font-medium group-hover:text-red-600 transition-colors text-red-300 dark:text-red-400"
+                        >Cerrar sesión</span
+                      >
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
-            <MainInfo
-              v-model="userCopy"
-              @photo-click="showPhotoModal = true"
-              @save="handleSave"
-              @cancel="handleCancel"
-            />
+            <section class="flex items-center justify-center min-h-0 h-full">
+              <div class="w-full max-w-lg flex flex-col gap-6">
+                <MainInfo
+                  v-model="userCopy"
+                  @photo-click="showPhotoModal = true"
+                  @save="handleSave"
+                  @cancel="handleCancel"
+                />
 
-            <div
-              class="mt-6 p-4 bg-slate-800/30 rounded-xl backdrop-blur-sm border border-slate-700/30"
-            >
-              <h3
-                class="text-white text-sm font-semibold mb-3 flex items-center gap-2"
-              >
-                <span class="material-symbols-outlined text-primary text-base"
-                  >info</span
+                <div
+                  class="p-4 w-full bg-card-dark rounded-xl backdrop-blur-sm border border-border-dark/30"
                 >
-                Información de la cuenta
-              </h3>
-              <div class="flex justify-center md:justify-start gap-8">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-primary text-base"
-                    >verified</span
+                  <h3
+                    class="text-white text-sm font-semibold mb-3 flex items-center gap-2"
                   >
-                  <div>
-                    <p class="text-slate-400 text-xs">Estado</p>
-                    <p class="text-green-400 text-sm font-medium">
-                      Cuenta Activa
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined text-primary text-base"
-                    >calendar_month</span
-                  >
-                  <div>
-                    <p class="text-slate-400 text-xs">Miembro desde</p>
-                    <p class="text-white text-sm">Enero 2024</p>
+                    <span
+                      class="material-symbols-outlined text-primary text-base"
+                      >info</span
+                    >
+                    Información de la cuenta
+                  </h3>
+                  <div class="flex justify-center md:justify-start gap-8">
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="material-symbols-outlined text-primary text-base"
+                        >verified</span
+                      >
+                      <div>
+                        <p class="text-slate-400 text-xs">Estado</p>
+                        <p class="text-green-400 text-sm font-medium">
+                          Cuenta Activa
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="material-symbols-outlined text-primary text-base"
+                        >calendar_month</span
+                      >
+                      <div>
+                        <p class="text-slate-400 text-xs">Miembro desde</p>
+                        <p class="text-white text-sm">Enero 2024</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
 
-          <div v-else-if="activeTab === 'security'">
+          <div
+            class="max-w-lg self-center"
+            v-else-if="activeTab === 'security'"
+          >
             <MainSeguridad />
           </div>
         </div>
@@ -316,9 +388,19 @@
             <div
               class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-32 w-32 ring-4 ring-primary/30 shadow-xl"
               :style="{
-                backgroundImage: `url(${userCopy?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userCopy?.fullName || '')})`,
+                backgroundImage: `url(${meStore.me?.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(meStore.me?.fullName || '')})`,
               }"
             ></div>
+            <div
+              class="flex flex-col py-3 border-b border-slate-700/30 md:border-b-0"
+            >
+              <input
+                type="url"
+                v-model="userCopy.avatar"
+                class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary w-full transition-all duration-300"
+                placeholder="Url de la foto"
+              />
+            </div>
 
             <div class="flex gap-3 w-full">
               <button
@@ -326,7 +408,7 @@
                 class="flex-1 flex items-center justify-center gap-2 rounded-xl h-11 bg-slate-700 text-white hover:bg-slate-600 transition-colors hover:scale-105"
               >
                 <span class="material-symbols-outlined">upload</span>
-                Subir foto
+                Guardar
               </button>
               <button
                 @click="handlePhotoChange('delete')"

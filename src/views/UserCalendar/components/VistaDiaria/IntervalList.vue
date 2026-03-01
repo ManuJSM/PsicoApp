@@ -1,44 +1,28 @@
-<!-- IntervalList.vue -->
 <template>
   <div class="glass-card rounded-3xl p-6 flex flex-col gap-4 min-h-0 h-full">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-4">
       <div>
         <h3 class="text-[#9dabb9] text-xs font-bold uppercase">
           Lista de Intervalos
         </h3>
-        <p class="text-white/40 text-[10px] font-medium mt-1" v-if="!hasData">
-          No hay intervalos registrados
-        </p>
-        <p class="text-white/40 text-[10px] font-medium mt-1" v-else>
+        <p class="text-white/40 text-[10px] font-medium mt-1">
           {{ intervals.length }} segmentos registrados
         </p>
       </div>
 
       <!-- Botón de acción (solo visible si hay datos) -->
       <button
-        v-if="hasData"
         class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
-        @click="$emit('edit')"
+        @click="handleEdit"
       >
         <span class="material-symbols-outlined text-base">edit_note</span>
         Editar Registro del Día
-      </button>
-
-      <!-- Botón para añadir (solo si no hay datos) -->
-      <button
-        v-else
-        class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
-        @click="$emit('add')"
-      >
-        <span class="material-symbols-outlined text-base">add_circle</span>
-        Añadir Registro
       </button>
     </div>
 
     <!-- Cabecera de la tabla (solo si hay datos) -->
     <div
-      v-if="hasData"
       class="grid grid-cols-12 gap-4 px-2 pb-3 text-[10px] font-bold text-[#637381] uppercase tracking-widest"
     >
       <div class="col-span-5">horario</div>
@@ -47,7 +31,7 @@
     </div>
 
     <!-- Lista de intervalos (CON DATOS) -->
-    <div v-if="hasData" class="divide-y divide-[#30363d]">
+    <div class="divide-y divide-[#30363d]">
       <div
         v-for="(interval, index) in intervals"
         :key="index"
@@ -77,34 +61,13 @@
         </div>
       </div>
     </div>
-
-    <!-- Estado vacío (SIN DATOS) -->
-    <div
-      v-else
-      class="flex flex-col flex-1 items-center justify-center py-16 px-4 border-2 border-dashed border-white/5 rounded-2xl"
-    >
-      <div class="relative">
-        <div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
-        <span
-          class="material-symbols-outlined text-primary/30 text-6xl font-thin relative z-10"
-        >
-          bedtime
-        </span>
-      </div>
-
-      <h4 class="text-white text-lg font-bold mt-4">
-        No hay intervalos registrados
-      </h4>
-      <p class="text-[#9dabb9] text-sm text-center max-w-sm mt-2">
-        {{ emptyMessage }}
-      </p>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue'
   import { type Interval, SleepState } from '@/types/sleepReg.types'
+  import { useRoute, useRouter } from 'vue-router'
 
   export interface IntervalListProps {
     /** Array de intervalos (puede ser vacío) */
@@ -117,11 +80,12 @@
     emptyMessage: 'Parece que no hay datos técnicos para este periodo.',
   })
 
-  // Emits
-  defineEmits<{
-    (e: 'edit'): void
-    (e: 'add'): void
-  }>()
+  const router = useRouter()
+  const route = useRoute()
+
+  function handleEdit() {
+    router.push(`${route.path}/form`)
+  }
 
   // Determinar si hay datos
   const hasData = computed(() => {

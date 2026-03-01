@@ -64,6 +64,15 @@ const MONTHS_ES = [
   'NOV',
   'DIC',
 ]
+export const formatDisplayDate = (date: Date) => {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
 
 export const formatDateRange = (range: DateRange): string => {
   const { start, end } = range

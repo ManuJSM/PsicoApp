@@ -1,4 +1,3 @@
-<!-- SleepArchitecture.vue -->
 <template>
   <div class="glass-card h-full flex flex-col justify-center rounded-3xl p-6">
     <!-- Header -->

@@ -14,8 +14,9 @@
   const currentYear = currentDate.getFullYear()
   const currentMonth = currentDate.getMonth()
   const currentDay = currentDate.getDate()
+  const yearSelected = new Date(selectedDate.value).getFullYear() || currentYear
 
-  const selectedYear = ref<number>(currentYear)
+  const selectedYear = ref<number>(yearSelected)
 
   // Mapa de registros
   const registrosMap = computed(() => {
