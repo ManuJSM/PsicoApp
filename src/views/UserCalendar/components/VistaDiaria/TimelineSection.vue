@@ -1,31 +1,36 @@
 <template>
-  <div class="glass-card h-full flex flex-col justify-center rounded-3xl p-6">
-    <!-- Header -->
+  <div
+    class="bg-card-dark rounded-2xl border border-border-dark p-6 flex flex-col h-full"
+  >
     <div
-      class="flex justify-center flex-col md:flex-row items-center md:justify-between mb-2"
+      class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4"
     >
       <div>
-        <h3
-          class="text-[#9dabb9] text-xs text-center font-bold uppercase tracking-widest"
-        >
-          Timeline del Sueño
-        </h3>
-        <p class="text-white text-xl font-bold">Visualizador por Horas</p>
+        <div class="flex items-center gap-2 mb-0.5">
+          <div class="h-4 w-1 bg-primary rounded-full"></div>
+          <h3
+            class="text-white text-[16px] font-black uppercase tracking-[0.15em]"
+          >
+            Timeline del Sueño
+          </h3>
+        </div>
       </div>
 
-      <!-- Leyenda -->
-      <div class="flex gap-6" :class="{ 'opacity-30': !hasData }">
+      <div
+        class="flex items-center w-full md:w-auto justify-center gap-4"
+        :class="{ 'opacity-30': !hasData }"
+      >
         <div
           v-for="item in legendItems"
           :key="item.label"
-          class="flex items-center gap-2"
+          class="flex items-center gap-1.5"
         >
           <div
-            class="size-3 rounded-full"
-            :class="hasData ? item.colorClass : 'bg-technical-divider'"
+            class="size-2.5 rounded-full shadow-sm"
+            :class="hasData ? item.colorClass : 'bg-slate-700'"
           ></div>
           <span
-            class="text-[10px] text-[#9dabb9] font-bold uppercase tracking-tighter"
+            class="text-[9px] text-slate-400 font-bold uppercase tracking-widest"
           >
             {{ item.label }}
           </span>
@@ -33,39 +38,22 @@
       </div>
     </div>
 
-    <!-- Timeline con SleepTimeline -->
-    <div class="w-full mb-2">
-      <!-- Horas del día (24h) -->
-      <div
-        class="flex mb-2 border-b pb-2"
-        :class="
-          hasData
-            ? 'text-[#9dabb9] border-glass-border'
-            : 'text-[#9dabb9]/40 border-glass-border/30'
-        "
-      ></div>
-
+    <div class="flex-1 flex flex-col justify-center">
       <SleepTimeline
         v-if="hasData && bedtimeDate && wakeupDate"
         :intervals="intervals"
         :bedtime-date="bedtimeDate"
         :wakeup-date="wakeupDate"
       />
-
-      <div v-else class="relative w-full m-2 flex items-center justify-center">
-        <span
-          class="text-technical-divider text-[10px] font-bold uppercase tracking-[0.2em] relative"
-        >
-          {{ emptyMessage }}
-        </span>
-      </div>
     </div>
-    <p
-      class="text-xs text-center italic"
-      :class="hasData ? 'text-[#9dabb9]' : 'text-[#9dabb9]/50'"
-    >
-      {{ footerText }}
-    </p>
+
+    <div class="mt-4 pt-4 border-t border-border-dark/30">
+      <p
+        class="text-[10px] text-slate-500 italic leading-tight text-center md:text-left"
+      >
+        {{ footerText }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -74,18 +62,11 @@
   import { computed } from 'vue'
   import type { Interval } from '@/types/sleepReg.types'
 
-  export type SleepState = 'asleep' | 'awake' | 'inBed' | 'out'
-
   export interface SleepArchitectureProps {
-    /** Intervalos de sueño (puede ser array vacío o null) */
     intervals: Interval[]
-    /** Fecha de inicio (acostarse) - opcional, si no hay datos no se usa */
     bedtimeDate?: Date | null
-    /** Fecha de fin (despertar) - opcional, si no hay datos no se usa */
     wakeupDate?: Date | null
-    /** Mensaje personalizado para estado vacío */
     emptyMessage?: string
-    /** Texto personalizado para el footer */
     footerText?: string
   }
 
@@ -97,14 +78,13 @@
       'El gráfico representa los estados técnicos registrados por el dispositivo médico durante el ciclo completo.',
   })
 
-  // Items de la leyenda
+  // Leyenda usando TUS clases exactas
   const legendItems = [
     { label: 'Dormido', colorClass: 'bg-state-asleep' },
     { label: 'En Cama', colorClass: 'bg-state-inbed' },
     { label: 'Fuera', colorClass: 'bg-state-awake' },
   ]
 
-  // Determinar si hay datos (array no vacío)
   const hasData = computed(() => {
     return props.intervals && props.intervals.length > 0
   })

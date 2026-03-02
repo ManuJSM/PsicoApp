@@ -44,6 +44,7 @@
   const myMetrics = ref<Metrics | null>(null)
   const mySleepData = ref<CharData | null>(null)
   const config = ref<ViewConfig | null>(null)
+  const today = new Date().toISOString().split('T')[0] as string
 
   const dayReg = ref<SleepReg | null>(null)
   const fetchPeriodData = async (view: DashboardViews, date: Date) => {
@@ -112,13 +113,15 @@
       <div
         class="sticky md:relative top-0 z-10 backdrop-blur-sm md:px-4 xl:px-20 flex pt-4 flex-col justify-center items-center lg:flex-row lg:justify-between lg:items-end gap-6"
       >
-        <div class="flex flex-col gap-1">
-          <h1
-            class="text-white text-3xl font-black leading-tight tracking-tight"
-          >
-            Vista Diaria Detallada
-          </h1>
-        </div>
+        <h1
+          class="text-white text-3xl md:w-90 md:text-4xl font-black tracking-tighter leading-none"
+        >
+          {{
+            selectedView === DashboardViews.DIARIA
+              ? 'Análisis del Día'
+              : 'Métricas del Periodo'
+          }}
+        </h1>
         <div
           class="flex flex-wrap justify-center items-center gap-4 p-1.5 rounded-2xl bg-primary/10 border border-primary/20"
         >
@@ -167,16 +170,32 @@
             Año
           </button>
         </div>
-        <button
-          class="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-bold transition-all border border-primary/20 group"
-          @click="toggleDrawer"
-        >
-          <span
-            class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform"
-            >calendar_today</span
+        <div class="flex items-center gap-2">
+          <button
+            @click="selectedDate = today"
+            :disabled="selectedDate === today"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 border"
+            :class="[
+              selectedDate === today
+                ? 'border-white/10 bg-transparent text-white/20 cursor-default'
+                : 'border-state-inbed cursor-pointer animate-pulse bg-state-inbed/10 text-state-inbed active:scale-95',
+            ]"
           >
-          <span>{{ selectedDate }}</span>
-        </button>
+            <span class="material-symbols-outlined text-[20px]">today</span>
+            <span>HOY</span>
+          </button>
+
+          <button
+            class="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-bold transition-all border border-primary/20 group"
+            @click="toggleDrawer"
+          >
+            <span
+              class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform"
+              >calendar_today</span
+            >
+            <span>{{ selectedDate }}</span>
+          </button>
+        </div>
       </div>
       <div class="flex-1 flex items-center justify-center" v-if="!loading">
         <VistaDiaria

@@ -18,7 +18,7 @@
 </script>
 <template>
   <div
-    class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 self-center max-w-7xl md:overflow-y-auto pb-2 h-full content-center"
+    class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 self-center xl:w-7xl md:overflow-y-auto pb-2 h-full content-center"
   >
     <div class="lg:col-span-8">
       <TimelineSection

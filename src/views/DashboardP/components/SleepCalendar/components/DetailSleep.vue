@@ -1,104 +1,95 @@
 <template>
-  <!-- Vista cuando no hay registro -->
   <section
     v-if="!dayReg"
-    class="flex flex-col items-center p-4 justify-center text-center"
+    class="flex flex-col items-center p-8 justify-center text-center min-h-[400px]"
   >
     <div class="mb-8">
       <div
-        class="size-32 md:size-40 rounded-full bg-[#0d1117] border-2 border-white/10 flex items-center justify-center mb-6"
+        class="size-32 md:size-40 rounded-full bg-card-dark border-2 border-border-dark flex items-center justify-center mb-6 shadow-xl shadow-black/20"
       >
-        <span class="material-symbols-outlined text-5xl text-slate-600">
+        <span class="material-symbols-outlined text-5xl text-slate-500/50">
           nights_stay
         </span>
       </div>
     </div>
 
-    <h2 class="text-2xl md:text-3xl font-bold text-slate-300 mb-4">
+    <h2 class="text-2xl md:text-3xl font-bold text-white/90 mb-4">
       Sin registro para esta fecha
     </h2>
 
-    <p class="text-slate-500 max-w-md">
+    <p class="text-slate-400 max-w-md">
       No se encontró un registro de sueño para el día seleccionado.
-      {{ showDateText ? `(${formatDisplayDate(props.date)})` : '' }}
+      <span v-if="showDateText" class="block mt-2 text-primary font-medium">
+        {{ formatDisplayDate(props.date) }}
+      </span>
     </p>
   </section>
 
-  <!-- Vista normal cuando hay registro -->
-  <section v-else class="flex flex-col gap-3">
-    <!-- Cronología de la Noche -->
-
+  <section v-else class="flex flex-col gap-4">
     <div
-      class="technical-card bg-card-dark border border-white/10 rounded-xl overflow-hidden"
+      class="technical-card bg-card-dark border border-border-dark rounded-xl overflow-hidden shadow-lg"
     >
-      <!-- Header con leyenda -->
-      <div class="px-4 md:px-6 py-4 border-b border-white/10 bg-[#0d1117]/50">
+      <div class="px-4 md:px-6 py-4 border-b border-border-dark bg-black/20">
         <div
-          class="flex flex-col md:flex-row md:items-center justify-between gap-2"
+          class="flex flex-col md:flex-row md:items-center justify-between gap-3"
         >
           <h3
             class="text-xs font-bold text-slate-400 uppercase tracking-widest"
           >
             Cronología de la Noche
           </h3>
-          <div class="flex items-baseline gap-3 md:gap-5">
+          <div class="flex items-center gap-4">
             <div
-              class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
+              class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400"
             >
-              <span class="size-1.5 rounded-full bg-state-asleep"></span>
-              Sueño
+              <span class="size-2 rounded-full bg-state-asleep"></span> Sueño
             </div>
             <div
-              class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
+              class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400"
             >
-              <span class="size-1.5 rounded-full bg-state-inbed"></span>
-              Cama
+              <span class="size-2 rounded-full bg-state-inbed"></span> Cama
             </div>
             <div
-              class="flex items-center gap-1.5 text-xs font-bold text-slate-400"
+              class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400"
             >
-              <span class="size-1.5 rounded-full bg-state-awake"></span>
-              Fuera
+              <span class="size-2 rounded-full bg-state-awake"></span> Fuera
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Contenido -->
-      <div class="p-4 md:p-6 space-y-4">
-        <!-- Timeline visual -->
-
+      <div class="p-4 md:p-6 space-y-5">
         <SleepTimeline
           :intervals="dayReg.intervals"
           :bedtime-date="dayReg.bedtime as Date"
           :wakeup-date="dayReg.wakeup as Date"
         />
-        <!-- Intervalos detallados -->
+
         <div
-          class="bg-[#0d1117]/50 rounded-lg border border-white/10 overflow-hidden"
+          class="bg-black/20 rounded-lg border border-border-dark overflow-hidden"
         >
-          <div class="grid grid-cols-1">
+          <div class="divide-y divide-border-dark/50">
             <div
               v-for="(interval, index) in dayReg.intervals"
               :key="index"
-              class="flex items-center justify-between p-3"
+              class="flex items-center justify-between p-3.5 hover:bg-white/2 transition-colors"
             >
               <div class="flex items-center gap-3">
                 <span
-                  class="size-2 rounded-full shrink-0"
+                  class="size-2 rounded-full shrink-0 shadow-[0_0_8px_currentColor]"
                   :class="getStateClass(interval.state)"
                 ></span>
-                <span class="text-xs font-bold text-white w-24 md:w-auto">
-                  {{ formatTime(interval.startTime) }} -
+                <span class="text-xs font-bold text-white/90">
+                  {{ formatTime(interval.startTime) }} —
                   {{ formatTime(interval.endTime) }}
                 </span>
                 <span
-                  class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter"
+                  class="text-[10px] text-slate-500 uppercase font-black tracking-wider"
                 >
                   {{ getStateLabel(interval.state) }}
                 </span>
               </div>
-              <span class="text-xs font-bold text-slate-400 shrink-0">
+              <span class="text-xs font-bold text-slate-400">
                 {{ formatDuration(interval.hours, interval.minutes) }}
               </span>
             </div>
@@ -107,119 +98,107 @@
       </div>
     </div>
 
-    <!-- Observaciones -->
     <div
-      class="technical-card bg-card-dark border border-white/10 rounded-xl overflow-hidden"
+      class="technical-card bg-card-dark border border-border-dark rounded-xl overflow-hidden"
     >
-      <div class="px-4 md:px-6 py-4 border-b border-white/10 bg-[#0d1117]/50">
+      <div class="px-4 md:px-6 py-4 border-b border-border-dark bg-black/20">
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">
-          Observaciones sobre la noche
+          Observaciones
         </h3>
       </div>
 
       <div class="p-4 md:p-6 space-y-6">
-        <!-- Observaciones del paciente -->
         <div v-if="dayReg.observaciones" class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-400 uppercase">
-              Paciente (Autorregistro)
-            </span>
-          </div>
-          <div
-            class="bg-[#0d1117]/50 border border-white/10 p-3 md:p-4 rounded-lg"
+          <span
+            class="text-[10px] font-black text-indigo-400/80 uppercase tracking-widest ml-1"
           >
+            Paciente (Autorregistro)
+          </span>
+          <div class="bg-black/20 border border-border-dark p-4 rounded-xl">
             <p class="text-slate-300 text-sm leading-relaxed italic">
               "{{ dayReg.observaciones }}"
             </p>
           </div>
         </div>
 
-        <!-- Observaciones técnicas existentes -->
         <div v-if="dayReg.psicoComment" class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-primary uppercase"
-              >Psicologo (Feedback)</span
-            >
-          </div>
-          <div
-            class="bg-[#0d1117]/50 border border-[#58a6ff]/20 p-3 md:p-4 rounded-lg"
+          <span
+            class="text-[10px] font-black text-primary uppercase tracking-widest ml-1"
           >
-            <p class="text-slate-300 text-sm leading-relaxed">
+            Psicólogo (Feedback)
+          </span>
+          <div class="bg-primary/5 border border-primary/20 p-4 rounded-xl">
+            <p class="text-slate-200 text-sm leading-relaxed">
               {{ dayReg.psicoComment }}
             </p>
           </div>
-          <div class="pt-2 border-t border-white/10">
-            <button
-              @click="editObservation"
-              class="text-xs text-primary hover:text-primary font-medium flex items-center gap-1 transition-colors duration-200"
-            >
-              <span class="material-symbols-outlined text-sm!">edit</span>
-              Editar comentario
-            </button>
-          </div>
+          <button
+            @click="editObservation"
+            class="text-[11px] text-primary hover:text-white font-bold flex items-center gap-1 mt-2 transition-all"
+          >
+            <span class="material-symbols-outlined text-sm">edit</span>
+            EDITAR COMENTARIO
+          </button>
         </div>
 
-        <!-- Formulario para añadir/editar observaciones -->
-        <div v-if="showObservationForm" class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-primary uppercase">
-              {{ dayReg.psicoComment ? 'Editar Nota' : 'Añadir Nota Técnica' }}
-            </span>
-          </div>
+        <div v-if="showObservationForm" class="space-y-3">
+          <span
+            class="text-[10px] font-black text-primary uppercase tracking-widest ml-1"
+          >
+            {{ dayReg.psicoComment ? 'Editar Nota' : 'Nueva Nota Técnica' }}
+          </span>
           <div
-            class="bg-[#0d1117]/50 border border-[#58a6ff]/20 p-3 md:p-4 rounded-lg"
+            class="bg-black/30 border border-primary/30 p-1 rounded-xl focus-within:border-primary transition-all"
           >
             <textarea
               v-model="newObservation"
-              class="w-full bg-transparent border-none text-white text-sm focus:ring-0 min-h-[100px] md:min-h-[120px] resize-none placeholder:text-slate-600 focus:outline-none focus:shadow-[0_0_0_2px_rgba(88,166,255,0.1)]"
+              class="w-full bg-transparent border-none text-white text-sm focus:ring-0 min-h-[120px] p-3 resize-none placeholder:text-slate-600 focus:outline-none"
               :placeholder="
                 dayReg.psicoComment
-                  ? 'Editar observaciones técnicas...'
-                  : 'Añadir observaciones técnicas sobre la arquitectura del sueño...'
+                  ? 'Editar...'
+                  : 'Escribe aquí tu análisis técnico...'
               "
               @keydown.ctrl.enter="saveObservation"
             ></textarea>
+
             <div
-              class="flex flex-col md:flex-row justify-between items-center gap-2 pt-3 border-t border-white/10 mt-3"
+              class="flex justify-end gap-2 p-2 bg-black/20 rounded-b-lg border-t border-border-dark"
             >
-              <div class="flex items-center gap-2">
-                <button
-                  @click="cancelObservation"
-                  class="px-3 py-1.5 text-xs text-slate-400 hover:text-white font-medium hover:bg-white/5 rounded-lg transition-colors duration-200"
-                >
-                  Cancelar
-                </button>
-                <button
-                  @click="saveObservation"
-                  :disabled="!newObservation.trim()"
-                  class="bg-[#238636] hover:bg-primary disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold px-4 py-2 rounded-lg text-xs transition-all duration-200 flex items-center gap-2 shadow-lg shadow-[#58a6ff]/10"
-                >
-                  <span class="material-symbols-outlined text-sm!">save</span>
-                  {{ dayReg.psicoComment ? 'Actualizar' : 'Guardar' }}
-                </button>
-              </div>
+              <button
+                @click="cancelObservation"
+                class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                @click="saveObservation"
+                :disabled="!newObservation.trim()"
+                class="bg-primary hover:bg-primary/80 disabled:opacity-30 text-white font-bold px-5 py-2 rounded-lg text-xs transition-all flex items-center gap-2"
+              >
+                <span class="material-symbols-outlined text-sm">save</span>
+                {{ dayReg.psicoComment ? 'Actualizar' : 'Guardar' }}
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Botón para mostrar formulario si no hay nota o está oculto -->
-        <div
+        <button
           v-if="!dayReg.psicoComment && !showObservationForm"
-          class="pt-4 border-t border-white/10"
+          @click="addObservation"
+          class="w-full py-4 rounded-xl border-2 border-dashed border-border-dark hover:border-primary/50 text-slate-500 hover:text-primary transition-all flex items-center justify-center gap-2 group"
         >
-          <button
-            @click="addObservation"
-            class="w-full md:w-auto bg-[#58a6ff]/10 hover:bg-[#58a6ff]/20 border border-[#58a6ff]/30 text-[#58a6ff] hover:text-blue-300 font-bold px-4 py-3 rounded-lg text-xs transition-all duration-200 flex items-center justify-center gap-2"
+          <span
+            class="material-symbols-outlined group-hover:scale-110 transition-transform"
+            >add_comment</span
           >
-            <span class="material-symbols-outlined text-sm!">add_comment</span>
-            Añadir comentario
-          </button>
-        </div>
+          <span class="text-xs font-bold uppercase tracking-widest"
+            >Añadir análisis técnico</span
+          >
+        </button>
       </div>
     </div>
   </section>
 </template>
-
 <script setup lang="ts">
   import { ref } from 'vue'
   import { SleepState, type SleepReg } from '@/types/sleepReg.types'

@@ -112,7 +112,7 @@
 
 <template>
   <aside
-    class="fixed top-0 right-0 h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
+    class="fixed top-0 right-0 h-full md:h-screen w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
     :class="model ? 'translate-x-0' : 'translate-x-full'"
   >
     <!-- Header -->
@@ -147,7 +147,7 @@
     </div>
 
     <!-- Meses -->
-    <div class="flex-1 overflow-y-auto p-6">
+    <div class="flex-1 overflow-y-auto overscroll-contain p-6">
       <div v-for="month in monthsToShow" :key="month.index" class="mb-8">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-white font-bold capitalize">{{ month.name }}</h3>
@@ -207,16 +207,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="p-4 border-t border-border-dark">
-      <button
-        class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-500 py-3 rounded-lg font-medium"
-        @click="selectedYear = currentYear"
-      >
-        Hoy
-      </button>
     </div>
   </aside>
 </template>

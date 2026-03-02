@@ -1,105 +1,179 @@
 <script setup lang="ts">
-  import SleepC from './components/SleepC.vue'
   import AppFooter from '../components/AppFooter.vue'
 </script>
+
 <template>
   <main
-    class="flex flex-col flex-1 px-6 pt-6 md:pb-4 gap-6 md:gap-8 mx-auto lg:bg-transparent md:px-20 md:overflow-y-auto"
+    class="flex flex-col flex-1 px-6 pt-2 h-full min-h-0 md:pb-8 gap-8 md:gap-12 mx-auto max-w-[1400px] w-full md:overflow-y-auto"
   >
-    <div class="flex items-center flex-col gap-1 lg:gap-2">
-      <h1
-        class="text-gray-900 dark:text-white tracking-tight text-2xl lg:text-4xl font-bold leading-tight"
-      >
-        Tu Centro de Bienestar
-      </h1>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-3">
+        <div
+          class="h-6 w-1.5 bg-primary rounded-full shadow-[0_0_15px_#137fec]"
+        ></div>
+        <h1
+          class="text-white tracking-tighter text-3xl lg:text-5xl font-black leading-tight"
+        >
+          Tu Centro de Bienestar
+        </h1>
+      </div>
       <p
-        class="text-gray-500 dark:text-gray-400 text-sm lg:text-base font-normal"
+        class="text-slate-500 text-sm lg:text-base font-bold uppercase tracking-widest ml-4"
       >
-        Accede a tus herramientas de salud y seguimiento.
+        Sistemas de salud y seguimiento biométrico
       </p>
     </div>
     <div
-      class="grid content-center h-full lg:grid lg:grid-cols-12 lg:gap-8 gap-6"
+      class="grid lg:grid-cols-12 lg:gap-10 h-full content-center gap-8 items-stretch"
     >
-      <SleepC />
-      <div
-        class="lg:col-span-7 xl:col-span-8 mb-2 flex flex-col gap-3 lg:gap-6"
+      <router-link
+        :to="{
+          name: 'UserCalendar',
+          params: { date: new Date().toISOString().split('T')[0] },
+        }"
+        class="lg:col-span-5 xl:col-span-4 group"
       >
-        <h3 class="text-gray-900 dark:text-white font-bold text-lg lg:text-xl">
-          Otras Herramientas
-        </h3>
         <div
-          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 lg:gap-6"
+          class="relative overflow-hidden rounded-[2.5rem] bg-card-dark border border-primary/30 shadow-2xl shadow-primary/10 text-white cursor-pointer transition-all duration-500 hover:border-primary group-hover:-translate-y-2 h-full min-h-[360px] flex flex-col justify-center"
         >
           <div
-            class="bg-white dark:bg-[#1e2936] rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 lg:gap-4 text-center cursor-pointer hover:shadow-md hover:border-primary/20 transition-all active:scale-95 group"
+            class="absolute top-0 right-0 -mr-12 -mt-12 size-64 rounded-full bg-primary/10 blur-[80px] group-hover:bg-primary/20 transition-colors"
+          ></div>
+          <div
+            class="absolute bottom-0 left-0 -ml-12 -mb-12 size-48 rounded-full bg-emerald-500/5 blur-[60px]"
+          ></div>
+
+          <div
+            class="relative p-8 flex flex-col items-center text-center gap-6"
           >
             <div
-              class="size-12 lg:size-16 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+              class="size-24 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center backdrop-blur-md shadow-inner group-hover:scale-110 group-hover:border-primary/50 transition-all duration-500"
             >
               <span
-                class="material-symbols-outlined lg:text-[32px]"
+                class="material-symbols-outlined text-[56px] text-primary drop-shadow-[0_0_15px_rgba(19,127,236,0.5)]"
+                style="font-variation-settings: 'FILL' 1"
+              >
+                bedtime
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              <h3
+                class="text-2xl lg:text-3xl font-black tracking-tight uppercase"
+              >
+                Sueño
+              </h3>
+              <p
+                class="text-slate-400 text-sm lg:text-base leading-relaxed font-medium max-w-[240px] mx-auto"
+              >
+                Registra tu arquitectura de descanso y optimiza tus ciclos
+                circadianos.
+              </p>
+            </div>
+
+            <div
+              class="flex items-center gap-2 px-8 py-3 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-primary/20 group-hover:bg-white group-hover:text-primary transition-all active:scale-95"
+            >
+              <span>Acceder al Registro</span>
+              <span class="material-symbols-outlined text-sm"
+                >arrow_forward_ios</span
+              >
+            </div>
+          </div>
+        </div>
+      </router-link>
+
+      <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+        <div class="flex items-center gap-4">
+          <h3 class="text-white font-black text-xs uppercase tracking-[0.3em]">
+            Otras herramientas
+          </h3>
+          <div class="h-px flex-1 bg-border-dark/50"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-2">
+          <div
+            class="group bg-card-dark/40 border border-border-dark rounded-2xl p-6 flex flex-col items-center gap-5 text-center cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/2 transition-all duration-300 active:scale-95"
+          >
+            <div
+              class="size-16 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all"
+            >
+              <span
+                class="material-symbols-outlined text-3xl"
                 style="font-variation-settings: 'FILL' 1"
                 >mood</span
               >
             </div>
-            <div class="flex flex-col">
+            <div class="space-y-1">
               <span
-                class="font-bold text-gray-800 dark:text-gray-200 text-sm lg:text-base leading-tight"
+                class="font-black text-white text-[11px] uppercase tracking-widest block"
                 >Registro de Ánimo</span
+              >
+              <span
+                class="text-slate-500 text-[10px] font-bold uppercase tracking-tighter"
+                >Estado emocional</span
               >
             </div>
           </div>
+
           <div
-            class="bg-white dark:bg-[#1e2936] rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 lg:gap-4 text-center cursor-pointer hover:shadow-md hover:border-primary/20 transition-all active:scale-95 group"
+            class="group bg-card-dark/40 border border-border-dark rounded-2xl p-6 flex flex-col items-center gap-5 text-center cursor-pointer hover:border-emerald-500/50 hover:bg-emerald-500/2 transition-all duration-300 active:scale-95"
           >
             <div
-              class="size-12 lg:size-16 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+              class="size-16 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all"
             >
               <span
-                class="material-symbols-outlined lg:text-[32px]"
+                class="material-symbols-outlined text-3xl"
                 style="font-variation-settings: 'FILL' 1"
                 >self_improvement</span
               >
             </div>
-            <div class="flex flex-col">
+            <div class="space-y-1">
               <span
-                class="font-bold text-gray-800 dark:text-gray-200 text-sm lg:text-base leading-tight"
-                >Mindfullness</span
+                class="font-black text-white text-[11px] uppercase tracking-widest block"
+                >Mindfulness</span
+              >
+              <span
+                class="text-slate-500 text-[10px] font-bold uppercase tracking-tighter"
+                >Meditación y calma</span
               >
             </div>
           </div>
+
           <div
-            class="bg-white dark:bg-[#1e2936] rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 lg:gap-4 text-center cursor-pointer hover:shadow-md hover:border-primary/20 transition-all active:scale-95 group"
+            class="group bg-card-dark/40 border border-border-dark rounded-2xl p-6 flex flex-col items-center gap-5 text-center cursor-pointer hover:border-violet-500/50 hover:bg-violet-500/2 transition-all duration-300 active:scale-95"
           >
             <div
-              class="size-12 lg:size-16 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+              class="size-16 rounded-2xl bg-violet-500/10 text-violet-500 border border-violet-500/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-violet-500/20 transition-all"
             >
               <span
-                class="material-symbols-outlined lg:text-[32px]"
+                class="material-symbols-outlined text-3xl"
                 style="font-variation-settings: 'FILL' 1"
                 >auto_stories</span
               >
             </div>
-            <div class="flex flex-col">
+            <div class="space-y-1">
               <span
-                class="font-bold text-gray-800 dark:text-gray-200 text-sm lg:text-base leading-tight"
+                class="font-black text-white text-[11px] uppercase tracking-widest block"
                 >Diario Terapéutico</span
+              >
+              <span
+                class="text-slate-500 text-[10px] font-bold uppercase tracking-tighter"
+                >Bitácora personal</span
               >
             </div>
           </div>
+
           <div
-            class="bg-gray-50 dark:bg-[#15202b] rounded-xl p-4 lg:p-6 shadow-none border border-dashed border-gray-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 lg:gap-3 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 transition-colors h-full lg:min-h-auto"
+            class="border border-dashed border-border-dark rounded-2xl p-6 flex flex-col items-center justify-center gap-3 bg-card-dark/40 hover:bg-card-dark/60 transition-colors cursor-pointer group"
           >
             <div
-              class="size-12 lg:size-10 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center"
+              class="size-10 rounded-full border border-border-dark flex items-center justify-center text-slate-600 group-hover:text-primary group-hover:border-primary transition-all"
             >
-              <span class="material-symbols-outlined text-xl lg:text-2xl"
-                >add</span
-              >
+              <span class="material-symbols-outlined">add</span>
             </div>
             <span
-              class="font-medium text-gray-400 dark:text-gray-500 text-xs lg:text-sm"
+              class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600"
               >Más apps</span
             >
           </div>

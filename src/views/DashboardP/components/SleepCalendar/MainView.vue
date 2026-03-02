@@ -57,6 +57,7 @@
   const selectedDate = computed<Date>(() => new Date(date.value))
 
   const selectedView = ref<DashboardViews>(DashboardViews.DIARIA)
+  const today = new Date().toISOString().split('T')[0] as string
 
   const handleViewChange = (view: DashboardViews) => {
     selectedView.value = view
@@ -257,11 +258,27 @@
           <span>Editar Perfil</span>
         </button>
       </div>
-      <DateMenu
-        :period-text="periodText"
-        @view-change="handleViewChange"
-        @calendar-click="isOpenCalendar = true"
-      />
+      <div class="flex flex-col md:flex-row gap-2">
+        <button
+          @click="date = today"
+          :disabled="date === today"
+          class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 border"
+          :class="[
+            date === today
+              ? 'border-white/10 bg-transparent text-white/20 cursor-default'
+              : 'border-primary bg-primary/10 animate-pulse text-primary cursor-pointer ',
+          ]"
+        >
+          <span class="material-symbols-outlined">today</span>
+          <span>HOY</span>
+        </button>
+        <DateMenu
+          class="w-full"
+          :period-text="periodText"
+          @view-change="handleViewChange"
+          @calendar-click="isOpenCalendar = true"
+        />
+      </div>
       <section class="min-h-0 h-full" v-if="loading === false">
         <div
           v-if="selectedView != DashboardViews.DIARIA"

@@ -1,64 +1,86 @@
 <template>
-  <div class="glass-card rounded-3xl p-6 flex flex-col gap-4 min-h-0 h-full">
-    <!-- Header -->
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <h3 class="text-[#9dabb9] text-xs font-bold uppercase">
-          Lista de Intervalos
-        </h3>
-        <p class="text-white/40 text-[10px] font-medium mt-1">
-          {{ intervals.length }} segmentos registrados
-        </p>
+  <div
+    class="bg-card-dark rounded-2xl border h-full border-border-dark shadow-2xl overflow-hidden flex flex-col"
+  >
+    <div
+      class="px-6 py-5 border-b border-border-dark/50 bg-white/2 flex items-center gap-4 justify-between"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="h-5 w-1 bg-primary rounded-full shadow-[0_0_10px_#137fec]"
+        ></div>
+        <div>
+          <h3
+            class="text-white text-[10px] font-black uppercase tracking-[0.2em]"
+          >
+            Lista de Intervalos
+          </h3>
+          <p
+            class="text-slate-500 text-[9px] font-bold mt-0.5 uppercase tracking-tighter"
+          >
+            {{ intervals.length }} segmentos registrados
+          </p>
+        </div>
       </div>
 
-      <!-- Botón de acción (solo visible si hay datos) -->
       <button
-        class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm"
+        v-if="hasData"
         @click="handleEdit"
+        class="flex items-center gap-2 px-2 py-2 bg-primary/10 border border-primary/20 rounded-xl text-[9px] font-black text-primary uppercase tracking-widest transition-all cursor-pointer shadow-sm"
       >
-        <span class="material-symbols-outlined text-base">edit_note</span>
-        Editar Registro del Día
+        <span class="material-symbols-outlined text-sm">edit_note</span>
+        Editar Registro
       </button>
     </div>
 
-    <!-- Cabecera de la tabla (solo si hay datos) -->
     <div
-      class="grid grid-cols-12 gap-4 px-2 pb-3 text-[10px] font-bold text-[#637381] uppercase tracking-widest"
+      v-if="hasData"
+      class="grid grid-cols-12 gap-4 px-8 py-3 bg-black/20 border-b border-border-dark/30 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]"
     >
-      <div class="col-span-5">horario</div>
-      <div class="col-span-4">estado</div>
-      <div class="col-span-3 text-right">duración</div>
+      <div class="col-span-5">Horario</div>
+      <div class="col-span-4">Estado</div>
+      <div class="col-span-3 text-right">Duración</div>
     </div>
 
-    <!-- Lista de intervalos (CON DATOS) -->
-    <div class="divide-y divide-[#30363d]">
+    <div class="divide-y divide-border-dark/20">
       <div
         v-for="(interval, index) in intervals"
         :key="index"
-        class="grid grid-cols-12 gap-4 py-4 px-2 items-center group"
+        class="grid grid-cols-12 gap-4 py-4 px-8 items-center"
       >
-        <!-- Horario -->
-        <div class="col-span-5 font-mono text-sm text-white/90 tracking-tight">
+        <div class="col-span-5 font-mono text-xs text-slate-200 tracking-tight">
           {{ formatTimeRange(interval.startTime, interval.endTime) }}
         </div>
 
-        <!-- Estado con indicador de color -->
         <div class="col-span-4 flex items-center gap-3">
           <div
-            class="size-1.5 rounded-full status-dot-glow"
+            class="size-1.5 rounded-full status-dot-glow transition-all duration-500 group-hover:scale-125"
             :class="getStateDotClass(interval.state)"
           ></div>
           <span
-            class="text-xs font-semibold tracking-wider text-white uppercase"
+            class="text-[10px] font-black tracking-widest text-white uppercase opacity-80 group-hover:opacity-100"
           >
             {{ getStateLabel(interval.state) }}
           </span>
         </div>
 
-        <!-- Duración -->
-        <div class="col-span-3 text-right text-xs font-light text-[#9dabb9]">
+        <div
+          class="col-span-3 text-right text-[11px] font-bold text-slate-500 group-hover:text-primary transition-colors"
+        >
           {{ formatDuration(interval.hours, interval.minutes) }}
         </div>
+      </div>
+
+      <div
+        v-if="!hasData"
+        class="p-12 flex flex-col items-center justify-center text-center"
+      >
+        <span class="material-symbols-outlined text-slate-700 text-4xl mb-3"
+          >database_off</span
+        >
+        <p class="text-slate-500 text-xs font-medium italic">
+          {{ emptyMessage }}
+        </p>
       </div>
     </div>
   </div>
@@ -70,9 +92,7 @@
   import { useRoute, useRouter } from 'vue-router'
 
   export interface IntervalListProps {
-    /** Array de intervalos (puede ser vacío) */
     intervals: Interval[]
-    /** Mensaje personalizado para estado vacío */
     emptyMessage?: string
   }
 
@@ -87,12 +107,10 @@
     router.push(`${route.path}/form`)
   }
 
-  // Determinar si hay datos
   const hasData = computed(() => {
     return props.intervals && props.intervals.length > 0
   })
 
-  // Formatear rango de horas
   const formatTimeRange = (start: Date, end: Date): string => {
     const startStr = start.toLocaleTimeString('es-ES', {
       hour: '2-digit',
@@ -107,14 +125,12 @@
     return `${startStr} — ${endStr}`
   }
 
-  // Formatear duración
   const formatDuration = (hours: number, minutes: number): string => {
     if (hours === 0) return `${minutes}m`
     if (minutes === 0) return `${hours}h`
     return `${hours}h ${minutes}m`
   }
 
-  // Obtener label del estado
   const getStateLabel = (state: SleepState): string => {
     const labels: Record<SleepState, string> = {
       asleep: 'Dormido',
@@ -124,7 +140,6 @@
     return labels[state] || state
   }
 
-  // Obtener clase del dot según estado
   const getStateDotClass = (state: SleepState): string => {
     const classes: Record<SleepState, string> = {
       asleep: 'bg-state-asleep text-state-asleep',

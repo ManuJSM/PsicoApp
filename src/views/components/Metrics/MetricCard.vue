@@ -1,58 +1,54 @@
 <template>
   <div
     :class="[
-      'relative overflow-hidden flex flex-col justify-between rounded-2xl p-3 sm:p-5 border transition-all duration-300',
-      'bg-white dark:bg-[#1a1c23] shadow-sm',
+      'relative overflow-hidden flex flex-col justify-between rounded-2xl p-4 sm:p-5 border transition-all duration-300',
+      'bg-card-dark shadow-lg',
       borderColorClass,
     ]"
   >
-    <div class="w-full mb-1">
+    <div class="w-full mb-2">
       <p
-        class="text-slate-400 dark:text-slate-500 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider leading-tight"
+        class="text-slate-500 text-[10px] font-black uppercase tracking-[0.15em] leading-tight"
       >
         {{ title }}
       </p>
     </div>
 
-    <div class="flex items-center justify-between gap-2 mb-2">
-      <h3
-        class="text-slate-900 dark:text-white tracking-tight text-lg sm:text-2xl font-black truncate"
-      >
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <h3 class="text-white tracking-tighter text-2xl sm:text-3xl font-black">
         {{ value }}
       </h3>
 
       <div
         :class="[
-          'shrink-0 flex items-center justify-center w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl text-lg sm:text-2xl',
+          'shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl border',
           moodBgClass,
         ]"
       >
-        {{ moodEmoji }}
+        <span class="material-symbols-outlined text-2xl sm:text-3xl">
+          {{ moodIcon }}
+        </span>
       </div>
     </div>
 
-    <div
-      class="flex flex-wrap items-center gap-x-2 pt-2 border-t border-slate-50 dark:border-white/5"
-    >
+    <div class="flex items-center gap-3 pt-3 border-t border-white/5">
       <div
-        class="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] sm:text-[12px] font-bold"
+        class="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold"
         :class="trendBadgeClass"
       >
-        <span class="material-symbols-outlined text-[12px] sm:text-[14px]">
+        <span class="material-symbols-outlined text-[14px]">
           {{ trendIcon }}
         </span>
         <span>{{ props.trend.value }}</span>
       </div>
 
-      <p
-        class="text-slate-400 text-[9px] sm:text-[11px] font-medium truncate max-w-[50%]"
-      >
+      <p class="text-slate-500 text-[11px] font-medium truncate">
         {{ props.trend.comparisonText }}
       </p>
     </div>
 
     <div
-      class="absolute top-0 left-0 w-1 h-full opacity-40"
+      class="absolute top-0 left-0 w-[3px] h-full"
       :class="accentBgClass"
     ></div>
   </div>
@@ -72,79 +68,78 @@
   }
 
   const props = withDefaults(defineProps<MetricCardProps>(), {
+    title: 'Métrica',
     value: '0',
     trend: () => ({
       value: '0%',
       direction: 'stable',
-      comparisonText: '',
+      comparisonText: 'vs. ayer',
     }),
   })
 
-  // Lógica de Moods
-  const moodEmoji = computed(() => {
+  const moodIcon = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return '🚀'
+        return 'insights'
       case 'down':
-        return '📉'
+        return 'release_alert'
       default:
-        return '⚖️'
+        return 'monitoring'
     }
   })
 
   const trendIcon = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return 'trending_up'
+        return 'north_east'
       case 'down':
-        return 'trending_down'
+        return 'south_east'
       default:
-        return 'horizontal_rule'
+        return 'trending_flat'
     }
   })
 
-  // Estilos de color (IDs de Tailwind)
   const borderColorClass = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return 'border-emerald-500/20 dark:border-emerald-500/10'
+        return 'border-emerald-500/20'
       case 'down':
-        return 'border-rose-500/20 dark:border-rose-500/10'
+        return 'border-rose-500/20'
       default:
-        return 'border-slate-200 dark:border-primary/20'
+        return 'border-border-dark'
     }
   })
 
   const trendBadgeClass = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+        return 'bg-emerald-500/10 text-emerald-400'
       case 'down':
-        return 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+        return 'bg-rose-500/10 text-rose-400'
       default:
-        return 'bg-slate-100 text-slate-500 dark:bg-primary/20'
+        return 'bg-white/5 text-slate-400 border border-white/5'
     }
   })
 
   const moodBgClass = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return 'bg-emerald-50 dark:bg-emerald-500/10'
+        return 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
       case 'down':
-        return 'bg-rose-50 dark:bg-rose-500/10'
+        return 'bg-rose-500/10 border-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.1)]'
       default:
-        return 'bg-slate-50 dark:bg-white/5'
+        return 'bg-primary/10 border-primary/20 text-primary shadow-[0_0_15px_rgba(19,127,236,0.1)]'
     }
   })
 
   const accentBgClass = computed(() => {
     switch (props.trend.direction) {
       case 'up':
-        return 'bg-emerald-500'
+        return 'bg-emerald-500 shadow-[0_0_8px_#10b981]'
       case 'down':
-        return 'bg-rose-500'
+        return 'bg-rose-500 shadow-[0_0_8px_#f43f5e]'
       default:
-        return 'bg-slate-300 dark:bg-primary/80'
+        return 'bg-primary shadow-[0_0_8px_#137fec]'
     }
   })
 </script>
