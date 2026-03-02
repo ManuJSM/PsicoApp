@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { Notification } from '@/types/types'
-import noNotiCard from './noNotiCard.vue'
+  import type { Notification } from '@/types/types'
 
-const notificationIcons = {
-  comment: 'chat_bubble',
-  reminder: 'calendar_month',
-} as const
+  const notificationIcons = {
+    comment: 'chat_bubble',
+    reminder: 'calendar_month',
+  } as const
 
-const props = defineProps<{ notifications: Notification[] }>()
+  const props = defineProps<{ notifications: Notification[] }>()
 
-const emit = defineEmits<{
-  (e: 'markRead', id: number): void
-  (e: 'deleteAll'): void
-}>()
+  const emit = defineEmits<{
+    (e: 'markRead', id: number): void
+    (e: 'deleteAll'): void
+  }>()
 </script>
 
 <template>
@@ -23,7 +22,9 @@ const emit = defineEmits<{
     <div
       class="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/90"
     >
-      <h3 class="font-bold text-slate-900 dark:text-white text-base">Notificaciones</h3>
+      <h3 class="font-bold text-slate-900 dark:text-white text-base">
+        Notificaciones
+      </h3>
       <button
         class="text-xs font-semibold text-primary hover:cursor-pointer transition-colors py-1 px-2 rounded"
         @click="emit('deleteAll')"
@@ -66,7 +67,9 @@ const emit = defineEmits<{
             }}</span>
           </div>
           <div class="flex justify-between items-baseline gap-2">
-            <p class="text-sm font-bold text-slate-900 dark:text-white truncate">
+            <p
+              class="text-sm font-bold text-slate-900 dark:text-white truncate"
+            >
               {{ notification.title }}
             </p>
             <span
@@ -75,12 +78,37 @@ const emit = defineEmits<{
               {{ notification.timeAgo }}
             </span>
           </div>
-          <p class="text-xs text-slate-600 dark:text-slate-400 whitespace-normal">
+          <p
+            class="text-xs text-slate-600 dark:text-slate-400 whitespace-normal"
+          >
             {{ notification.message }}
           </p>
         </div>
       </div>
-      <noNotiCard v-if="props.notifications.length == 0" />
+      <div v-if="props.notifications.length == 0">
+        <div class="flex flex-col items-center justify-center gap-2 py-12">
+          <div class="relative">
+            <div
+              class="absolute inset-0 bg-primary/10 rounded-full blur-xl animate-pulse"
+            ></div>
+            <div
+              class="relative size-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-700"
+            >
+              <span class="material-symbols-outlined text-slate-400 text-4xl"
+                >notifications_off</span
+              >
+            </div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-slate-900 dark:text-white font-bold text-lg mb-1">
+              No hay notificaciones
+            </h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm">
+              Todo está en orden por ahora
+            </p>
+          </div>
+        </div>
+      </div>
     </transition-group>
   </div>
 </template>

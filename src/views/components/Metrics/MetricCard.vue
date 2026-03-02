@@ -31,7 +31,9 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-3 pt-3 border-t border-white/5">
+    <div
+      class="flex flex-col md:flex-row items-center gap-3 pt-3 border-t border-white/5"
+    >
       <div
         class="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold"
         :class="trendBadgeClass"

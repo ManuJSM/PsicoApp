@@ -49,6 +49,7 @@ export const getViewConfig = (
       throw new Error(`View ${view} not supported`)
   }
 }
+const formatTrend = (val: number) => (val > 0 ? `+${val}%` : `${val}%`)
 export function getCardsValues(
   metrics: Metrics,
   comparison: string
@@ -65,8 +66,8 @@ export function getCardsValues(
       title: 'Tiempo en Cama',
       value: metrics.avgInBed.current.formatted,
       trend: {
-        value: `${Math.abs(metrics.avgInBed.trendPercentaje)}%`,
-        direction: getDirection(metrics.avgInBed.trendPercentaje),
+        value: formatTrend(metrics.avgInBed.trendPercentaje),
+        direction: getDirection(metrics.avgInBed.trendPercentaje, true),
         comparisonText: comparison,
       },
     },
@@ -74,7 +75,7 @@ export function getCardsValues(
       title: 'Hora Media Sueño',
       value: metrics.avgSleep.current.formatted,
       trend: {
-        value: `${Math.abs(metrics.avgSleep.trendPercentaje)}%`,
+        value: formatTrend(metrics.avgSleep.trendPercentaje),
         direction: getDirection(metrics.avgSleep.trendPercentaje),
         comparisonText: comparison,
       },
@@ -83,7 +84,7 @@ export function getCardsValues(
       title: 'Eficiencia Media',
       value: metrics.avgEfficiency.current.formatted,
       trend: {
-        value: `${Math.abs(metrics.avgEfficiency.trendPercentaje)}%`,
+        value: formatTrend(metrics.avgEfficiency.trendPercentaje),
         direction: getDirection(metrics.avgEfficiency.trendPercentaje),
         comparisonText: comparison,
       },
@@ -92,8 +93,7 @@ export function getCardsValues(
       title: 'Latencia al Sueño',
       value: metrics.avgLatency.current.formatted,
       trend: {
-        value: `${Math.abs(metrics.avgLatency.trendPercentaje)}%`,
-        // Aquí invertimos: si el porcentaje es positivo (tardas más), la dirección es 'down' (mal)
+        value: formatTrend(metrics.avgLatency.trendPercentaje),
         direction: getDirection(metrics.avgLatency.trendPercentaje, true),
         comparisonText: comparison,
       },
