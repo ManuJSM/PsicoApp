@@ -1,28 +1,19 @@
 <script setup lang="ts">
-defineProps<{
-  isActive: boolean
-  hasUnread: boolean
-}>()
+  defineProps<{
+    hasUnread: boolean
+  }>()
 
-const emit = defineEmits(['click'])
+  const emit = defineEmits(['click'])
 
-const handleClick = () => {
-  emit('click')
-}
+  const handleClick = () => {
+    emit('click')
+  }
 </script>
 
 <template>
   <button
     @click="handleClick"
-    :class="[
-      'relative flex items-center justify-center size-10 rounded-full transition-all duration-100 ease-in-out',
-      isActive
-        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary ring-1 ring-primary/20'
-        : 'hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300',
-      hasUnread
-        ? 'text-primary dark:text-primary'
-        : 'hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300',
-    ]"
+    class="relative flex items-center text-primary dark:text-primary cursor-pointer justify-center size-10 rounded-full"
   >
     <span class="material-symbols-outlined">notifications</span>
     <span v-show="hasUnread" class="absolute top-2.5 right-2.5 flex h-2 w-2">

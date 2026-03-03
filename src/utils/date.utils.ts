@@ -73,6 +73,15 @@ export const formatDisplayDate = (date: Date) => {
     day: 'numeric',
   })
 }
+export const formatCreatedAt = (fechaStr: string) => {
+  const fecha = new Date(fechaStr)
+  return fecha.toLocaleString('es', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
 
 export const formatDateRange = (range: DateRange): string => {
   const { start, end } = range

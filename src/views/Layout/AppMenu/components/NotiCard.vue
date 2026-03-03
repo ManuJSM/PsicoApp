@@ -1,114 +1,162 @@
 <script setup lang="ts">
-  import type { Notification } from '@/types/types'
+  import { ref, computed, onMounted } from 'vue'
+  import type {
+    Notification,
+    NotificationType,
+  } from '@/types/notification.types'
+  import { useNotificationsStore } from '@/stores/notification.store'
+  import { formatCreatedAt } from '@/utils/date.utils'
 
-  const notificationIcons = {
-    comment: 'chat_bubble',
-    reminder: 'calendar_month',
-  } as const
+  // Control de visibilidad (v-model)
+  const model = defineModel<boolean>({ required: true })
+  const notificationsStore = useNotificationsStore()
 
-  const props = defineProps<{ notifications: Notification[] }>()
+  const handleNotificationClick = (id: string) => {
+    notificationsStore.markAsRead(id)
+  }
+  onMounted(async () => {
+    await notificationsStore.fetchNotifications()
+  })
 
-  const emit = defineEmits<{
-    (e: 'markRead', id: number): void
-    (e: 'deleteAll'): void
-  }>()
+  const getIcon = (tipo: NotificationType) => {
+    switch (tipo) {
+      // case 'warning':
+      //   return 'warning'
+      // case 'error':
+      //   return 'error'
+      // case 'success':
+      //   return 'check_circle'
+      default:
+        return 'info'
+    }
+  }
+
+  const getIconColor = (tipo: NotificationType) => {
+    switch (tipo) {
+      // case 'warning':
+      //   return 'text-orange-400'
+      // case 'error':
+      //   return 'text-red-400'
+      // case 'success':
+      //   return 'text-green-400'
+      default:
+        return 'text-primary'
+    }
+  }
+  const ultimaActualizacion = computed(() => {
+    return new Date().toLocaleString('es', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  })
+
+  const handleClearAll = () => {
+    console.log('clear all')
+  }
 </script>
 
 <template>
-  <div
-    class="absolute left-0 right-0 md:left-auto top-full m-2 md:w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700/60 z-40 overflow-hidden origin-top-right"
+  <aside
+    class="fixed top-0 right-0 h-full w-full md:w-[400px] bg-card-dark border-l border-border-dark shadow-2xl z-50 transition-transform duration-500 flex flex-col"
+    :class="model ? 'translate-x-0' : 'translate-x-full'"
   >
-    <!-- Header -->
-    <div
-      class="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/90"
-    >
-      <h3 class="font-bold text-slate-900 dark:text-white text-base">
-        Notificaciones
-      </h3>
-      <button
-        class="text-xs font-semibold text-primary hover:cursor-pointer transition-colors py-1 px-2 rounded"
-        @click="emit('deleteAll')"
-      >
-        Borrar Todas
-      </button>
+    <div class="p-6 border-b border-border-dark">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xl font-bold text-white">Notificaciones</h2>
+          <span
+            v-if="notificationsStore.unreadCount > 0"
+            class="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full"
+          >
+            {{ notificationsStore.unreadCount }} nuevas
+          </span>
+        </div>
+        <button
+          class="text-white/60 hover:text-white transition-colors"
+          @click="model = false"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between text-sm">
+        <button
+          @click="handleClearAll"
+          class="text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+        >
+          <span class="material-symbols-outlined text-sm">delete_sweep</span>
+          Limpiar todas
+        </button>
+        <span class="text-gray-500 text-xs italic">
+          Última actualización:
+          {{ ultimaActualizacion }}
+        </span>
+      </div>
     </div>
 
-    <!-- Notifications List -->
-    <!-- https://vuejs.org/guide/built-ins/transition-group -->
-    <transition-group
-      name="list"
-      tag="article"
-      class="min-h-[40vh] md:max-h-[40vh] overflow-x-hidden overflow-y-auto"
-    >
+    <div class="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3">
       <div
-        v-for="notification in props.notifications"
-        :key="notification.id"
-        class="flex gap-4 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors border-b border-slate-100 dark:border-slate-700/50 cursor-pointer group"
-        @mouseenter="emit('markRead', notification.id)"
+        v-if="notificationsStore.items.length === 0"
+        class="h-full flex flex-col items-center justify-center text-gray-500 space-y-2"
       >
-        <div class="shrink-0 mt-1">
-          <div
-            v-show="!notification.read"
-            class="h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-white dark:ring-slate-800 shadow-sm ease-in-out"
-          ></div>
-        </div>
-        <div class="flex flex-col gap-1 flex-1 min-w-0">
-          <div
-            class="flex items-center justify-center rounded-full size-10 shrink-0"
-            :class="{
-              'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400':
-                notification.type === 'comment',
-              'bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400':
-                notification.type === 'reminder',
-            }"
-          >
-            <span class="material-symbols-outlined">{{
-              notificationIcons[notification.type]
-            }}</span>
-          </div>
-          <div class="flex justify-between items-baseline gap-2">
-            <p
-              class="text-sm font-bold text-slate-900 dark:text-white truncate"
-            >
-              {{ notification.title }}
-            </p>
-            <span
-              class="text-[10px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap"
-            >
-              {{ notification.timeAgo }}
-            </span>
-          </div>
-          <p
-            class="text-xs text-slate-600 dark:text-slate-400 whitespace-normal"
-          >
-            {{ notification.message }}
-          </p>
-        </div>
+        <span class="material-symbols-outlined text-4xl opacity-20"
+          >notifications_off</span
+        >
+        <p>No tienes notificaciones</p>
       </div>
-      <div v-if="props.notifications.length == 0">
-        <div class="flex flex-col items-center justify-center gap-2 py-12">
-          <div class="relative">
-            <div
-              class="absolute inset-0 bg-primary/10 rounded-full blur-xl animate-pulse"
-            ></div>
-            <div
-              class="relative size-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-700"
-            >
-              <span class="material-symbols-outlined text-slate-400 text-4xl"
-                >notifications_off</span
+
+      <div
+        v-for="notif in notificationsStore.items"
+        :key="notif.id"
+        @click="handleNotificationClick(notif.id)"
+        class="p-4 rounded-lg border transition-all cursor-pointer group"
+        :class="[
+          notif.isRead
+            ? 'bg-transparent border-border-dark opacity-60'
+            : 'bg-white/5 border-primary/30 hover:border-primary/60 shadow-lg',
+        ]"
+      >
+        <div class="flex gap-3">
+          <span
+            class="material-symbols-outlined mt-1"
+            :class="getIconColor(notif.type)"
+          >
+            {{ getIcon(notif.type) }}
+          </span>
+
+          <div class="flex-1">
+            <div class="flex justify-between items-start">
+              <h4
+                class="font-bold text-sm"
+                :class="notif.isRead ? 'text-gray-400' : 'text-white'"
               >
+                {{ notif.title }}
+              </h4>
+              <span class="text-[10px] text-gray-500 uppercase font-medium">
+                {{ formatCreatedAt(notif.createdAt) }}
+              </span>
             </div>
-          </div>
-          <div class="text-center">
-            <h3 class="text-slate-900 dark:text-white font-bold text-lg mb-1">
-              No hay notificaciones
-            </h3>
-            <p class="text-slate-500 dark:text-slate-400 text-sm">
-              Todo está en orden por ahora
+            <p class="text-sm text-gray-400 mt-1 leading-snug">
+              {{ notif.message }}
             </p>
+          </div>
+
+          <div v-if="!notif.isRead" class="flex flex-col justify-center">
+            <div
+              class="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.8)]"
+            ></div>
           </div>
         </div>
       </div>
-    </transition-group>
-  </div>
+    </div>
+
+    <div class="hidden md:block p-4 border-t border-border-dark bg-black/20">
+      <button
+        @click="model = false"
+        class="w-full py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded text-sm font-bold transition-colors"
+      >
+        Cerrar panel
+      </button>
+    </div>
+  </aside>
 </template>

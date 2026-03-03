@@ -10,77 +10,18 @@
   import { deleteAllArray } from '@/views/components/utils/utils'
   import { name } from '@/../package.json'
   import { useMeStore } from '@/stores/me.store'
+  import { useNotificationsStore } from '@/stores/notification.store'
 
   const { open } = useAsideMenu()
 
-  const emit = defineEmits<{
-    (e: 'notification-click'): void
-  }>()
-
   const appName = name.toUpperCase()
   const meStore = useMeStore()
+  const notificationsStore = useNotificationsStore()
   onMounted(async () => {
     await meStore.fetchMe()
   })
 
-  const notifications = ref<Notification[]>([
-    {
-      id: 1,
-      type: 'comment',
-      title: 'Registro de Sueño',
-      message:
-        'Calidad de sueño baja reportada (2/5). Comentario: "Tuve pesadillas y desperté varias veces."',
-      timeAgo: 'Hace 15 min',
-      read: false,
-    },
-    {
-      id: 2,
-      type: 'reminder',
-      title: 'Recordatorio de Sesión',
-      message: 'Sesión de seguimiento con Carlos Rodriguez en 30 minutos.',
-      timeAgo: 'Hace 30 min',
-      read: false,
-    },
-    {
-      id: 3,
-      type: 'comment',
-      title: 'Actualización del Sistema',
-      message:
-        'Nuevas métricas de consistencia de sueño disponibles en los reportes semanales.',
-      timeAgo: 'Ayer',
-      read: true,
-    },
-    {
-      id: 4,
-      type: 'comment',
-      title: 'Nuevo Comentario',
-      message: 'El paciente ha respondido a tu último mensaje.',
-      timeAgo: 'Ayer',
-      read: true,
-    },
-  ])
-
-  const isNotificationActive = ref(false)
-  const unreadNotifications = computed<boolean>(() => {
-    return notifications.value.some(notification => !notification.read)
-  })
-
-  const handleNotificationClick = () => {
-    isNotificationActive.value = !isNotificationActive.value
-    emit('notification-click')
-  }
-  const handleDeleteAll = async () => {
-    await deleteAllArray(notifications.value)
-  }
-
-  const handleMarkRead = (id: number) => {
-    notifications.value = notifications.value.map(notification => {
-      if (notification.id === id) {
-        notification.read = true
-      }
-      return notification
-    })
-  }
+  const isOpenNotiDrawer = ref<boolean>(false)
 </script>
 <template>
   <header
@@ -100,22 +41,15 @@
     <div class="flex flex-1 justify-end gap-4">
       <div>
         <NotificationBell
-          :is-active="isNotificationActive"
-          :has-unread="unreadNotifications"
-          @click="handleNotificationClick"
+          :is-active="isOpenNotiDrawer"
+          :has-unread="notificationsStore.unreadCount > 0"
+          @click="isOpenNotiDrawer = !isOpenNotiDrawer"
         />
         <div
-          v-if="isNotificationActive"
+          v-if="isOpenNotiDrawer"
           class="fixed inset-0 z-40"
-          @click="isNotificationActive = false"
+          @click="isOpenNotiDrawer = false"
         ></div>
-        <NotiCard
-          v-if="isNotificationActive"
-          @close="isNotificationActive = false"
-          @markRead="handleMarkRead"
-          @deleteAll="handleDeleteAll"
-          :notifications="notifications"
-        />
       </div>
       <RouterLink
         to="/myAccount"
@@ -126,4 +60,14 @@
     </div>
   </header>
   <AppNav />
+  <Teleport to="body">
+    <div
+      class="hidden md:block fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-500 ease-in-out"
+      :class="
+        isOpenNotiDrawer ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      "
+      @click="isOpenNotiDrawer = false"
+    ></div>
+    <NotiCard v-model="isOpenNotiDrawer" />
+  </Teleport>
 </template>
