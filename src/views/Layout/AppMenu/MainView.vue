@@ -1,13 +1,11 @@
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue'
-  import NotiCard from './components/NotiCard.vue'
-  import type { Notification } from '@/types/types'
+  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import NotiCard from './components/NotiDrawer.vue'
   import AppNav from './components/AppMenu/MainView.vue'
   import MenuButton from './components/MenuButton.vue'
   import HeaderLogo from './components/HeaderLogo.vue'
   import NotificationBell from './components/NotificationBell.vue'
   import { useAsideMenu } from '@/composables/useAsideMenu'
-  import { deleteAllArray } from '@/views/components/utils/utils'
   import { name } from '@/../package.json'
   import { useMeStore } from '@/stores/me.store'
   import { useNotificationsStore } from '@/stores/notification.store'
@@ -20,7 +18,6 @@
   onMounted(async () => {
     await meStore.fetchMe()
   })
-
   const isOpenNotiDrawer = ref<boolean>(false)
 </script>
 <template>

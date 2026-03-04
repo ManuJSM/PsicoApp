@@ -30,7 +30,8 @@
     date: string
   }>()
   const fecha = new Date(props.date)
-  const isUpdate = ref<boolean>(true)
+  const isUpdate = ref<boolean>(false)
+  const loading = ref<boolean>(false)
 
   const registro = reactive<SleepReg>({
     fecha: fecha,
@@ -40,7 +41,6 @@
     intervals: [],
     psicoComment: '',
   })
-  const loading = ref<boolean>(false)
   onMounted(async () => {
     loading.value = true
     const reg = await fetchMeDailyReg({ day: fecha })
@@ -48,7 +48,6 @@
       Object.assign(registro, reg)
       isUpdate.value = true
     }
-    console.log(registro)
     loading.value = false
   })
   const toast = useToast()

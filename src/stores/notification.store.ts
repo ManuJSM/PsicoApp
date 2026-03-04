@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
+  clearAllNotifications,
   fetchMeNotifications,
   markNotificationAsRead,
 } from '@/api/notifications/notifications.api'
@@ -31,6 +32,12 @@ export const useNotificationsStore = defineStore('notifications', () => {
       unreadCount.value--
     }
   }
+  const clearAll = async () => {
+    await clearAllNotifications()
+
+    items.value = []
+    unreadCount.value = 0
+  }
 
   return {
     items,
@@ -38,5 +45,6 @@ export const useNotificationsStore = defineStore('notifications', () => {
     fetchNotifications,
     addNotification,
     markAsRead,
+    clearAll,
   }
 })
