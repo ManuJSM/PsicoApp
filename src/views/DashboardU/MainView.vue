@@ -70,15 +70,6 @@
                 circadianos.
               </p>
             </div>
-
-            <div
-              class="flex items-center gap-2 px-8 py-3 bg-primary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-primary/20 group-hover:bg-white group-hover:text-primary transition-all active:scale-95"
-            >
-              <span>Acceder al Registro</span>
-              <span class="material-symbols-outlined text-sm"
-                >arrow_forward_ios</span
-              >
-            </div>
           </div>
         </div>
       </router-link>

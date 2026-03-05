@@ -30,9 +30,12 @@ export type PsicoInfo = {
   fullName: string
   email: string
   phone: string
-  avatar: string
+  avatar: string | null
 }
-export type CreatePatient = Omit<Patient, 'id'>
+export type CreatePatient = Omit<Patient, 'id' | 'active' | 'avatar'> & {
+  password: string
+  psicoId: number
+}
 export type UpdateUser = Pick<
   Patient,
   'fullName' | 'email' | 'phone' | 'avatar'
@@ -43,7 +46,7 @@ export interface Patient {
   fullName: string
   email: string
   phone: string
-  avatar: string
+  avatar: string | null
   active: boolean
   psico?: PsicoInfo
 }

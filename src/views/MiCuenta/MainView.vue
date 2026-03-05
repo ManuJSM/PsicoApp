@@ -18,7 +18,7 @@
     fullName: '',
     email: '',
     phone: '',
-    avatar: '',
+    avatar: null,
   })
 
   onMounted(async () => {
@@ -38,10 +38,10 @@
   const handleSave = async () => {
     console.log('Guardando usuario:', userCopy.value)
     const updated = await updateProfile({
-      fullName: userCopy.value?.fullName,
-      email: userCopy.value?.email,
-      phone: userCopy.value?.phone,
-      avatar: userCopy.value?.avatar,
+      fullName: userCopy.value.fullName,
+      email: userCopy.value.email,
+      phone: userCopy.value.phone,
+      avatar: userCopy.value.avatar,
     })
     if (updated) {
       meStore.reset()
@@ -64,9 +64,7 @@
 
   const handlePhotoChange = async (action: 'upload' | 'delete') => {
     if (action === 'delete') {
-      userCopy.value.avatar =
-        'https://ui-avatars.com/api/?name=' +
-        encodeURIComponent(userCopy.value.fullName)
+      userCopy.value.avatar = null
     }
     handleSave()
     showPhotoModal.value = false

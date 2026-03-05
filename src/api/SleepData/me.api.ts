@@ -57,7 +57,7 @@ export async function updateProfile({
   fullName?: string
   email?: string
   phone?: string
-  avatar?: string
+  avatar: string | null
 }): Promise<boolean> {
   const updated = await httpAuth<{ success: boolean }>(
     `${updateProfileEndpoint}`,

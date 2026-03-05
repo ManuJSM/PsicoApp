@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
-  import { type Patient, ToastType } from '@/types/types'
+  import { type Patient, ToastType, type CreatePatient } from '@/types/types'
   import SideBar from './components/AppSideBar/AppSidebar.vue'
   import MainSectionShow from './components/SleepCalendar/MainView.vue'
   import MainSectionAdd from './components/MainSection/MainSectionAdd.vue'
@@ -10,6 +10,7 @@
   import { onMounted } from 'vue'
   import { DASHBOARD_P_ROOT } from '@/router/psico.route'
   import { fetchMePatients } from '@/api/SleepData/me.api'
+  import { createUser, deleteUser } from '@/api/notifications/user.api'
   const patients = ref<Patient[]>([])
   const props = defineProps<{
     //viene de la url
@@ -29,7 +30,7 @@
 
   type ViewMode = 'show' | 'add' | 'edit'
   const currentView = ref<ViewMode>('show')
-
+  const loading = ref(false)
   const { setToast } = useToast()
 
   const handleBack = () => {
@@ -39,11 +40,20 @@
     router.push({ name: DASHBOARD_P_ROOT })
   }
 
-  const handleAdd = (patient: Patient) => {
-    patients.value.push(patient)
-    router.push({ name: DASHBOARD_P_ROOT, params: { id: String(patient.id) } })
-    currentView.value = 'show'
-    setToast(ToastType.SUCCESS, 'Paciente añadido correctamente')
+  const handleAdd = async (patient: CreatePatient) => {
+    loading.value = true
+    try {
+      const createdPatient = await createUser({ user: patient })
+      patients.value.push(createdPatient)
+      currentView.value = 'show'
+      setToast(ToastType.SUCCESS, 'Paciente añadido correctamente')
+    } catch (error) {
+      if (error instanceof Error) {
+        setToast(ToastType.ERROR, 'Error al añadir paciente: ' + error.message)
+      }
+    } finally {
+      loading.value = false
+    }
   }
 
   const handleSave = (patient: Patient) => {
@@ -64,13 +74,26 @@
   const showAdd = () => {
     currentView.value = 'add'
   }
-  const handleDelete = () => {
-    patients.value = patients.value.filter(
-      (p: Patient) => p.id !== Number(props.id)
-    )
-    currentView.value = 'show'
-    handleExit()
-    setToast(ToastType.SUCCESS, 'Paciente eliminado correctamente')
+  const handleDelete = async () => {
+    loading.value = true
+    try {
+      const deletedPatient = await deleteUser({ id: Number(props.id) })
+      patients.value = patients.value.filter(
+        (p: Patient) => p.id !== Number(props.id)
+      )
+      currentView.value = 'show'
+      handleExit()
+      setToast(ToastType.SUCCESS, 'Paciente eliminado correctamente')
+    } catch (error) {
+      if (error instanceof Error) {
+        setToast(
+          ToastType.ERROR,
+          'Error al eliminar paciente: ' + error.message
+        )
+      }
+    } finally {
+      loading.value = false
+    }
   }
 </script>
 

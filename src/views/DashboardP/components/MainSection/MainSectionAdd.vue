@@ -3,17 +3,19 @@
   import { reactive } from 'vue'
   import { type CreatePatient } from '@/types/types'
   import FormInput from './components/FormInput.vue'
+  import { useMeStore } from '@/stores/me.store'
 
   const nonAvatar =
     'https://lh3.googleusercontent.com/aida-public/AB6AXuAWoHqaA7dq_qhMrfVmh63nndpIKFwxN75_b7OljfUVc56ky7dYjCTH85UY1FN9IqLr1VMVT54YbWCcz4hzQ3gO5z7rgEb8yhg0aR332ljniRntCHJoGlUYsWE2Z55ORRoOa7_27DvnS0paNvmK_ZJmX-_Wu1m3U0wfXlM8IoqefMR7_wqb6Ww0fY7Il2D_AccwGea5zYPooCtxmVAyGW70QunAk7r35-7XSIHxQEnC-Kh3VV7_k4pYXzOY1y4XbL2EzSWJn9kE-rk'
   const emit = defineEmits(['back', 'save'])
+  const me = useMeStore()
 
   const editPatient = reactive<CreatePatient>({
     fullName: '',
     email: '',
     phone: '',
-    active: true,
-    avatar: nonAvatar,
+    password: '', // Campo añadido en el estado
+    psicoId: me.me?.id!,
   })
 </script>
 
@@ -37,15 +39,8 @@
           <div class="relative size-32 shrink-0">
             <div
               class="w-full h-full rounded-2xl bg-slate-800 border border-white/10 bg-center bg-cover"
-              :style="{ backgroundImage: `url(${editPatient.avatar})` }"
+              :style="{ backgroundImage: `url(${nonAvatar})` }"
             ></div>
-            <button
-              class="absolute -bottom-2 -right-2 size-10 bg-primary rounded-xl flex items-center justify-center shadow-lg"
-            >
-              <span class="material-symbols-outlined text-white text-xl"
-                >photo_camera</span
-              >
-            </button>
           </div>
 
           <div class="text-center md:text-left">
@@ -68,22 +63,39 @@
               required
             />
           </div>
-          <FormInput
-            id="email"
-            label="Correo Electrónico"
-            type="email"
-            v-model="editPatient.email"
-            placeholder="ejemplo@correo.com"
-            required
-          />
-          <FormInput
-            id="phone"
-            label="Teléfono"
-            type="tel"
-            v-model="editPatient.phone"
-            placeholder="+34 000 000 000"
-            :optional="true"
-          />
+
+          <div class="md:col-span-1">
+            <FormInput
+              id="email"
+              label="Correo Electrónico"
+              type="email"
+              v-model="editPatient.email"
+              placeholder="ejemplo@correo.com"
+              required
+            />
+          </div>
+
+          <div class="md:col-span-1">
+            <FormInput
+              id="password"
+              label="Contraseña de Acceso"
+              type="password"
+              v-model="editPatient.password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <FormInput
+              id="phone"
+              label="Teléfono"
+              type="tel"
+              v-model="editPatient.phone"
+              placeholder="+34 000 000 000"
+              :optional="true"
+            />
+          </div>
         </form>
       </div>
     </div>
@@ -106,26 +118,3 @@
     </div>
   </section>
 </template>
-
-<style scoped>
-  /* Ajuste de inputs para que se vean oscuros y profesionales */
-  :deep(input) {
-    background: #161b22 !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 0.75rem !important;
-    padding: 1rem !important;
-    color: white !important;
-    font-size: 0.875rem !important;
-    text-transform: none !important; /* El nombre no debe ser uppercase a la fuerza */
-    letter-spacing: normal !important;
-  }
-
-  :deep(label) {
-    color: #94a3b8 !important;
-    font-size: 0.65rem !important;
-    font-weight: 800 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    margin-bottom: 0.5rem !important;
-  }
-</style>

@@ -318,6 +318,8 @@
           />
         </div>
       </section>
+      <div v-else class="flex items-center justify-center h-180"></div>
+
       <Teleport to="body">
         <div
           class="hidden md:block fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-500 ease-in-out"
