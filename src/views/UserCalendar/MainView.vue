@@ -114,7 +114,7 @@
         class="sticky md:relative top-0 z-10 backdrop-blur-sm md:px-4 xl:px-20 flex pt-4 flex-col justify-center items-center lg:flex-row lg:justify-between lg:items-end gap-6"
       >
         <h1
-          class="text-white text-3xl md:w-90 md:text-4xl font-black tracking-tighter leading-none"
+          class="text-white text-3xl md:w-90 md:text-4xl font-black tracking-tighter leading-none mt-1"
         >
           {{
             selectedView === DashboardViews.DIARIA
