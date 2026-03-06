@@ -52,22 +52,22 @@
             : 'bg-black/20 border border-border-dark/50 opacity-60'
         "
       >
-        <div
-          class="flex-1 md:overflow-y-auto flex justify-center items-center min-h-0"
-        >
-          <p
-            class="italic leading-relaxed text-sm text-center"
-            :class="
-              hasFeedback ? 'text-slate-200 font-medium' : 'text-slate-500'
-            "
-          >
-            {{ hasFeedback ? `"${feedback}"` : emptyMessage }}
-          </p>
+        <div class="flex-1 overflow-y-auto min-h-0 py-4 custom-scrollbar">
+          <div class="min-h-full flex flex-col justify-center">
+            <p
+              :class="[
+                hasFeedback ? 'text-slate-200 font-medium' : 'text-slate-500',
+                'text-center leading-relaxed whitespace-pre-wrap',
+              ]"
+            >
+              {{ hasFeedback ? `"${feedback}"` : emptyMessage }}
+            </p>
+          </div>
         </div>
 
         <div
           v-if="hasFeedback"
-          class="flex-none mt-2 pt-2 border-t border-primary/10 flex justify-end"
+          class="flex-none mt-2 pt-2 border-t border-primary/10 flex justify-end pb-2"
         >
           <div
             class="flex items-center gap-1.5 text-[8px] font-black text-primary/60 uppercase tracking-widest"
@@ -80,6 +80,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
   import { computed } from 'vue'
 
