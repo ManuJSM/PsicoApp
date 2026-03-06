@@ -4,6 +4,7 @@ import App from './App.vue'
 import { createAppRouter } from './router'
 import { useAuthStore } from '@/stores/auth.store'
 import { AuthenticationError } from '@/types/errors.types'
+import { useSocketConnection } from '@/composables/useSocketConnection'
 const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
@@ -13,6 +14,8 @@ await auth.authRefresh()
 
 const router = createAppRouter(auth.role)
 app.use(router)
+
+useSocketConnection().setupSocketWatcher()
 
 app.config.errorHandler = (err, instance, info) => {
   if (err instanceof AuthenticationError) {

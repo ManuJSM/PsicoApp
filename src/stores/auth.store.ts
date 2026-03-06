@@ -24,6 +24,7 @@ export function parseJwt(token: string) {
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref<string | null>(null)
   const role = ref<Role | null>(null)
+  const userId = ref<number | null>(null)
   const isLoggedIn = ref(false)
 
   function setToken(token: string) {
@@ -35,6 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     role.value = data.role
+    userId.value = data.id
     isLoggedIn.value = true
   }
 
@@ -58,12 +60,14 @@ export const useAuthStore = defineStore('auth', () => {
     await logoutAPI()
     accessToken.value = null
     role.value = null
+    userId.value = null
     isLoggedIn.value = false
   }
 
   return {
     accessToken,
     role,
+    userId,
     isLoggedIn,
     setToken,
     login,
