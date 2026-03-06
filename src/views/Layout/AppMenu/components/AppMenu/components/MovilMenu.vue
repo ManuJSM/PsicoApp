@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import type { MenuItems } from '@/types/types'
-import menuUtils from './utils'
-const route = useRoute()
+  import { useRoute } from 'vue-router'
+  import type { MenuItems } from '@/types/types'
+  import menuUtils from '@/utils/menu.utils'
+  const route = useRoute()
 
-const props = defineProps<{ menuItems: MenuItems[] }>()
+  const props = defineProps<{ menuItems: MenuItems[] }>()
 </script>
 <template>
   <nav
@@ -18,7 +18,9 @@ const props = defineProps<{ menuItems: MenuItems[] }>()
         class="flex flex-col items-center justify-center gap-1 h-full transition-colors"
         :class="menuUtils.getLinkSelected(item.routeName, route.name as string)"
       >
-        <span class="material-symbols-outlined text-[24px]">{{ item.icon }}</span>
+        <span class="material-symbols-outlined text-[24px]">{{
+          item.icon
+        }}</span>
         <span class="text-[10px]">{{ item.title }}</span>
       </router-link>
     </div>

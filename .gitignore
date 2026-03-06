@@ -24,6 +24,7 @@ coverage
 *.sln
 *.sw?
 
+AGENTS.md
 *.tsbuildinfo
 .env
 .eslintcache

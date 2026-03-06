@@ -1,4 +1,5 @@
 import type { SleepState } from '@/types/sleepReg.types'
+
 const sleepStateConfig = {
   asleep: {
     class: 'bg-state-asleep',
@@ -26,7 +27,22 @@ const sleepStateConfig = {
   },
 } as const
 
-export const getStateClass = (state: SleepState) =>
+export const getStateClass = (state: SleepState): string =>
   sleepStateConfig[state].class
-export const getStateIcon = (state: SleepState) => sleepStateConfig[state].icon
+
+export const getStateIcon = (state: SleepState): string =>
+  sleepStateConfig[state].icon
+
+export const getStateBgClass = (state: SleepState): string =>
+  sleepStateConfig[state].bgClass
+
+export const getStateBorderClass = (state: SleepState): string =>
+  sleepStateConfig[state].borderClass
+
+export const getStateHoverClass = (state: SleepState): string =>
+  sleepStateConfig[state].hoverClass
+
+export const getStateLabel = (state: SleepState): string =>
+  sleepStateConfig[state].label
+
 export default sleepStateConfig

@@ -140,11 +140,8 @@
     type Interval,
     type SleepReg,
   } from '@/types/sleepReg.types'
-  import {
-    getQualityIcon,
-    getQualityColor,
-  } from '@/views/components/utils/utils'
-  import { formatDuration } from '@/views/UserEditReg/utils/time.util'
+  import { getQualityIcon, getQualityColor } from '@/utils/metrics.utils'
+  import { formatDuration } from '@/utils/time.utils'
   import SleepTimeline from './components/SleepTimeline.vue'
 
   const registro = inject('registro') as SleepReg

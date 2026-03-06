@@ -4,7 +4,7 @@
   import { RouterLink } from 'vue-router'
   import { useRoute } from 'vue-router'
   import type { MenuItems } from '@/types/types'
-  import menuUtils from './utils'
+  import menuUtils from '@/utils/menu.utils'
   import { name } from '@/../package.json'
 
   const appName = name.toUpperCase()

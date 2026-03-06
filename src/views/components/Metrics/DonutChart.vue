@@ -227,7 +227,7 @@
     const minDegrees = 8 // Un 1% ahora se verá como un ~3.5% para que sea visible
 
     // 1. Calculamos los grados "teóricos"
-    let segmentsWithDegrees = props.segments.map(seg => ({
+    const segmentsWithDegrees = props.segments.map(seg => ({
       ...seg,
       degrees: (seg.value / total) * 360,
     }))

@@ -396,17 +396,14 @@
 
 <script setup lang="ts">
   import { ref, computed, inject } from 'vue'
-  import { getStateClass, getStateIcon } from '../../utils/css.util'
+  import { getStateClass, getStateIcon } from '@/utils/sleep.utils'
   import InstructionsPanel from '../InstructionsPanel.vue'
   import {
     SleepState,
     type Interval,
     type SleepReg,
   } from '@/types/sleepReg.types'
-  import {
-    formatDuration,
-    formatTime,
-  } from '@/views/UserEditReg/utils/time.util'
+  import { formatDuration, formatTime } from '@/utils/time.utils'
   const registro = inject('registro') as SleepReg
 
   const emits = defineEmits(['back', 'next'])

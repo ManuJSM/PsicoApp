@@ -27,9 +27,9 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { Interval } from '@/types/sleepReg.types'
-  import { getIntervalWidth } from '@/views/UserEditReg/utils/bar.util'
-  import { getStateClass } from '@/views/UserEditReg/utils/css.util'
-  import { formatTime } from '@/views/UserEditReg/utils/time.util'
+  import { getIntervalWidth } from '@/utils/bar.utils'
+  import { getStateClass } from '@/utils/sleep.utils'
+  import { formatTime } from '@/utils/time.utils'
 
   interface Props {
     intervals: Interval[]

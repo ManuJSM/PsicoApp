@@ -202,7 +202,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { SleepState, type SleepReg } from '@/types/sleepReg.types'
-  import { getStateClass } from '@/views/UserEditReg/utils/css.util'
+  import { getStateClass } from '@/utils/sleep.utils'
   import SleepTimeline from '@/views/UserEditReg/components/Step3/components/SleepTimeline.vue'
   import { formatDisplayDate } from '../../../../../utils/date.utils'
 
