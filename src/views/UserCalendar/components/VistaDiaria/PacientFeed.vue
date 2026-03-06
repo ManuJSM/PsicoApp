@@ -17,60 +17,61 @@
       </div>
     </div>
 
-    <div class="flex-1 md:relative min-h-0">
-      <div class="md:absolute md:inset-0 p-6 flex flex-col">
-        <div v-if="hasComment" class="flex-1 flex flex-col min-h-0">
-          <div class="relative group flex-1 flex flex-col min-h-0">
-            <span
-              class="absolute -top-2 -left-1 text-primary/20 text-4xl flex font-serif select-none"
-              >“</span
-            >
+    <div class="flex-1 relative min-h-0">
+      <div v-if="hasComment" class="absolute inset-0 p-6 flex flex-col">
+        <div class="relative flex-1 flex flex-col min-h-0">
+          <span
+            class="absolute -top-4 -left-1 text-primary/20 text-5xl font-serif select-none z-10"
+            >“</span
+          >
 
+          <div
+            class="flex-1 min-h-0 bg-black/20 border border-border-dark/50 rounded-2xl overflow-hidden flex flex-col"
+          >
             <div
-              class="bg-black/20 border border-border-dark/50 rounded-2xl min-h-0 flex-1 h-full md:overflow-y-auto"
+              class="flex-1 overflow-y-auto custom-scrollbar p-5 grid place-items-center"
             >
-              <div class="px-4 py-2 flex items-center justify-center">
-                <p
-                  class="text-slate-200 text-sm leading-relaxed italic font-medium"
-                >
-                  {{ comment }}
-                </p>
-              </div>
+              <p
+                class="text-slate-200 text-center text-sm leading-relaxed italic font-medium w-full"
+              >
+                {{ comment }}
+              </p>
             </div>
-
-            <span
-              class="absolute -bottom-4 -right-1 text-primary/20 text-4xl font-serif select-none rotate-180"
-              >“</span
-            >
           </div>
 
-          <div class="mt-4 flex-none flex justify-end">
-            <span
-              class="text-[9px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-1"
-            >
-              <span class="size-1 bg-slate-700 rounded-full"></span>
-              Tus Observaciones
-            </span>
-          </div>
+          <span
+            class="absolute -bottom-6 -right-1 text-primary/20 text-5xl font-serif select-none rotate-180 z-10"
+            >“</span
+          >
         </div>
 
-        <div
-          v-else
-          class="flex-1 py-10 md:py-0 flex flex-col items-center justify-center border border-dashed border-border-dark/50 rounded-2xl bg-white/1"
+        <div class="mt-4 flex-none flex justify-end">
+          <span
+            class="text-[9px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-1"
+          >
+            <span class="size-1 bg-slate-700 rounded-full"></span>
+            Tus Observaciones
+          </span>
+        </div>
+      </div>
+
+      <div
+        v-else
+        class="absolute inset-0 m-6 flex flex-col items-center justify-center border border-dashed border-border-dark/50 rounded-2xl bg-white/1"
+      >
+        <span class="material-symbols-outlined text-slate-600 text-xl mb-3"
+          >description</span
         >
-          <span class="material-symbols-outlined text-slate-600 text-xl mb-3"
-            >description</span
-          >
-          <p
-            class="text-slate-500 text-[11px] font-bold uppercase tracking-wider text-center px-4"
-          >
-            {{ emptyMessage }}
-          </p>
-        </div>
+        <p
+          class="text-slate-500 text-[11px] font-bold uppercase tracking-wider text-center px-4"
+        >
+          {{ emptyMessage }}
+        </p>
       </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
   import { computed } from 'vue'
   const props = withDefaults(

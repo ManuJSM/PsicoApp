@@ -1,11 +1,36 @@
 <script setup lang="ts">
-  import { computed, onMounted } from 'vue'
-  import type { NotificationType } from '@/types/notification.types'
+  import { computed, onMounted, ref } from 'vue'
+  import { RouterLink } from 'vue-router'
+  import { NotificationType } from '@/types/notification.types'
   import { useNotificationsStore } from '@/stores/notification.store'
   import { formatCreatedAt } from '@/utils/date.utils'
+  import { useAuthStore } from '@/stores/auth.store'
+  import { Role } from '@/types/types'
 
+  const authStore = useAuthStore()
   const model = defineModel<boolean>({ required: true })
   const notificationsStore = useNotificationsStore()
+
+  const getNotificationLink = (notif: {
+    type: NotificationType
+    metadata?: { commentDate?: string }
+    senderId?: string
+  }): string | null => {
+    if (
+      notif.type === NotificationType.COMMENT &&
+      notif.metadata?.commentDate
+    ) {
+      const dateStr = new Date(notif.metadata.commentDate)
+        .toISOString()
+        .split('T')[0]
+      if (authStore.role === Role.USER) {
+        return `/sleep/${dateStr}`
+      } else if (authStore.role === Role.PSICO) {
+        return `/Dashboard/${notif.senderId}/sleepCalendar/${dateStr}`
+      }
+    }
+    return null
+  }
 
   const handleNotificationClick = (id: string) => {
     notificationsStore.markAsRead(id)
@@ -48,9 +73,16 @@
       minute: '2-digit',
     })
   })
+  const loading = ref<boolean>(false)
 
   const handleClearAll = async () => {
+    loading.value = true
     await notificationsStore.clearAll()
+    loading.value = false
+  }
+  const handleredirection = (id: string) => {
+    handleNotificationClick(id)
+    model.value = false
   }
 </script>
 <template>
@@ -157,6 +189,18 @@
               >
                 {{ notif.message }}
               </p>
+
+              <RouterLink
+                v-if="getNotificationLink(notif)"
+                :to="getNotificationLink(notif)!"
+                class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary hover:text-white transition-colors uppercase tracking-wider"
+                @click="handleredirection(notif.id)"
+              >
+                <span>Ver comentario</span>
+                <span class="material-symbols-outlined text-sm"
+                  >arrow_forward</span
+                >
+              </RouterLink>
             </div>
           </div>
           <div class="flex items-center justify-center p-1">

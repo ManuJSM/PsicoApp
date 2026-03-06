@@ -1,3 +1,8 @@
+export interface NotificationMetadata {
+  commentDate?: string
+  [key: string]: unknown
+}
+
 export interface Notification {
   id: string
   type: NotificationType
@@ -5,6 +10,7 @@ export interface Notification {
   message: string
   isRead: boolean
   createdAt: string
+  metadata?: NotificationMetadata
 }
 
 export enum NotificationType {

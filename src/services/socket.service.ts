@@ -1,6 +1,7 @@
 import { io, type Socket } from 'socket.io-client'
 import { useAuthStore } from '@/stores/auth.store'
 import { useNotificationsStore } from '@/stores/notification.store'
+import { NotificationType } from '@/types/notification.types'
 import type { Notification } from '@/types/notification.types'
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL

@@ -6,7 +6,7 @@
   <main
     class="flex flex-col flex-1 px-6 pt-2 h-full min-h-0 md:pb-8 gap-8 md:gap-12 mx-auto max-w-[1400px] w-full md:overflow-y-auto"
   >
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 mt-2">
       <div class="flex items-center gap-3">
         <div
           class="h-6 w-1.5 bg-primary rounded-full shadow-[0_0_15px_#137fec]"

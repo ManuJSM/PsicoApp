@@ -80,3 +80,21 @@ export async function fetchMePatients(): Promise<Patient[]> {
   const patients = await httpAuth<Patient[]>(`${patientsEndpoint}`)
   return patients
 }
+
+const passwordEndpoint = '/me/password'
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<boolean> {
+  const result = await httpAuth<{ success: boolean }>(passwordEndpoint, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  })
+  return result.success
+}

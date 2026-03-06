@@ -66,12 +66,27 @@
           >
             Usa al menos 8 caracteres con una combinación de letras y números.
           </p>
-          <button
-            @click="handlePasswordChange"
-            class="px-6 py-3 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary/80 transition-all shadow-lg shadow-primary/20 active:scale-95 whitespace-nowrap"
-          >
-            Actualizar Credenciales
-          </button>
+          <div class="flex flex-col items-end gap-2">
+            <p
+              v-if="errorMessage"
+              class="text-rose-400 text-[10px] font-medium"
+            >
+              {{ errorMessage }}
+            </p>
+            <p
+              v-if="successMessage"
+              class="text-emerald-400 text-[10px] font-medium"
+            >
+              {{ successMessage }}
+            </p>
+            <button
+              @click="handlePasswordChange"
+              :disabled="isLoading"
+              class="px-6 py-3 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-primary/80 transition-all shadow-lg shadow-primary/20 active:scale-95 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ isLoading ? 'Actualizando...' : 'Actualizar Credenciales' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -238,12 +253,17 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { changePassword } from '@/api/SleepData/me.api'
 
   const passwordForm = ref({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   })
+
+  const isLoading = ref(false)
+  const errorMessage = ref('')
+  const successMessage = ref('')
 
   const twoFactorEnabled = ref(true)
 
@@ -262,12 +282,37 @@
     },
   ])
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
+    errorMessage.value = ''
+    successMessage.value = ''
+
     if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-      // Aquí podrías disparar tu toast.error
+      errorMessage.value = 'Las contraseñas no coinciden'
       return
     }
-    console.log('Password updated')
+
+    if (passwordForm.value.newPassword.length < 8) {
+      errorMessage.value = 'La contraseña debe tener al menos 8 caracteres'
+      return
+    }
+
+    isLoading.value = true
+
+    try {
+      await changePassword(
+        passwordForm.value.currentPassword,
+        passwordForm.value.newPassword
+      )
+      successMessage.value = 'Contraseña actualizada correctamente'
+      passwordForm.value.currentPassword = ''
+      passwordForm.value.newPassword = ''
+      passwordForm.value.confirmPassword = ''
+    } catch {
+      errorMessage.value =
+        'Error al cambiar la contraseña. Verifica que la contraseña actual sea correcta.'
+    } finally {
+      isLoading.value = false
+    }
   }
 
   const handleDisable2FA = () => {
